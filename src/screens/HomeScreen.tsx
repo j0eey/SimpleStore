@@ -98,7 +98,7 @@ const HomeScreen = () => {
 
       <TextInput
         style={styles.searchInput}
-        placeholder="Search Products..."
+        placeholder="Search Mobiles..."
         value={searchQuery}
         onChangeText={handleSearchChange}
       />
@@ -108,15 +108,18 @@ const HomeScreen = () => {
           <Text style={styles.emptyText}>{errorMessage}</Text>
         </View>
       ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
+        <>
+          <Text style={styles.sectionTitle}>Latest Mobiles</Text>
+          <FlatList
+            data={products}
+            keyExtractor={(item) => item._id}
+            renderItem={renderItem}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
       )}
     </View>
   );
@@ -124,11 +127,10 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-// styles stay the same as you provided
 const { width } = Dimensions.get('window');
 const HORIZONTAL_PADDING = 16;
 const CARD_GAP = 12;
-const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
+const CARD_WIDTH = (width - HORIZONTAL_PADDING * 1.8 - CARD_GAP) / 2;
 
 const styles = StyleSheet.create({
   container: {
@@ -154,6 +156,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
     fontSize: 16,
+  },
+  sectionTitle: {
+    fontSize: 21,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'left',
+    marginLeft: 2,
   },
   listContainer: {
     paddingBottom: 20,
