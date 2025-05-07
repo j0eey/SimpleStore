@@ -1,12 +1,9 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Share, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, ScrollView } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
-
-type RootStackParamList = {
-  ProductDetails: { id: string; title: string; description: string; image: string; price: number };
-};
+import { RootStackParamList } from '../navigation/types';
+import { FC } from 'react';
 
 type ProductDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetails'>;
 type ProductDetailsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProductDetails'>;
@@ -16,18 +13,8 @@ type Props = {
   navigation: ProductDetailsScreenNavigationProp;
 };
 
-const ProductDetailsScreen: React.FC<Props> = ({ route }) => {
+const ProductDetailsScreen: FC<Props> = ({ route }) => {
   const { id, title, description, image, price } = route.params;
-
-  const onShare = async () => {
-    try {
-      await Share.share({
-        message: `Check out this product: ${title} for $${price}`,
-      });
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
-  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -36,13 +23,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route }) => {
       <Text style={styles.price}>${price}</Text>
       <Text style={styles.description}>{description}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={onShare}>
-        <Text style={styles.buttonText}>Share</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#28a745' }]}>
-        <Text style={styles.buttonText}>Add to Cart</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <Button title="Add to Cart" onPress={() => {}} color="#34C759" />
+      </View>
     </ScrollView>
   );
 };
@@ -52,7 +35,8 @@ export default ProductDetailsScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#fff',
+    paddingTop: 120,
+    backgroundColor: '#ffffff',
     alignItems: 'center',
   },
   image: {
@@ -70,24 +54,17 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     color: '#007AFF',
-    marginBottom: 10,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   description: {
     fontSize: 16,
     color: '#555',
+    marginBottom: 20,
     textAlign: 'center',
-    marginBottom: 30,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  buttonContainer: {
+    width: '100%',
   },
 });

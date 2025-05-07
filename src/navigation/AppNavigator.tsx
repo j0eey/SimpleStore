@@ -8,6 +8,10 @@ import VerificationScreen from '../screens/VerificationScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import { useAuth } from '../contexts/AuthContext';
+import { Text, Share } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -27,13 +31,47 @@ const AppNavigator = () => {
               }}
             />
             <Stack.Screen
-              name="ProductDetails"
-              component={ProductDetailsScreen}
-              options={{
-                headerShown: true,
-                headerTitle: 'Product Details',
-              }}
-            />
+  name="ProductDetails"
+  component={ProductDetailsScreen}
+  options={({ route, navigation }) => ({
+    headerShown: true,
+    headerTitle: '',
+    headerTransparent: true,
+    headerBackground: () => null,
+    headerLeft: () => (
+      <Ionicons
+        name="chevron-back"
+        size={28}
+        color="#007AFF"
+        style={{ marginLeft: 16, marginTop: 2 }}
+        onPress={() => navigation.goBack()}
+      />
+    ),
+    headerRight: () => (
+      <Ionicons
+        name="share-outline"
+        size={28}
+        color="#007AFF"
+        style={{ marginRight: 18 }}
+        onPress={async () => {
+          try {
+            await Share.share({
+              message: `${route.params.title}\n\n${route.params.description}\n\nPrice: $${route.params.price}`,
+              url: route.params.image,
+              title: route.params.title,
+            });
+          } catch (error) {
+            console.log('Error sharing:', error);
+          }
+        }}
+      />
+    ),
+    gestureEnabled: true,
+    animation: 'fade',
+  })}
+/>
+
+
           </>
         ) : (
           <>
