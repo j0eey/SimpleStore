@@ -70,8 +70,6 @@ const AppNavigator = () => {
                 animation: 'fade',
               })}
             />
-
-
           </>
         ) : (
           <>

@@ -1,4 +1,3 @@
-// src/api/product.api.ts
 import { Product } from '../types/Product';
 
 export const fetchProductsApi = async (): Promise<Product[]> => {

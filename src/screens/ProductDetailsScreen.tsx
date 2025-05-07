@@ -67,13 +67,13 @@ export default ProductDetailsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: '5%', // Adjusted padding to be responsive
+    padding: '5%',
     paddingTop: 120,
     backgroundColor: '#ffffff',
   },
   image: {
     width: '100%',
-    aspectRatio: 1,  // Ensures image maintains ratio and is responsive
+    aspectRatio: 1,
     borderRadius: 12,
     marginBottom: 20,
     resizeMode: 'cover',

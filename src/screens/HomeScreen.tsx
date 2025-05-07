@@ -5,7 +5,6 @@ import { fetchProductsApi, searchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Type declarations
 type RootStackParamList = {
   Home: undefined;
   ProductDetails: { id: string; title: string; description: string; image: string; price: number };
@@ -13,7 +12,6 @@ type RootStackParamList = {
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-// Responsive helpers
 const { width } = Dimensions.get('window');
 const scaleFont = (size: number) => size * PixelRatio.getFontScale();
 
