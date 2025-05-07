@@ -17,7 +17,7 @@ const scaleFont = (size: number) => size * PixelRatio.getFontScale();
 
 const HORIZONTAL_PADDING = 16;
 const CARD_GAP = 12;
-const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
+const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2.5 - CARD_GAP) / 2;
 
 const HomeScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
