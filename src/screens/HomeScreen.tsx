@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, TouchableOpacity } from 'react-native';
 import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+type RootStackParamList = {
+  Home: undefined;
+  ProductDetails: { id: string; title: string; description: string; image: string; price: number };
+};
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   const fetchProducts = async () => {
     try {
@@ -55,11 +66,22 @@ const HomeScreen = () => {
   }, []);
 
   const renderItem = ({ item }: { item: Product }) => (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        navigation.navigate('ProductDetails', {
+          id: item._id,
+          title: item.title,
+          description: item.description,
+          image: item.images[0].url,
+          price: item.price,
+        })
+      }
+    >
       <Image source={{ uri: item.images[0].url }} style={styles.image} resizeMode="cover" />
       <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
       <Text style={styles.price}>${item.price}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -102,8 +124,9 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
+// styles stay the same as you provided
 const { width } = Dimensions.get('window');
-const HORIZONTAL_PADDING = 16; // same as container paddingHorizontal
+const HORIZONTAL_PADDING = 16;
 const CARD_GAP = 12;
 const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 

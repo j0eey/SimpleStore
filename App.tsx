@@ -1,11 +1,11 @@
 import React from 'react';
-import Navigation from './src/navigation';
+import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 
 const App = () => {
   return (
     <AuthProvider>
-      <Navigation />
+      <AppNavigator />
     </AuthProvider>
   );
 };
