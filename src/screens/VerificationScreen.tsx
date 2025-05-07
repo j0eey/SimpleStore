@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../contexts/AuthContext';
+import Modal from 'react-native-modal';
 
 const verificationSchema = z.object({
   code: z.string().length(4, 'Code must be exactly 4 digits'),
@@ -12,26 +13,37 @@ const verificationSchema = z.object({
 type VerificationFormData = z.infer<typeof verificationSchema>;
 
 const VerificationScreen = () => {
-  const { verify } = useAuth(); 
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<VerificationFormData>({
+  const { verify } = useAuth();
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<VerificationFormData>({
     resolver: zodResolver(verificationSchema),
   });
 
-  const onSubmit = (data: VerificationFormData) => {
-    // console.log('Verifying code:', data.code);
-    verify();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const onSubmit = async (data: VerificationFormData) => {
+    try {
+      await verify(); 
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('An unknown error occurred.');
+      }
+      setModalVisible(true);
+    }
+  };
+  
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setErrorMessage('');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Enter Verification Code</Text>
 
-      {/* Input Field */}
       <Controller
         control={control}
         name="code"
@@ -48,7 +60,6 @@ const VerificationScreen = () => {
       />
       {errors.code && <Text style={styles.error}>{errors.code.message}</Text>}
 
-      {/* Custom Styled Verify Button */}
       <TouchableOpacity
         style={styles.button}
         onPress={handleSubmit(onSubmit)}
@@ -58,6 +69,20 @@ const VerificationScreen = () => {
           {isSubmitting ? 'Verifying...' : 'Verify'}
         </Text>
       </TouchableOpacity>
+
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={closeModal}
+        backdropOpacity={0.5}
+      >
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Verification Failed</Text>
+          <Text style={styles.modalMessage}>{errorMessage}</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+            <Text style={styles.closeButtonText}>Dismiss</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -103,6 +128,34 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: '600',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +14,11 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const LoginScreen = ({ navigation }: any) => {
+type LoginScreenProps = {
+  navigation: any;
+};
+
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login } = useAuth();
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -30,7 +34,6 @@ const LoginScreen = ({ navigation }: any) => {
       const response = await loginApi(data.email, data.password);
       if (response.success) {
         login();
-        // ToastAndroid.show('Login successful!', ToastAndroid.SHORT);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -39,8 +42,9 @@ const LoginScreen = ({ navigation }: any) => {
         setErrorMessage('An unknown error occurred.');
       }
       setModalVisible(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const closeModal = () => {
@@ -57,10 +61,12 @@ const LoginScreen = ({ navigation }: any) => {
         name="email"
         render={({ field: { onChange, value } }) => (
           <TextInput
+            style={styles.input}
             placeholder="Email"
             value={value}
             onChangeText={onChange}
-            style={styles.input}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         )}
       />
@@ -71,11 +77,12 @@ const LoginScreen = ({ navigation }: any) => {
         name="password"
         render={({ field: { onChange, value } }) => (
           <TextInput
+            style={styles.input}
             placeholder="Password"
             value={value}
             onChangeText={onChange}
-            style={styles.input}
             secureTextEntry
+            autoCapitalize="none"
           />
         )}
       />
@@ -86,9 +93,11 @@ const LoginScreen = ({ navigation }: any) => {
         onPress={handleSubmit(onSubmit)}
         disabled={loading}
       >
-        <Text style={styles.loginButtonText}>
-          {loading ? 'Logging in...' : 'Login'}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.loginButtonText}>Login</Text>
+        )}
       </TouchableOpacity>
 
       <Text style={styles.text}>
@@ -142,9 +151,9 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
+    fontSize: 14,
     marginBottom: 8,
     marginLeft: 4,
-    fontSize: 14,
   },
   loginButton: {
     backgroundColor: '#007BFF',
@@ -163,18 +172,15 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 20,
     fontSize: 16,
-    
   },
   link: {
-    textAlign: 'center',
     color: '#007BFF',
-    marginTop: 20,
-    fontSize: 16,
+    fontWeight: '600',
   },
   modalContent: {
     backgroundColor: 'white',
     padding: 24,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
   modalTitle: {

@@ -67,13 +67,13 @@ export default ProductDetailsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: '5%', // Adjusted padding to be responsive
     paddingTop: 120,
     backgroundColor: '#ffffff',
   },
   image: {
     width: '100%',
-    aspectRatio: 1,
+    aspectRatio: 1,  // Ensures image maintains ratio and is responsive
     borderRadius: 12,
     marginBottom: 20,
     resizeMode: 'cover',
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    width: '100%',
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -116,6 +117,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#eee',
+    marginVertical: 3,
   },
   sectionTitle: {
     fontSize: 18,

@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, PixelRatio, TouchableOpacity } from 'react-native';
 import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+// Type declarations
 type RootStackParamList = {
   Home: undefined;
   ProductDetails: { id: string; title: string; description: string; image: string; price: number };
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+// Responsive helpers
+const { width } = Dimensions.get('window');
+const scaleFont = (size: number) => size * PixelRatio.getFontScale();
+
+const HORIZONTAL_PADDING = 16;
+const CARD_GAP = 12;
+const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 
 const HomeScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,12 +54,7 @@ const HomeScreen = () => {
       } else {
         const searchedProducts = await searchProductsApi(query);
         setProducts(searchedProducts);
-
-        if (searchedProducts.length === 0) {
-          setErrorMessage('No products found!');
-        } else {
-          setErrorMessage('');
-        }
+        setErrorMessage(searchedProducts.length === 0 ? 'No products found!' : '');
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -127,16 +131,12 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const { width } = Dimensions.get('window');
-const HORIZONTAL_PADDING = 16;
-const CARD_GAP = 12;
-const CARD_WIDTH = (width - HORIZONTAL_PADDING * 1.8 - CARD_GAP) / 2;
-
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 30,
+    paddingTop: width * 0.1,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
@@ -145,36 +145,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleText: {
-    fontSize: 24,
+    fontSize: scaleFont(26),
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    color: '#222',
   },
   searchInput: {
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     marginBottom: 20,
     backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    fontSize: 16,
+    borderRadius: 10,
+    fontSize: scaleFont(16),
   },
   sectionTitle: {
-    fontSize: 21,
+    fontSize: scaleFont(22),
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 14,
     textAlign: 'left',
     marginLeft: 2,
   },
   listContainer: {
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   row: {
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: CARD_GAP,
   },
   card: {
     backgroundColor: '#f9f9f9',
     width: CARD_WIDTH,
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: 'hidden',
     elevation: 3,
     shadowColor: '#000',
@@ -187,13 +189,14 @@ const styles = StyleSheet.create({
     height: CARD_WIDTH,
   },
   productTitle: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
     fontWeight: '600',
     marginHorizontal: 8,
     marginTop: 8,
+    color: '#333',
   },
   price: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
     color: '#007AFF',
     marginHorizontal: 8,
     marginBottom: 8,
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: scaleFont(18),
     color: '#999',
   },
 });
