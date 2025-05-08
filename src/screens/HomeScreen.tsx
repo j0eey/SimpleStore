@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: width * 0.1,
+    paddingTop: width * 0.05,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     height: CARD_WIDTH * 0.9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.inputBackground,
   },
   image: {
     width: '100%',
