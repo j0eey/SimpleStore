@@ -3,7 +3,7 @@ export const fonts = {
     semiBold: 'Poppins-SemiBold',
     Bold: 'Poppins-Bold',
     light: 'Inter_18pt-Light',
-    blackItalic: 'Inter_18pt-BlackItalic',
+    blackItalic: 'Poppins-BlackItalic',
     black: 'Poppins-Black',
   };
   

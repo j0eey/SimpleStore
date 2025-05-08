@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    fontFamily: 'Poppins-SemiBold', // Poppins font for section title
+    fontFamily: fonts.semiBold,
   },
   description: {
     fontSize: 16,
     color: '#555',
     marginBottom: 20,
-    fontFamily: 'Inter_18pt-LightItalic', // Inter font for description
+    fontFamily: fonts.light,
   },
   addButton: {
     backgroundColor: colors.success,
