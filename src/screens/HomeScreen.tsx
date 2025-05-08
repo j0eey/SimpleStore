@@ -94,7 +94,7 @@ const HomeScreen = () => {
       <Text style={styles.price}>${item.price}</Text>
     </TouchableOpacity>
   );
-  
+
 
   if (loading) {
     return (
@@ -153,25 +153,24 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: scaleFont(26),
-    fontWeight: 'bold',
+    fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#222',
   },
   searchInput: {
     paddingVertical: 12,
     paddingHorizontal: 14,
-    marginBottom: 20,
+    marginBottom:10,
     backgroundColor:  colors.light,
     borderRadius: 10,
     fontSize: scaleFont(16),
   },
   sectionTitle: {
     fontSize: scaleFont(22),
-    fontWeight: 'bold',
-    marginBottom: 14,
+    fontWeight: '400',
+    marginBottom: 10,
     textAlign: 'left',
-    marginLeft: 2,
   },
   listContainer: {
     paddingBottom: 30,

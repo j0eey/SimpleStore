@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 20,
   },
   addButtonText: {
     fontSize: 18,
