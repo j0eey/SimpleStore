@@ -81,11 +81,20 @@ const HomeScreen = () => {
         })
       }
     >
-      <Image source={{ uri: item.images[0].url }} style={styles.image} resizeMode="cover" />
-      <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
+      <View style={styles.imageWrapper}>
+        <Image
+          source={{ uri: item.images[0].url }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </View>
+      <Text style={styles.productTitle} numberOfLines={2}>
+        {item.title}
+      </Text>
       <Text style={styles.price}>${item.price}</Text>
     </TouchableOpacity>
   );
+  
 
   if (loading) {
     return (
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: width * 0.15,
+    paddingTop: width * 0.1,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
@@ -153,7 +162,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     marginBottom: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor:  colors.light,
     borderRadius: 10,
     fontSize: scaleFont(16),
   },
@@ -172,7 +181,7 @@ const styles = StyleSheet.create({
     marginBottom: CARD_GAP,
   },
   card: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.inputBackground,
     width: CARD_WIDTH,
     borderRadius: 14,
     overflow: 'hidden',
@@ -182,21 +191,28 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
+  imageWrapper: {
+    width: '100%',
+    height: CARD_WIDTH * 0.9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f9f9f9',
+  },
   image: {
     width: '100%',
-    height: CARD_WIDTH,
+    height: '100%',
   },
+
   productTitle: {
     fontSize: scaleFont(14),
-    fontWeight: '900',
     marginHorizontal: 8,
     marginTop: 8,
     color: '#333',
-    // fontFamily: 'Poppins-ExtraBoldItalic',
+    fontFamily: fonts.blackItalic,
   },
   price: {
     fontSize: scaleFont(14),
-    color: '#007AFF',
+    color: colors.info,
     marginHorizontal: 8,
     marginBottom: 8,
     marginTop: 4,

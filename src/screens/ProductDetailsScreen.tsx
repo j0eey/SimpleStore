@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, FC } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
-import { FC } from 'react';
 import { fonts, colors } from '../theme/Theme';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 type ProductDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetails'>;
 type ProductDetailsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProductDetails'>;
@@ -26,13 +27,21 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   const totalPrice = (price * quantity).toFixed(2);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: image }} style={styles.image} />
+    <ScrollView 
+      contentContainerStyle={styles.contentContainer} 
+      style={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.imageWrapper}>
+        <Image 
+          source={{ uri: image }} 
+          style={styles.image} 
+          resizeMode="contain" 
+        />
+      </View>
 
-      {/* Title */}
       <Text style={styles.title}>{title}</Text>
 
-      {/* Quantity and Price Row */}
       <View style={styles.row}>
         <View style={styles.quantityContainer}>
           <TouchableOpacity style={styles.quantityButton} onPress={handleDecrease}>
@@ -47,17 +56,14 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
         <Text style={styles.price}>${totalPrice}</Text>
       </View>
 
-      {/* Separator */}
       <View style={styles.separator} />
 
-      {/* Description */}
       <Text style={styles.sectionTitle}>Description</Text>
       <Text style={styles.description}>{description}</Text>
 
-      {/* Add to Cart */}
-        <TouchableOpacity style={styles.addButton}>
-          <Text style={styles.addButtonText}>Add to Cart</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.addButton}>
+        <Text style={styles.addButtonText}>Add to Cart</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -65,24 +71,31 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
 export default ProductDetailsScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: '5%',
-    paddingTop: '30.5%',
+  scrollContainer: {
+    flex: 1,
     backgroundColor: colors.background,
+  },
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  imageWrapper: {
+    width: '100%',
+    height: SCREEN_WIDTH * 0.8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   image: {
     width: '100%',
-    aspectRatio: 1,
-    borderRadius: 12,
-    marginBottom: 20,
-    resizeMode: 'cover',
+    height: '100%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'left',
-    fontFamily: fonts.blackItalic,
+    fontFamily: fonts.regular,
   },
   row: {
     flexDirection: 'row',
@@ -96,7 +109,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.light,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -112,12 +125,12 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#007AFF',
+    color: colors.info,
   },
   separator: {
     height: 1,
     backgroundColor: '#eee',
-    marginVertical: 3,
+    marginVertical: 12,
   },
   sectionTitle: {
     fontSize: 18,
@@ -127,7 +140,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#555',
+    color: colors.text,
     marginBottom: 20,
     fontFamily: fonts.light,
   },
@@ -136,6 +149,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
+    marginTop: 20,
   },
   addButtonText: {
     fontSize: 18,

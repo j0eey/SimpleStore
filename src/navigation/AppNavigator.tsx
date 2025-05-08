@@ -36,8 +36,6 @@ const AppNavigator = () => {
               options={({ route, navigation }) => ({
                 headerShown: true,
                 headerTitle: '',
-                headerTransparent: true,
-                headerBackground: () => null,
                 headerLeft: () => (
                   <Ionicons
                     name="chevron-back"
@@ -52,7 +50,7 @@ const AppNavigator = () => {
                     name="share-outline"
                     size={28}
                     color="#007AFF"
-                    style={{ marginRight: 18 }}
+                    style={{ marginRight: 18,  }}
                     onPress={async () => {
                       try {
                         await Share.share({
@@ -70,6 +68,7 @@ const AppNavigator = () => {
                 animation: 'fade',
               })}
             />
+
           </>
         ) : (
           <>
