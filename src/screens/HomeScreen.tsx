@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
     color: '#222',
+    fontFamily: fonts.Bold,
   },
   searchInput: {
     paddingVertical: 12,
@@ -171,6 +172,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginBottom: 10,
     textAlign: 'left',
+    fontFamily: fonts.Bold,
   },
   listContainer: {
     paddingBottom: 30,
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginTop: 8,
     color: '#333',
-    fontFamily: fonts.blackItalic,
+    fontFamily: fonts.semiBold,
   },
   price: {
     fontSize: scaleFont(14),
@@ -216,6 +218,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginBottom: 8,
     marginTop: 4,
+    fontFamily: fonts.regular,
   },
   emptyContainer: {
     flex: 1,

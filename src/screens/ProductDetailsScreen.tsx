@@ -92,10 +92,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'left',
-    fontFamily: fonts.regular,
+    fontFamily: fonts.Bold,
   },
   row: {
     flexDirection: 'row',
@@ -126,6 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: colors.info,
+    fontFamily: fonts.regular,
   },
   separator: {
     height: 1,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     marginBottom: 20,
-    fontFamily: fonts.light,
+    fontFamily: fonts.regular,
   },
   addButton: {
     backgroundColor: colors.success,
