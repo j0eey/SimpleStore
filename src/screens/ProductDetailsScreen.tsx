@@ -4,6 +4,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import { fonts, colors } from '../theme/Theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -18,6 +19,8 @@ type Props = {
 const ProductDetailsScreen: FC<Props> = ({ route }) => {
   const { id, title, description, image, price } = route.params;
   const [quantity, setQuantity] = useState(1);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const handleIncrease = () => setQuantity(prev => prev + 1);
   const handleDecrease = () => {
@@ -29,7 +32,7 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   return (
     <ScrollView 
       contentContainerStyle={styles.contentContainer} 
-      style={styles.scrollContainer}
+      style={[styles.scrollContainer, { backgroundColor: isDark ? '#000' : colors.background }]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.imageWrapper}>
@@ -40,26 +43,36 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
         />
       </View>
 
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>{title}</Text>
 
       <View style={styles.row}>
         <View style={styles.quantityContainer}>
-          <TouchableOpacity style={styles.quantityButton} onPress={handleDecrease}>
-            <Text style={styles.quantityButtonText}>-</Text>
+          <TouchableOpacity 
+            style={[styles.quantityButton, { backgroundColor: isDark ? '#333' : colors.light }]} 
+            onPress={handleDecrease}
+          >
+            <Text style={[styles.quantityButtonText, { color: isDark ? '#fff' : '#000' }]}>-</Text>
           </TouchableOpacity>
-          <Text style={styles.quantityText}>{quantity}</Text>
-          <TouchableOpacity style={styles.quantityButton} onPress={handleIncrease}>
-            <Text style={styles.quantityButtonText}>+</Text>
+
+          <Text style={[styles.quantityText, { color: isDark ? '#fff' : '#000' }]}>{quantity}</Text>
+
+          <TouchableOpacity 
+            style={[styles.quantityButton, { backgroundColor: isDark ? '#333' : colors.light }]} 
+            onPress={handleIncrease}
+          >
+            <Text style={[styles.quantityButtonText, { color: isDark ? '#fff' : '#000' }]}>+</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.price}>${totalPrice}</Text>
+        <Text style={[styles.price, { color: isDark ? '#0af' : colors.info }]} >
+          ${totalPrice}
+        </Text>
       </View>
 
-      <View style={styles.separator} />
+      <View style={[styles.separator, { backgroundColor: isDark ? '#444' : '#eee' }]} />
 
-      <Text style={styles.sectionTitle}>Description</Text>
-      <Text style={styles.description}>{description}</Text>
+      <Text style={[styles.sectionTitle, { color: isDark ? '#fff' : '#000' }]}>Description</Text>
+      <Text style={[styles.description, { color: isDark ? '#ccc' : colors.text }]}>{description}</Text>
 
       <TouchableOpacity style={styles.addButton}>
         <Text style={styles.addButtonText}>Add to Cart</Text>
@@ -73,7 +86,6 @@ export default ProductDetailsScreen;
 const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   contentContainer: {
     padding: 20,
@@ -108,7 +120,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButton: {
-    backgroundColor: colors.light,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -124,12 +135,10 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 22,
     fontWeight: '600',
-    color: colors.info,
     fontFamily: fonts.regular,
   },
   separator: {
     height: 1,
-    backgroundColor: '#eee',
     marginVertical: 12,
   },
   sectionTitle: {
@@ -140,7 +149,6 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: colors.text,
     marginBottom: 20,
     fontFamily: fonts.regular,
   },

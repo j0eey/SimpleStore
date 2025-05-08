@@ -8,15 +8,21 @@ import VerificationScreen from '../screens/VerificationScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import { useAuth } from '../contexts/AuthContext';
-import { Text, Share } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
-
+import { useTheme } from '../contexts/ThemeContext'; 
+import Ionicons from 'react-native-vector-icons/Ionicons'; 
+import { Share } from 'react-native';
+import { colors } from '../theme/Theme';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
+
+  const headerStyle = {
+    backgroundColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
+    shadowColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader, 
+  };
 
   return (
     <NavigationContainer>
@@ -40,7 +46,7 @@ const AppNavigator = () => {
                   <Ionicons
                     name="chevron-back"
                     size={28}
-                    color="#007AFF"
+                    color={theme === 'dark' ? '#fff' : '#007AFF'}
                     style={{ marginLeft: 16, marginTop: 2 }}
                     onPress={() => navigation.goBack()}
                   />
@@ -49,8 +55,8 @@ const AppNavigator = () => {
                   <Ionicons
                     name="share-outline"
                     size={28}
-                    color="#007AFF"
-                    style={{ marginRight: 18,  }}
+                    color={theme === 'dark' ? '#fff' : '#007AFF'}
+                    style={{ marginRight: 18 }}
                     onPress={async () => {
                       try {
                         await Share.share({
@@ -66,9 +72,9 @@ const AppNavigator = () => {
                 ),
                 gestureEnabled: true,
                 animation: 'fade',
+                headerStyle,
               })}
             />
-
           </>
         ) : (
           <>

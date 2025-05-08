@@ -19,7 +19,11 @@ export const fonts = {
     error: '#FF3B30',
     warning: '#FF9500',
     info: '#007AFF',
-    light: '#f0f0f0',    
+    light: '#f0f0f0',
+    darkHeader: '#000000',
+    lightHeader: '#ffffff',
+    darkCard: '#0a0a0a',
+    lightCard: '#f9f9f9',     
 
   };
   

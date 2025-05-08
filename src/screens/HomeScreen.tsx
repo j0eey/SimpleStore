@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, PixelRatio, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import {View,Text,FlatList,Image,StyleSheet,ActivityIndicator,TextInput,Dimensions,PixelRatio,TouchableOpacity,} from 'react-native';
 import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { fonts, colors } from '../theme/Theme';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../contexts/ThemeContext';
+
 
 type RootStackParamList = {
   Home: undefined;
@@ -27,6 +30,8 @@ const HomeScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const { theme, toggleTheme } = useTheme();
+
 
   const fetchProducts = async () => {
     try {
@@ -70,7 +75,7 @@ const HomeScreen = () => {
 
   const renderItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard }]}
       onPress={() =>
         navigation.navigate('ProductDetails', {
           id: item._id,
@@ -88,13 +93,25 @@ const HomeScreen = () => {
           resizeMode="contain"
         />
       </View>
-      <Text style={styles.productTitle} numberOfLines={2}>
+      <Text
+        style={[
+          styles.productTitle,
+          { color: theme === 'dark' ? '#eee' : '#333' },
+        ]}
+        numberOfLines={2}
+      >
         {item.title}
       </Text>
-      <Text style={styles.price}>${item.price}</Text>
+      <Text
+        style={[
+          styles.price,
+          { color: theme === 'dark' ? '#FFD700' : colors.info },
+        ]}
+      >
+        ${item.price}
+      </Text>
     </TouchableOpacity>
   );
-
 
   if (loading) {
     return (
@@ -105,23 +122,67 @@ const HomeScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titleText}>Simple Store</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme === 'dark' ? '#000' : colors.background },
+      ]}
+    >
+      {/* Header with Title and Toggle */}
+      <View style={styles.header}>
+        <Text
+          style={[
+            styles.titleText,
+            { color: theme === 'dark' ? '#fff' : '#222' },
+          ]}
+        >
+          Simple Store
+        </Text>
+        <TouchableOpacity onPress={toggleTheme}>
+          <Ionicons
+            name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'}
+            size={24}
+            color={theme === 'dark' ? '#FFD700' : '#333'}
+          />
+        </TouchableOpacity>
+      </View>
 
+      {/* Search Input */}
       <TextInput
-        style={styles.searchInput}
+        style={[
+          styles.searchInput,
+          {
+            backgroundColor: theme === 'dark' ? '#222' : colors.light,
+            color: theme === 'dark' ? '#eee' : '#000',
+          },
+        ]}
         placeholder="Search Mobiles..."
+        placeholderTextColor={theme === 'dark' ? '#999' : '#666'}
         value={searchQuery}
         onChangeText={handleSearchChange}
       />
 
       {errorMessage ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>{errorMessage}</Text>
+          <Text
+            style={[
+              styles.emptyText,
+              { color: theme === 'dark' ? '#888' : '#999' },
+            ]}
+          >
+            {errorMessage}
+          </Text>
         </View>
       ) : (
         <>
-          <Text style={styles.sectionTitle}>Latest Mobiles</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: theme === 'dark' ? '#eee' : '#000' },
+            ]}
+          >
+            Latest Mobiles
+          </Text>
           <FlatList
             data={products}
             keyExtractor={(item) => item._id}
@@ -142,7 +203,6 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingTop: width * 0.05,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
@@ -151,21 +211,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   titleText: {
     fontSize: scaleFont(26),
     fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#222',
     fontFamily: fonts.Bold,
   },
   searchInput: {
     paddingVertical: 12,
     paddingHorizontal: 14,
-    marginBottom:10,
-    backgroundColor:  colors.light,
     borderRadius: 10,
     fontSize: scaleFont(16),
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: scaleFont(22),
@@ -182,7 +244,6 @@ const styles = StyleSheet.create({
     marginBottom: CARD_GAP,
   },
   card: {
-    backgroundColor: colors.inputBackground,
     width: CARD_WIDTH,
     borderRadius: 14,
     overflow: 'hidden',
@@ -198,23 +259,19 @@ const styles = StyleSheet.create({
     height: CARD_WIDTH * 0.9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.inputBackground,
   },
   image: {
     width: '100%',
     height: '100%',
   },
-
   productTitle: {
     fontSize: scaleFont(14),
     marginHorizontal: 8,
     marginTop: 8,
-    color: '#333',
     fontFamily: fonts.semiBold,
   },
   price: {
     fontSize: scaleFont(14),
-    color: colors.info,
     marginHorizontal: 8,
     marginBottom: 8,
     marginTop: 4,
@@ -228,6 +285,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: scaleFont(18),
-    color: '#999',
   },
 });
