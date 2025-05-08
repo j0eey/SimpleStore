@@ -142,7 +142,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     paddingTop: width * 0.05,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     borderRadius: 14,
     overflow: 'hidden',
-    elevation: 3,
+    elevation: 4,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
