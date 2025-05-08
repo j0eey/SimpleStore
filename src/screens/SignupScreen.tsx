@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../contexts/AuthContext';
+import { fonts, colors } from '../theme/Theme';
 
 const signupSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
   },
   link: {
     textAlign: 'center',
-    color: '#007BFF',
+    color: colors.primary,
     marginTop: 20,
     fontSize: 16,
   },

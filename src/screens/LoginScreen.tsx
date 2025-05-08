@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../contexts/AuthContext';
 import { loginApi } from '../api/auth.api';
 import Modal from 'react-native-modal';
+import { fonts, colors } from '../theme/Theme';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   loginButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   link: {
-    color: '#007BFF',
+    color: colors.primary,
     fontWeight: '600',
   },
   modalContent: {
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   closeButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,

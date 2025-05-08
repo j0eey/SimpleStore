@@ -4,6 +4,7 @@ import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { fonts, colors } from '../theme/Theme';
 
 type RootStackParamList = {
   Home: undefined;
@@ -89,7 +90,7 @@ const HomeScreen = () => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#007BFF" />
       </View>
     );
   }
@@ -129,12 +130,11 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: width * 0.1,
+    paddingTop: width * 0.15,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
@@ -188,10 +188,11 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontSize: scaleFont(14),
-    fontWeight: '600',
+    fontWeight: '900',
     marginHorizontal: 8,
     marginTop: 8,
     color: '#333',
+    // fontFamily: 'Poppins-ExtraBoldItalic',
   },
   price: {
     fontSize: scaleFont(14),

@@ -4,6 +4,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import { FC } from 'react';
+import { fonts, colors } from '../theme/Theme';
 
 type ProductDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ProductDetails'>;
 type ProductDetailsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProductDetails'>;
@@ -54,11 +55,9 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
       <Text style={styles.description}>{description}</Text>
 
       {/* Add to Cart */}
-      <View style={styles.addButton}>
         <TouchableOpacity style={styles.addButton}>
           <Text style={styles.addButtonText}>Add to Cart</Text>
         </TouchableOpacity>
-      </View>
     </ScrollView>
   );
 };
@@ -68,8 +67,8 @@ export default ProductDetailsScreen;
 const styles = StyleSheet.create({
   container: {
     padding: '5%',
-    paddingTop: 120,
-    backgroundColor: '#ffffff',
+    paddingTop: '30.5%',
+    backgroundColor: colors.background,
   },
   image: {
     width: '100%',
@@ -83,6 +82,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'left',
+    fontFamily: fonts.blackItalic,
   },
   row: {
     flexDirection: 'row',
@@ -123,15 +123,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    fontFamily: 'Poppins-SemiBold', // Poppins font for section title
   },
   description: {
     fontSize: 16,
     color: '#555',
     marginBottom: 20,
+    fontFamily: 'Inter_18pt-LightItalic', // Inter font for description
   },
   addButton: {
-    backgroundColor: '#34C759',
-    paddingVertical: 9,
+    backgroundColor: colors.success,
+    paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
