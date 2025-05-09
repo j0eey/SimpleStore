@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../contexts/AuthContext';
 import { loginApi } from '../api/auth.api';
-import Modal from 'react-native-modal';
 import { fonts, colors } from '../theme/Theme';
+import CustomModal from '../components/CustomModal';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -27,7 +27,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginFormData) => {
@@ -123,19 +123,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         </Text>
       </Text>
 
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={closeModal}
-        backdropOpacity={0.5}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Login Failed</Text>
-          <Text style={styles.modalMessage}>{errorMessage}</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-            <Text style={styles.closeButtonText}>Dismiss</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <CustomModal
+  isVisible={modalVisible}
+  title="Login Failed"
+  message="Invalid credentials. Please try again."
+  buttons={[
+    { label: 'Dismiss', onPress: () => setModalVisible(false), type: 'primary' },
+  ]}
+/>
+
+
     </View>
   );
 };
@@ -215,33 +212,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '600',
     fontFamily: fonts.italic,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 24,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  modalMessage: {
-    fontSize: 16,
-    color:  colors.text,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  closeButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  closeButtonText: {
-    color: colors.lightHeader,
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

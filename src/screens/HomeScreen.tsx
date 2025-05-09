@@ -7,6 +7,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { fonts, colors } from '../theme/Theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
+import CustomModal from '../components/CustomModal';
+import { useAuth } from '../contexts/AuthContext';
 
 type RootStackParamList = {
   Home: undefined;
@@ -27,8 +29,10 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -65,6 +69,16 @@ const HomeScreen = () => {
       setErrorMessage(error.message);
     } else {
       setErrorMessage('An unknown error occurred.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setLogoutModalVisible(false);
+      // No need to manually navigate to Login — AppNavigator handles it automatically
+    } catch (error) {
+      console.error('Logout failed', error);
     }
   };
 
@@ -106,9 +120,14 @@ const HomeScreen = () => {
         <Text style={[styles.titleText, { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }]}>
           Simple Store
         </Text>
-        <TouchableOpacity onPress={toggleTheme}>
-          <Ionicons name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'} size={24} color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} />
-        </TouchableOpacity>
+        <View style={styles.iconRow}>
+          <TouchableOpacity onPress={toggleTheme} style={styles.iconButton}>
+            <Ionicons name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'} size={24} color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setLogoutModalVisible(true)} style={styles.iconButton}>
+            <Ionicons name="log-out-outline" size={24} color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Search Bar */}
@@ -148,6 +167,17 @@ const HomeScreen = () => {
           />
         </>
       )}
+
+      {/* Custom Logout Modal */}
+      <CustomModal
+        isVisible={logoutModalVisible}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        buttons={[
+          { label: 'Cancel', onPress: () => setLogoutModalVisible(false), type: 'secondary' },
+          { label: 'Log Out', onPress: handleLogout, type: 'primary' },
+        ]}
+      />
     </View>
   );
 };
@@ -157,7 +187,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: width * 0.1,
+    paddingTop: width * 0.13,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
@@ -170,6 +200,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  iconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    marginLeft: 12,
   },
   titleText: {
     fontSize: scaleFont(26),

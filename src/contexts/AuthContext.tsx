@@ -1,11 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
-  signup: () => void;
-  verify: () => void;
-  logout: () => void;
+  login: () => Promise<void>;
+  signup: () => Promise<void>;
+  verify: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,19 +18,41 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = () => {
-    setIsAuthenticated(true);
+  // Load saved auth state on app start
+  useEffect(() => {
+    const loadAuthState = async () => {
+      try {
+        const savedState = await AsyncStorage.getItem('@auth');
+        if (savedState !== null) {
+          setIsAuthenticated(JSON.parse(savedState));
+        }
+      } catch (error) {
+        console.error('Failed to load auth state', error);
+      }
+    };
+    loadAuthState();
+  }, []);
+
+  // Unified auth state updater
+  const setAuthState = async (authenticated: boolean) => {
+    setIsAuthenticated(authenticated);
+    await AsyncStorage.setItem('@auth', JSON.stringify(authenticated));
   };
 
-  const signup = () => {
-    setIsAuthenticated(false); 
+  const login = async () => {
+    await setAuthState(true);
   };
 
-  const verify = () => {
-    setIsAuthenticated(true);
+  const signup = async () => {
+    await setAuthState(false);
   };
 
-  const logout = () => {
+  const verify = async () => {
+    await setAuthState(true);
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem('@auth');
     setIsAuthenticated(false);
   };
 
@@ -40,7 +63,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-// Custom hook to use AuthContext easily
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

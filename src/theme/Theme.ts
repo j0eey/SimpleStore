@@ -7,6 +7,12 @@ export const fonts = {
     black: 'Poppins-Black',
     italic: 'Poppins-Italic',
     thin: 'Poppins-Thin',
+    thinItalic: 'Poppins-ThinItalic',
+    extraBold: 'Poppins-ExtraBold',
+    extraLight: 'Poppins-ExtraLight',
+    extraLightItalic: 'Poppins-ExtraLightItalic',
+    extraBoldItalic: 'Poppins-ExtraBoldItalic',
+    medium: 'Poppins-Medium',
   };
   
   export const colors = {
