@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { colors, fonts } from '../theme/Theme';
-import { useTheme } from '../contexts/ThemeContext'; // Adjust the import path as needed
+import { useTheme } from '../contexts/ThemeContext';
 
 type ButtonConfig = {
   label: string;
