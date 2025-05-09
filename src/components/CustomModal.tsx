@@ -61,7 +61,7 @@ export default CustomModal;
 
 const styles = StyleSheet.create({
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: colors.lightHeader,
     padding: 24,
     borderRadius: 10,
     alignItems: 'center',
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.info,
   },
   buttonText: {
-    color: 'white',
+    color: colors.lightHeader,
     fontSize: 16,
     fontWeight: '600',
   },
