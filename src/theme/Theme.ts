@@ -1,3 +1,5 @@
+import { ImageBackground } from "react-native";
+
 export const fonts = {
     regular: 'Poppins-Regular',
     semiBold: 'Poppins-SemiBold',
@@ -43,6 +45,7 @@ export const fonts = {
     notFoundLight: '#999',
     priceDarkDetails: '#0af',
     lineDark: '#444',
+    imageBackground: '#f8f8f8',
 
   };
   
