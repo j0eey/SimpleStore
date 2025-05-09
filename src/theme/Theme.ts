@@ -5,6 +5,8 @@ export const fonts = {
     light: 'Poppins-Light',
     blackItalic: 'Poppins-BlackItalic',
     black: 'Poppins-Black',
+    italic: 'Poppins-Italic',
+    thin: 'Poppins-Thin',
   };
   
   export const colors = {
@@ -23,7 +25,18 @@ export const fonts = {
     darkHeader: '#000000',
     lightHeader: '#ffffff',
     darkCard: '#0a0a0a',
-    lightCard: '#f9f9f9',     
+    lightCard: '#f9f9f9',
+    nameCardDark: '#eee',
+    nameCardLight: '#333333',
+    priceDark: '#FFD700',   
+    darkSearchbar: '#222',
+    lightSearchbar: '#f0f0f0',
+    darkSearch: '#999',
+    lightSearch: '#666',
+    notFoundDark: '#888',
+    notFoundLight: '#999',
+    priceDarkDetails: '#0af',
+    lineDark: '#444',
 
   };
   

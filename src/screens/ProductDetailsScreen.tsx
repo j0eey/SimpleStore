@@ -32,7 +32,7 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   return (
     <ScrollView 
       contentContainerStyle={styles.contentContainer} 
-      style={[styles.scrollContainer, { backgroundColor: isDark ? '#000' : colors.background }]}
+      style={[styles.scrollContainer, { backgroundColor: isDark ?  colors.darkHeader : colors.background }]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.imageWrapper}>
@@ -43,36 +43,36 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
         />
       </View>
 
-      <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>{title}</Text>
+      <Text style={[styles.title, { color: isDark ?  colors.lightHeader :  colors.darkHeader }]}>{title}</Text>
 
       <View style={styles.row}>
         <View style={styles.quantityContainer}>
           <TouchableOpacity 
-            style={[styles.quantityButton, { backgroundColor: isDark ? '#333' : colors.light }]} 
+            style={[styles.quantityButton, { backgroundColor: isDark ?  colors.nameCardLight : colors.light }]} 
             onPress={handleDecrease}
           >
-            <Text style={[styles.quantityButtonText, { color: isDark ? '#fff' : '#000' }]}>-</Text>
+            <Text style={[styles.quantityButtonText, { color: isDark ?  colors.lightHeader :  colors.darkHeader }]}>-</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.quantityText, { color: isDark ? '#fff' : '#000' }]}>{quantity}</Text>
+          <Text style={[styles.quantityText, { color: isDark ?  colors.lightHeader :  colors.darkHeader }]}>{quantity}</Text>
 
           <TouchableOpacity 
-            style={[styles.quantityButton, { backgroundColor: isDark ? '#333' : colors.light }]} 
+            style={[styles.quantityButton, { backgroundColor: isDark ?  colors.nameCardLight : colors.light }]} 
             onPress={handleIncrease}
           >
-            <Text style={[styles.quantityButtonText, { color: isDark ? '#fff' : '#000' }]}>+</Text>
+            <Text style={[styles.quantityButtonText, { color: isDark ?  colors.lightHeader :  colors.darkHeader }]}>+</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={[styles.price, { color: isDark ? '#0af' : colors.info }]} >
+        <Text style={[styles.price, { color: isDark ?  colors.priceDarkDetails : colors.info }]} >
           ${totalPrice}
         </Text>
       </View>
 
-      <View style={[styles.separator, { backgroundColor: isDark ? '#444' : '#eee' }]} />
+      <View style={[styles.separator, { backgroundColor: isDark ?  colors.lineDark :  colors.nameCardDark }]} />
 
-      <Text style={[styles.sectionTitle, { color: isDark ? '#fff' : '#000' }]}>Description</Text>
-      <Text style={[styles.description, { color: isDark ? '#ccc' : colors.text }]}>{description}</Text>
+      <Text style={[styles.sectionTitle, { color: isDark ?  colors.lightHeader :  colors.darkHeader }]}>Description</Text>
+      <Text style={[styles.description, { color: isDark ?  colors.border : colors.text }]}>{description}</Text>
 
       <TouchableOpacity style={styles.addButton}>
         <Text style={styles.addButtonText}>Add to Cart</Text>
@@ -161,6 +161,6 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color:  colors.lightHeader,
   },
 });

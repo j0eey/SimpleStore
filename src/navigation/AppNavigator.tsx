@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { RootStackParamList } from './types';
@@ -12,29 +12,38 @@ import { useTheme } from '../contexts/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
 import { Share } from 'react-native';
 import { colors } from '../theme/Theme';
-
+import SplashScreen from '../screens/SplashScreen';
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
+  const [isSplashVisible, setIsSplashVisible] = useState(true);
 
   const headerStyle = {
     backgroundColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
     shadowColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader, 
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsSplashVisible(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
+        {isSplashVisible ? (
+          <Stack.Screen name="Splash" component={SplashScreen} />
+        ) : isAuthenticated ? (
           <>
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{
-                animation: 'fade',
-              }}
+              options={{ animation: 'fade' }}
             />
             <Stack.Screen
               name="ProductDetails"
@@ -46,7 +55,7 @@ const AppNavigator = () => {
                   <Ionicons
                     name="chevron-back"
                     size={28}
-                    color={theme === 'dark' ? '#fff' : '#007AFF'}
+                    color={theme === 'dark' ? colors.lightHeader : colors.info}
                     style={{ marginLeft: 16, marginTop: 2 }}
                     onPress={() => navigation.goBack()}
                   />
@@ -55,7 +64,7 @@ const AppNavigator = () => {
                   <Ionicons
                     name="share-outline"
                     size={28}
-                    color={theme === 'dark' ? '#fff' : '#007AFF'}
+                    color={theme === 'dark' ? colors.lightHeader : colors.info}
                     style={{ marginRight: 18 }}
                     onPress={async () => {
                       try {
@@ -81,23 +90,17 @@ const AppNavigator = () => {
             <Stack.Screen
               name="Login"
               component={LoginScreen}
-              options={{
-                animation: 'fade',
-              }}
+              options={{ animation: 'fade' }}
             />
             <Stack.Screen
               name="Signup"
               component={SignupScreen}
-              options={{
-                animation: 'fade',
-              }}
+              options={{ animation: 'fade' }}
             />
             <Stack.Screen
               name="Verification"
               component={VerificationScreen}
-              options={{
-                animation: 'fade',
-              }}
+              options={{ animation: 'fade' }}
             />
           </>
         )}

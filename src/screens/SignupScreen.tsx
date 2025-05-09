@@ -118,9 +118,12 @@ const SignupScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         {/* Link to Login */}
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.link}>Already have an account? Login</Text>
-        </TouchableOpacity>
+        <Text style={styles.text}>
+          Already have an account?{' '}
+          <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
+            Login
+          </Text>
+        </Text>
       </View>
     </View>
   );
@@ -131,15 +134,15 @@ export default SignupScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.lightHeader,
     paddingHorizontal: 24,
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 32,
+    fontFamily: fonts.Bold,
   },
   form: {
     width: '100%',
@@ -168,14 +171,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.lightHeader,
     fontSize: 18,
     fontWeight: '600',
   },
   link: {
-    textAlign: 'center',
     color: colors.primary,
+    fontWeight: '600',
+    fontFamily: fonts.italic,
+  },
+  text: {
+    textAlign: 'center',
+    color: colors.darkHeader,
     marginTop: 20,
     fontSize: 16,
+    fontFamily: fonts.light,
   },
 });

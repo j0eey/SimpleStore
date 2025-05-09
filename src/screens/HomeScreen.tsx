@@ -96,7 +96,7 @@ const HomeScreen = () => {
       <Text
         style={[
           styles.productTitle,
-          { color: theme === 'dark' ? '#eee' : '#333' },
+          { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader },
         ]}
         numberOfLines={2}
       >
@@ -105,7 +105,7 @@ const HomeScreen = () => {
       <Text
         style={[
           styles.price,
-          { color: theme === 'dark' ? '#FFD700' : colors.info },
+          { color: theme === 'dark' ? colors.priceDark : colors.info },
         ]}
       >
         ${item.price}
@@ -125,7 +125,7 @@ const HomeScreen = () => {
     <View
       style={[
         styles.container,
-        { backgroundColor: theme === 'dark' ? '#000' : colors.background },
+        { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background },
       ]}
     >
       {/* Header with Title and Toggle */}
@@ -133,7 +133,7 @@ const HomeScreen = () => {
         <Text
           style={[
             styles.titleText,
-            { color: theme === 'dark' ? '#fff' : '#222' },
+            { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader },
           ]}
         >
           Simple Store
@@ -142,7 +142,7 @@ const HomeScreen = () => {
           <Ionicons
             name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'}
             size={24}
-            color={theme === 'dark' ? '#FFD700' : '#333'}
+            color={theme === 'dark' ? colors.priceDark : colors.nameCardLight}
           />
         </TouchableOpacity>
       </View>
@@ -152,12 +152,12 @@ const HomeScreen = () => {
         style={[
           styles.searchInput,
           {
-            backgroundColor: theme === 'dark' ? '#222' : colors.light,
-            color: theme === 'dark' ? '#eee' : '#000',
+            backgroundColor: theme === 'dark' ? colors.darkSearchbar : colors.lightSearchbar,
+            color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader,
           },
         ]}
         placeholder="Search Mobiles..."
-        placeholderTextColor={theme === 'dark' ? '#999' : '#666'}
+        placeholderTextColor={theme === 'dark' ? colors.darkSearch : colors.lightSearch}
         value={searchQuery}
         onChangeText={handleSearchChange}
       />
@@ -167,7 +167,7 @@ const HomeScreen = () => {
           <Text
             style={[
               styles.emptyText,
-              { color: theme === 'dark' ? '#888' : '#999' },
+              { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight },
             ]}
           >
             {errorMessage}
@@ -178,7 +178,7 @@ const HomeScreen = () => {
           <Text
             style={[
               styles.sectionTitle,
-              { color: theme === 'dark' ? '#eee' : '#000' },
+              { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader },
             ]}
           >
             Latest Mobiles
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     overflow: 'hidden',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: colors.darkHeader,
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },

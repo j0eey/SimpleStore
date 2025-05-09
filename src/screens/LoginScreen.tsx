@@ -104,7 +104,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       <Text style={styles.text}>
         Don't have an account?{' '}
         <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>
-          Sign up here.
+          Sign up here
         </Text>
       </Text>
 
@@ -130,15 +130,15 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.lightHeader,
     paddingHorizontal: 24,
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 32,
+    fontFamily: fonts.Bold,
   },
   input: {
     borderWidth: 1,
@@ -164,19 +164,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   loginButtonText: {
-    color: '#fff',
+    color: colors.lightHeader,
     fontSize: 18,
     fontWeight: '600',
   },
   text: {
     textAlign: 'center',
-    color: '#000',
+    color: colors.darkHeader,
     marginTop: 20,
     fontSize: 16,
+    fontFamily: fonts.light,
   },
   link: {
     color: colors.primary,
     fontWeight: '600',
+    fontFamily: fonts.italic,
   },
   modalContent: {
     backgroundColor: 'white',
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   closeButtonText: {
-    color: 'white',
+    color: colors.lightHeader,
     fontSize: 16,
     fontWeight: '600',
   },

@@ -70,20 +70,6 @@ const VerificationScreen = () => {
           {isSubmitting ? 'Verifying...' : 'Verify'}
         </Text>
       </TouchableOpacity>
-
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={closeModal}
-        backdropOpacity={0.5}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Verification Failed</Text>
-          <Text style={styles.modalMessage}>{errorMessage}</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-            <Text style={styles.closeButtonText}>Dismiss</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -93,15 +79,15 @@ export default VerificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.lightHeader,
     paddingHorizontal: 24,
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 32,
+    fontFamily: fonts.Bold,
   },
   input: {
     borderWidth: 1,
@@ -127,36 +113,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.lightHeader,
     fontSize: 18,
     fontWeight: '600',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 24,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  modalMessage: {
-    fontSize: 16,
-    color:  colors.text,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  closeButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+
 });
