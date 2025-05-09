@@ -22,6 +22,7 @@ const SignupScreen = ({ navigation }: any) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: SignupFormData) => {
     setLoading(true);
@@ -33,6 +34,10 @@ const SignupScreen = ({ navigation }: any) => {
       console.error('Signup failed');
     }
     setLoading(false);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -73,19 +78,30 @@ const SignupScreen = ({ navigation }: any) => {
         {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
 
         {/* Password */}
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Password"
-              value={value}
-              onChangeText={onChange}
-              style={styles.input}
-              secureTextEntry
-            />
-          )}
-        />
+        <View style={styles.passwordContainer}>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Password"
+                value={value}
+                onChangeText={onChange}
+                style={styles.passwordInput}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+            )}
+          />
+          <TouchableOpacity 
+            style={styles.eyeButton}
+            onPress={togglePasswordVisibility}
+          >
+            <Text style={styles.eyeButtonText}>
+              {showPassword ? '🙈' : '👁️'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
 
         {/* Phone */}
@@ -150,12 +166,33 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor:  colors.inputBackground,
+    backgroundColor: colors.inputBackground,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 10,
     marginBottom: 12,
     fontSize: 16,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.inputBackground,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  eyeButton: {
+    padding: 10,
+  },
+  eyeButtonText: {
+    fontSize: 20,
   },
   error: {
     color: 'red',
