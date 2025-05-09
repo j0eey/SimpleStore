@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,Text,FlatList,Image,StyleSheet,ActivityIndicator,TextInput,Dimensions,PixelRatio,TouchableOpacity,} from 'react-native';
 import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';

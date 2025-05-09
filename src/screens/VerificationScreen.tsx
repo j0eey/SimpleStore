@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../contexts/AuthContext';
-import Modal from 'react-native-modal';
 import { fonts, colors } from '../theme/Theme';
 
 const verificationSchema = z.object({
