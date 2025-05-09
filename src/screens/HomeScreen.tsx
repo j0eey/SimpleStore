@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,Text,FlatList,Image,StyleSheet,ActivityIndicator,TextInput,Dimensions,PixelRatio,TouchableOpacity,} from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, PixelRatio, TouchableOpacity } from 'react-native';
 import { Product } from '../types/Product';
 import { fetchProductsApi, searchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { fonts, colors } from '../theme/Theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
-
 
 type RootStackParamList = {
   Home: undefined;
@@ -28,21 +27,19 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { theme, toggleTheme } = useTheme();
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const fetchProducts = async () => {
     try {
-      const products = await fetchProductsApi();
-      setProducts(products);
+      const data = await fetchProductsApi();
+      setProducts(data);
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An unknown error occurred.');
-      }
+      handleError(error);
     } finally {
       setLoading(false);
     }
@@ -50,64 +47,45 @@ const HomeScreen = () => {
 
   const handleSearchChange = async (query: string) => {
     setSearchQuery(query);
+    if (!query.trim()) {
+      fetchProducts();
+      return;
+    }
     try {
-      if (query.trim() === '') {
-        const allProducts = await fetchProductsApi();
-        setProducts(allProducts);
-        setErrorMessage('');
-      } else {
-        const searchedProducts = await searchProductsApi(query);
-        setProducts(searchedProducts);
-        setErrorMessage(searchedProducts.length === 0 ? 'No products found!' : '');
-      }
+      const result = await searchProductsApi(query);
+      setProducts(result);
+      setErrorMessage(result.length ? '' : 'No products found!');
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('An unknown error occurred.');
-      }
+      handleError(error);
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const handleError = (error: unknown) => {
+    if (error instanceof Error) {
+      setErrorMessage(error.message);
+    } else {
+      setErrorMessage('An unknown error occurred.');
+    }
+  };
 
   const renderItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard }]}
-      onPress={() =>
-        navigation.navigate('ProductDetails', {
-          id: item._id,
-          title: item.title,
-          description: item.description,
-          image: item.images[0].url,
-          price: item.price,
-        })
-      }
+      onPress={() => navigation.navigate('ProductDetails', {
+        id: item._id,
+        title: item.title,
+        description: item.description,
+        image: item.images[0].url,
+        price: item.price,
+      })}
     >
       <View style={styles.imageWrapper}>
-        <Image
-          source={{ uri: item.images[0].url }}
-          style={styles.image}
-          resizeMode="contain"
-        />
+        <Image source={{ uri: item.images[0].url }} style={styles.image} resizeMode="contain" />
       </View>
-      <Text
-        style={[
-          styles.productTitle,
-          { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader },
-        ]}
-        numberOfLines={2}
-      >
+      <Text style={[styles.productTitle, { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }]}>
         {item.title}
       </Text>
-      <Text
-        style={[
-          styles.price,
-          { color: theme === 'dark' ? colors.priceDark : colors.info },
-        ]}
-      >
+      <Text style={[styles.price, { color: theme === 'dark' ? colors.priceDark : colors.info }]}>
         ${item.price}
       </Text>
     </TouchableOpacity>
@@ -122,32 +100,18 @@ const HomeScreen = () => {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background },
-      ]}
-    >
-      {/* Header with Title and Toggle */}
+    <View style={[styles.container, { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }]}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text
-          style={[
-            styles.titleText,
-            { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader },
-          ]}
-        >
+        <Text style={[styles.titleText, { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }]}>
           Simple Store
         </Text>
         <TouchableOpacity onPress={toggleTheme}>
-          <Ionicons
-            name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'}
-            size={24}
-            color={theme === 'dark' ? colors.priceDark : colors.nameCardLight}
-          />
+          <Ionicons name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'} size={24} color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} />
         </TouchableOpacity>
       </View>
 
-      {/* Search Input */}
+      {/* Search Bar */}
       <TextInput
         style={[
           styles.searchInput,
@@ -164,23 +128,13 @@ const HomeScreen = () => {
 
       {errorMessage ? (
         <View style={styles.emptyContainer}>
-          <Text
-            style={[
-              styles.emptyText,
-              { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight },
-            ]}
-          >
+          <Text style={[styles.emptyText, { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight }]}>
             {errorMessage}
           </Text>
         </View>
       ) : (
         <>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader },
-            ]}
-          >
+          <Text style={[styles.sectionTitle, { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader }]}>
             Latest Mobiles
           </Text>
           <FlatList
@@ -233,7 +187,6 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(22),
     fontWeight: '400',
     marginBottom: 10,
-    textAlign: 'left',
     fontFamily: fonts.Bold,
   },
   listContainer: {
