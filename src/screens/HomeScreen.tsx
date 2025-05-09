@@ -203,7 +203,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: width * 0.05,
+    paddingTop: width * 0.1,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   loader: {
