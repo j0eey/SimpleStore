@@ -28,6 +28,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
@@ -53,6 +54,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setErrorMessage('');
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -73,20 +78,30 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       />
       {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
 
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={value}
-            onChangeText={onChange}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-        )}
-      />
+      <View style={styles.passwordContainer}>
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Password"
+              value={value}
+              onChangeText={onChange}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+            />
+          )}
+        />
+        <TouchableOpacity 
+          style={styles.eyeButton}
+          onPress={togglePasswordVisibility}
+        >
+          <Text style={styles.eyeButtonText}>
+            {showPassword ? '🙈' : '👁️'}
+          </Text>
+        </TouchableOpacity>
+      </View>
       {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
 
       <TouchableOpacity
@@ -149,6 +164,27 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 12,
     fontSize: 16,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.inputBackground,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  eyeButton: {
+    padding: 10,
+  },
+  eyeButtonText: {
+    fontSize: 20,
   },
   error: {
     color: 'red',
