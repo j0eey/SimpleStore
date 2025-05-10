@@ -73,7 +73,7 @@ const VerificationScreen = () => {
   );
 };
 
-export default VerificationScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -118,3 +118,5 @@ const styles = StyleSheet.create({
   },
 
 });
+
+export default VerificationScreen;

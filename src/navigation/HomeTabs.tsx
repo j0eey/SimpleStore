@@ -32,20 +32,25 @@ const HomeTabs = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: isDark ? colors.lightHeader : colors.primary,
+        tabBarActiveTintColor: isDark ? colors.lightHeader : colors.darkHeader,
         tabBarInactiveTintColor: isDark ? colors.darkCard : colors.lightCard,
         tabBarStyle: {
           backgroundColor: isDark ? colors.darkHeader : colors.lightHeader,
           borderTopWidth: 0,
           height: 60,
+          paddingBottom: 5,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontFamily: 'Poppins-Regular',
         },
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Cart" component={CartScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="Search" component={SearchScreen} options={{ title: 'Search' }} />
+      <Tab.Screen name="Cart" component={CartScreen} options={{ title: 'Cart' }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
     </Tab.Navigator>
   );
 };

@@ -18,8 +18,8 @@ const TabsNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: isDark ? colors.lightHeader : colors.text,
+        tabBarActiveTintColor: isDark ? colors.priceDark : colors.info,
+        tabBarInactiveTintColor: isDark ? colors.darkSearch : colors.darkSearch,
         tabBarStyle: {
           backgroundColor: isDark ? colors.darkHeader : colors.lightHeader,
           borderTopWidth: 0,

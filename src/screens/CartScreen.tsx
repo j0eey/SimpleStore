@@ -1,27 +1,62 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors, fonts } from '../theme/Theme';
+import { useTheme } from '../contexts/ThemeContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const CartScreen = () => {
+  const { theme } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Cart Screen</Text>
+    <View style={[
+      styles.container,
+      { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }
+    ]}>
+      <View style={styles.emptyCartContainer}>
+        <Ionicons
+          name="cart-outline"
+          size={80}
+          color={theme === 'dark' ? colors.darkSearch : colors.lightSearch}
+        />
+        <Text style={[
+          styles.emptyCartText,
+          { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }
+        ]}>
+          Empty Cart
+        </Text>
+        <Text style={[
+          styles.emptyCartSubtext,
+          { color: theme === 'dark' ? colors.darkSearch : colors.lightSearch }
+        ]}>
+          Your cart is currently empty
+        </Text>
+      </View>
     </View>
   );
 };
 
-export default CartScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+  },
+  emptyCartContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
-  text: {
+  emptyCartText: {
     fontSize: 24,
     fontFamily: fonts.Bold,
-    color: colors.text,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyCartSubtext: {
+    fontSize: 16,
+    fontFamily: fonts.regular,
+    textAlign: 'center',
+    maxWidth: 300,
   },
 });
+
+export default CartScreen;

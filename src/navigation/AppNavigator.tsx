@@ -6,13 +6,14 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import VerificationScreen from '../screens/VerificationScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext'; 
-import Ionicons from 'react-native-vector-icons/Ionicons'; 
+import { useTheme } from '../contexts/ThemeContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Share } from 'react-native';
 import { colors } from '../theme/Theme';
 import SplashScreen from '../screens/SplashScreen';
-import TabsNavigator from './TabsNavigator'; // <-- Now we're importing TabsNavigator
+import TabsNavigator from './TabsNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -23,7 +24,7 @@ const AppNavigator = () => {
 
   const headerStyle = {
     backgroundColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
-    shadowColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader, 
+    shadowColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
   };
 
   useEffect(() => {
@@ -41,7 +42,6 @@ const AppNavigator = () => {
           <Stack.Screen name="Splash" component={SplashScreen} />
         ) : isAuthenticated ? (
           <>
-            {/* Use TabsNavigator here */}
             <Stack.Screen
               name="HomeTabs"
               component={TabsNavigator}
@@ -84,6 +84,25 @@ const AppNavigator = () => {
                 gestureEnabled: true,
                 animation: 'fade',
                 headerStyle,
+              })}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={({ navigation }) => ({
+                headerShown: true,
+                headerTitle: 'My Profile',
+                headerStyle,
+                headerTintColor: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+                headerLeft: () => (
+                  <Ionicons
+                    name="chevron-back"
+                    size={28}
+                    color={theme === 'dark' ? colors.lightHeader : colors.info}
+                    style={{ marginLeft: 16 }}
+                    onPress={() => navigation.goBack()}
+                  />
+                ),
               })}
             />
           </>

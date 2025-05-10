@@ -81,7 +81,6 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   );
 };
 
-export default ProductDetailsScreen;
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -164,3 +163,6 @@ const styles = StyleSheet.create({
     color:  colors.lightHeader,
   },
 });
+
+
+export default ProductDetailsScreen;

@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, TextInput, Dimensions, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, ActivityIndicator, Dimensions, PixelRatio, TouchableOpacity } from 'react-native';
 import { Product } from '../types/Product';
-import { fetchProductsApi, searchProductsApi } from '../api/products.api';
+import { fetchProductsApi } from '../api/products.api';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { fonts, colors } from '../theme/Theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useTheme } from '../contexts/ThemeContext';
-import CustomModal from '../components/CustomModal';
-import { useAuth } from '../contexts/AuthContext';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-type RootStackParamList = {
-  Home: undefined;
-  ProductDetails: { id: string; title: string; description: string; image: string; price: number };
-  AllProducts: undefined;
-};
+import { useTheme } from '../contexts/ThemeContext';
+import { RootStackParamList } from '../navigation/types';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -32,15 +25,12 @@ const HomeScreen = () => {
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [latestLoading, setLatestLoading] = useState(false);
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { theme, toggleTheme } = useTheme();
-  const { logout } = useAuth();
+  const { theme } = useTheme();
 
   useEffect(() => {
     fetchProducts();
@@ -65,36 +55,11 @@ const HomeScreen = () => {
     }
   };
 
-  const handleSearchChange = async (query: string) => {
-    setSearchQuery(query);
-    if (!query.trim()) {
-      fetchProducts();
-      setShowAllProducts(false);
-      return;
-    }
-    try {
-      const result = await searchProductsApi(query);
-      setDisplayedProducts(result);
-      setErrorMessage(result.length ? '' : 'No products found!');
-    } catch (error) {
-      handleError(error);
-    }
-  };
-
   const handleError = (error: unknown) => {
     if (error instanceof Error) {
       setErrorMessage(error.message);
     } else {
       setErrorMessage('An unknown error occurred.');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setLogoutModalVisible(false);
-    } catch (error) {
-      console.error('Logout failed', error);
     }
   };
 
@@ -160,36 +125,34 @@ const HomeScreen = () => {
   );
 
   const renderListHeader = () => {
-    if (searchQuery) return null;
-
     const renderFeaturedItem = ({ item }: { item: Product }) => (
       <TouchableOpacity
-      style={[styles.featuredCard, {
-        backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
-        shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
-      }]}
-      onPress={() => navigation.navigate('ProductDetails', {
-        id: item._id,
-        title: item.title,
-        description: item.description,
-        image: item.images[0].url,
-        price: item.price,
-      })}
-      activeOpacity={0.8}
+        style={[styles.featuredCard, {
+          backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+          shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+        }]}
+        onPress={() => navigation.navigate('ProductDetails', {
+          id: item._id,
+          title: item.title,
+          description: item.description,
+          image: item.images[0].url,
+          price: item.price,
+        })}
+        activeOpacity={0.8}
       >
-      <Image
-        source={{ uri: item.images[0].url }}
-        style={styles.featuredImage}
-        resizeMode="cover"
-      />
-      <View style={styles.featuredOverlay}>
-        <Text style={styles.featuredTitle} numberOfLines={1}>
-        {item.title}
-        </Text>
-        <Text style={styles.featuredPrice}>
-        ${item.price.toFixed(2)}
-        </Text>
-      </View>
+        <Image
+          source={{ uri: item.images[0].url }}
+          style={styles.featuredImage}
+          resizeMode="cover"
+        />
+        <View style={styles.featuredOverlay}>
+          <Text style={styles.featuredTitle} numberOfLines={1}>
+            {item.title}
+          </Text>
+          <Text style={styles.featuredPrice}>
+            ${item.price.toFixed(2)}
+          </Text>
+        </View>
       </TouchableOpacity>
     );
 
@@ -211,21 +174,19 @@ const HomeScreen = () => {
             />
           </>
         )}
+
         {/* Categories */}
         <Text style={[styles.sectionTitle, { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader }]}>
           Categories
         </Text>
         <View style={styles.categoriesContainer}>
           {['Smartphones', 'Tablets', 'Accessories', 'Wearables'].map((category, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={[
-                styles.categoryCard, 
-                { 
-                  backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
-                  shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
-                }
-              ]}
+            <TouchableOpacity
+              key={index}
+              style={[styles.categoryCard, {
+                backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+                shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+              }]}
             >
               <Text style={[styles.categoryText, { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }]}>
                 {category}
@@ -245,7 +206,6 @@ const HomeScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        
       </>
     );
   };
@@ -260,12 +220,7 @@ const HomeScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }]}>
-      <View style={[
-        styles.header, 
-        { 
-          backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background,
-        }
-      ]}>
+      <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.greetingContainer}>
             <Text style={[styles.greetingText, { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }]}>
@@ -276,85 +231,30 @@ const HomeScreen = () => {
             </Text>
           </View>
           <View style={styles.iconRow}>
-            <TouchableOpacity 
-              onPress={toggleTheme} 
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Profile')}
               style={[styles.iconButton, { backgroundColor: theme === 'dark' ? colors.nameCardLight : colors.lightSearchbar }]}
             >
-              <Ionicons 
-                name={theme === 'dark' ? 'sunny-outline' : 'moon-outline'} 
-                size={20} 
-                color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} 
-              />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setLogoutModalVisible(true)} 
-              style={[styles.iconButton, { backgroundColor: theme === 'dark' ? colors.nameCardLight : colors.lightSearchbar }]}
-            >
-              <Ionicons 
-                name="log-out-outline" 
-                size={20} 
-                color={theme === 'dark' ? colors.priceDark : colors.nameCardLight} 
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color={theme === 'dark' ? colors.priceDark : colors.nameCardLight}
               />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <View style={styles.searchContainer}>
-        <View style={[
-          styles.searchInputContainer, 
-          { 
-            backgroundColor: theme === 'dark' ? colors.darkSearchbar : colors.lightSearchbar,
-            shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
-          }
-        ]}>
-          <Feather 
-            name="search" 
-            size={20} 
-            color={theme === 'dark' ? colors.darkSearch : colors.lightSearch} 
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={[
-              styles.searchInput,
-              {
-                color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader,
-              },
-            ]}
-            placeholder="Search products..."
-            placeholderTextColor={theme === 'dark' ? colors.darkSearch : colors.lightSearch}
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => handleSearchChange('')}>
-              <Feather 
-                name="x" 
-                size={20} 
-                color={theme === 'dark' ? colors.darkSearch : colors.lightSearch} 
-                style={styles.clearIcon}
-              />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-
       {errorMessage ? (
         <View style={styles.emptyContainer}>
-          <MaterialCommunityIcons 
-            name="emoticon-sad-outline" 
-            size={60} 
-            color={theme === 'dark' ? colors.notFoundDark : colors.notFoundLight} 
+          <MaterialCommunityIcons
+            name="emoticon-sad-outline"
+            size={60}
+            color={theme === 'dark' ? colors.notFoundDark : colors.notFoundLight}
           />
           <Text style={[styles.emptyText, { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight }]}>
             {errorMessage}
           </Text>
-          <TouchableOpacity 
-            style={[styles.retryButton, { backgroundColor: theme === 'dark' ? colors.priceDark : colors.info }]}
-            onPress={fetchProducts}
-          >
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -367,23 +267,11 @@ const HomeScreen = () => {
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={renderListHeader()}
         />
-        
       )}
 
-      {/* Mini Loader when latest products expand */}
-        {latestLoading && (
-          <ActivityIndicator size="small" color={theme === 'dark' ? colors.lightHeader : colors.primary} style={{ marginVertical: 10 }} />
-        )}
-        
-      <CustomModal
-        isVisible={logoutModalVisible}
-        title="Logout"
-        message="Are you sure you want to logout?"
-        buttons={[
-          { label: 'Cancel', onPress: () => setLogoutModalVisible(false), type: 'secondary' },
-          { label: 'Log Out', onPress: handleLogout, type: 'primary' },
-        ]}
-      />
+      {latestLoading && (
+        <ActivityIndicator size="small" color={theme === 'dark' ? colors.lightHeader : colors.primary} style={{ marginVertical: 10 }} />
+      )}
     </View>
   );
 };
@@ -436,32 +324,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 10,
   },
-  searchContainer: {
-    paddingHorizontal: HORIZONTAL_PADDING,
-    marginBottom: 10,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    borderRadius: 12,
-    elevation: 2,
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  clearIcon: {
-    marginLeft: 10,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 14,
-    fontSize: scaleFont(16),
-    fontFamily: fonts.medium,
-  },
+  
   sectionTitle: {
     fontSize: scaleFont(20),
     fontFamily: fonts.Bold,

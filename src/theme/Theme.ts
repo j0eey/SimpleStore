@@ -46,6 +46,7 @@ export const fonts = {
     priceDarkDetails: '#0af',
     lineDark: '#444',
     imageBackground: '#f8f8f8',
+    avatarContainerBackground: '#e1e1e1',
 
   };
   

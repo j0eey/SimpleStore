@@ -127,7 +127,7 @@ const SignupScreen = ({ navigation }: any) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.lightHeader} />
           ) : (
             <Text style={styles.buttonText}>Sign Up</Text>
           )}
@@ -145,7 +145,7 @@ const SignupScreen = ({ navigation }: any) => {
   );
 };
 
-export default SignupScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -225,3 +225,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.light,
   },
 });
+
+export default SignupScreen;

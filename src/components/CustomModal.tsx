@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.darkHeader,
     shadowOffset: {
       width: 0,
       height: 2,

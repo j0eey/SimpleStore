@@ -110,7 +110,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color= {colors.lightHeader} />
         ) : (
           <Text style={styles.loginButtonText}>Login</Text>
         )}
@@ -137,7 +137,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   );
 };
 
-export default LoginScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -214,3 +214,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.italic,
   },
 });
+
+
+export default LoginScreen;
