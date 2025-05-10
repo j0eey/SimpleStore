@@ -124,13 +124,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       </Text>
 
       <CustomModal
-  isVisible={modalVisible}
-  title="Login Failed"
-  message="Invalid credentials. Please try again."
-  buttons={[
-    { label: 'Dismiss', onPress: () => setModalVisible(false), type: 'primary' },
-  ]}
-/>
+        isVisible={modalVisible}
+        title="Login Failed"
+        message="Invalid credentials. Please try again."
+        buttons={[
+          { label: 'Dismiss', onPress: () => setModalVisible(false), type: 'primary' },
+        ]}
+      />
 
 
     </View>

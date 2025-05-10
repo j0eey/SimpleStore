@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(20),
     fontFamily: fonts.Bold,
     marginBottom: 15,
-    marginTop: 5,
+    marginTop: 10,
   },
   sectionHeader: {
     flexDirection: 'row',
