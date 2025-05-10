@@ -11,16 +11,21 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useTheme } from '../contexts/ThemeContext';
 import { RootStackParamList } from '../navigation/types';
 
+// Type for navigation prop
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const { width } = Dimensions.get('window');
+
+// Helper function to scale font sizes based on device settings
 const scaleFont = (size: number) => size * PixelRatio.getFontScale();
 
+// Layout constants
 const HORIZONTAL_PADDING = 20;
 const CARD_GAP = 16;
 const CARD_WIDTH = (width - HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 
 const HomeScreen = () => {
+  // State management
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -32,16 +37,19 @@ const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { theme } = useTheme();
 
+  // Fetch products on initial render
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  // Update displayed products when showAllProducts or allProducts change
   useEffect(() => {
     if (allProducts.length > 0) {
       setDisplayedProducts(showAllProducts ? allProducts : allProducts.slice(0, 4));
     }
   }, [showAllProducts, allProducts]);
 
+  // Fetch products from API
   const fetchProducts = async () => {
     try {
       const data = await fetchProductsApi();
@@ -55,6 +63,7 @@ const HomeScreen = () => {
     }
   };
 
+  // Handle errors during fetching
   const handleError = (error: unknown) => {
     if (error instanceof Error) {
       setErrorMessage(error.message);
@@ -63,18 +72,20 @@ const HomeScreen = () => {
     }
   };
 
+  // Toggle between showing all products and a few
   const toggleShowAllProducts = () => {
     if (!showAllProducts) {
       setLatestLoading(true);
       setTimeout(() => {
         setShowAllProducts(true);
         setLatestLoading(false);
-      }, 1000);
+      }, 1000); // Simulated loading for UX
     } else {
       setShowAllProducts(false);
     }
   };
 
+  // Render a single product card
   const renderItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
       style={[styles.card, {
@@ -124,6 +135,7 @@ const HomeScreen = () => {
     </TouchableOpacity>
   );
 
+  // Render header: featured products, categories, and latest section
   const renderListHeader = () => {
     const renderFeaturedItem = ({ item }: { item: Product }) => (
       <TouchableOpacity
@@ -158,7 +170,7 @@ const HomeScreen = () => {
 
     return (
       <>
-        {/* Featured Products */}
+        {/* Featured Products List */}
         {featuredProducts.length > 0 && (
           <>
             <Text style={[styles.sectionTitle, { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader }]}>
@@ -175,7 +187,7 @@ const HomeScreen = () => {
           </>
         )}
 
-        {/* Categories */}
+        {/* Static Categories */}
         <Text style={[styles.sectionTitle, { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader }]}>
           Categories
         </Text>
@@ -195,7 +207,7 @@ const HomeScreen = () => {
           ))}
         </View>
 
-        {/* Latest Products */}
+        {/* Latest Products Section */}
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme === 'dark' ? colors.nameCardDark : colors.darkHeader }]}>
             Latest Products
@@ -210,6 +222,7 @@ const HomeScreen = () => {
     );
   };
 
+  // Show loader while fetching data
   if (loading) {
     return (
       <View style={[styles.loader, { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }]}>
@@ -218,8 +231,10 @@ const HomeScreen = () => {
     );
   }
 
+  // Main screen content
   return (
     <View style={[styles.container, { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }]}>
+      {/* Header greeting and profile button */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.greetingContainer}>
@@ -245,6 +260,7 @@ const HomeScreen = () => {
         </View>
       </View>
 
+      {/* Error message or products list */}
       {errorMessage ? (
         <View style={styles.emptyContainer}>
           <MaterialCommunityIcons
@@ -269,12 +285,14 @@ const HomeScreen = () => {
         />
       )}
 
+      {/* Small loader when switching product lists */}
       {latestLoading && (
         <ActivityIndicator size="small" color={theme === 'dark' ? colors.lightHeader : colors.primary} style={{ marginVertical: 10 }} />
       )}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

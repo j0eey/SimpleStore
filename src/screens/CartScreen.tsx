@@ -5,28 +5,28 @@ import { useTheme } from '../contexts/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const CartScreen = () => {
-  const { theme } = useTheme();
+  const { theme } = useTheme(); // Access current theme (light/dark)
 
   return (
     <View style={[
       styles.container,
-      { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }
+      { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background } // Dynamic background based on theme
     ]}>
       <View style={styles.emptyCartContainer}>
         <Ionicons
           name="cart-outline"
           size={80}
-          color={theme === 'dark' ? colors.darkSearch : colors.lightSearch}
+          color={theme === 'dark' ? colors.darkSearch : colors.lightSearch} // Dynamic icon color based on theme
         />
         <Text style={[
           styles.emptyCartText,
-          { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }
+          { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader } // Dynamic text color
         ]}>
           Empty Cart
         </Text>
         <Text style={[
           styles.emptyCartSubtext,
-          { color: theme === 'dark' ? colors.darkSearch : colors.lightSearch }
+          { color: theme === 'dark' ? colors.darkSearch : colors.lightSearch } // Dynamic subtext color
         ]}>
           Your cart is currently empty
         </Text>

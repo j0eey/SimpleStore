@@ -21,9 +21,11 @@ type LoginScreenProps = {
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login } = useAuth();
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+  const { control, handleSubmit, formState: { errors, isValid } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onChange', // important to track validity live
   });
+
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -105,9 +107,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
 
       <TouchableOpacity
-        style={styles.loginButton}
+        style={[styles.loginButton, (!isValid || loading) && { opacity: 0.5 }]}
         onPress={handleSubmit(onSubmit)}
-        disabled={loading}
+        disabled={!isValid || loading}
       >
         {loading ? (
           <ActivityIndicator color= {colors.lightHeader} />
@@ -126,18 +128,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       <CustomModal
         isVisible={modalVisible}
         title="Login Failed"
-        message="Invalid credentials. Please try again."
+        message={errorMessage || "An error occurred. Please try again."}
         buttons={[
-          { label: 'Dismiss', onPress: () => setModalVisible(false), type: 'primary' },
+          { label: 'Dismiss', onPress: closeModal, type: 'primary' },
         ]}
       />
-
-
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
