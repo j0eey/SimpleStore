@@ -5,7 +5,6 @@ import { RootStackParamList } from './types';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import VerificationScreen from '../screens/VerificationScreen';
-import HomeScreen from '../screens/HomeScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext'; 
@@ -13,6 +12,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Share } from 'react-native';
 import { colors } from '../theme/Theme';
 import SplashScreen from '../screens/SplashScreen';
+import TabsNavigator from './TabsNavigator'; // <-- Now we're importing TabsNavigator
+
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
@@ -40,9 +41,10 @@ const AppNavigator = () => {
           <Stack.Screen name="Splash" component={SplashScreen} />
         ) : isAuthenticated ? (
           <>
+            {/* Use TabsNavigator here */}
             <Stack.Screen
-              name="Home"
-              component={HomeScreen}
+              name="HomeTabs"
+              component={TabsNavigator}
               options={{ animation: 'fade' }}
             />
             <Stack.Screen
