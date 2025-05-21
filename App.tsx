@@ -4,6 +4,8 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import Toast from 'react-native-toast-message';
+import  toastConfig  from './src/components/toastConfig';
 
 const ThemedApp = () => {
   const { theme } = useTheme();
@@ -18,6 +20,7 @@ const ThemedApp = () => {
         barStyle={barStyle}
       />
       <AppNavigator />
+      <Toast config={toastConfig} topOffset={50} />
     </SafeAreaView>
   );
 };

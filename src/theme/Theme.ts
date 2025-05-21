@@ -1,5 +1,3 @@
-import { ImageBackground } from "react-native";
-
 export const fonts = {
     regular: 'Poppins-Regular',
     semiBold: 'Poppins-SemiBold',
@@ -15,9 +13,9 @@ export const fonts = {
     extraLightItalic: 'Poppins-ExtraLightItalic',
     extraBoldItalic: 'Poppins-ExtraBoldItalic',
     medium: 'Poppins-Medium',
-  };
-  
-  export const colors = {
+};
+
+export const colors = {
     primary: '#007BFF',
     success: '#34C759',
     background: '#ffffff',
@@ -47,6 +45,88 @@ export const fonts = {
     lineDark: '#444',
     imageBackground: '#f8f8f8',
     avatarContainerBackground: '#e1e1e1',
+    gray: '#808080',
+    disabled: '#d3d3d3',
+    icon: '#000000',
+    SuccessToast: '#4CAF50',
+    ErrorToast: '#F44336',
 
-  };
-  
+    darkBackground: '#121212',
+    darkText: '#ffffff',
+    darkTextSecondary: '#aaaaaa',
+    darkBorder: '#333333',
+    darkInputBackground: '#1e1e1e',
+    darkIcon: '#ffffff',
+    darkPlaceholder: '#666666',
+    darkError: '#ff4444',
+    darkPrimary: '#0a84ff',
+    darkSuccess: '#2e7d32',
+    darkWarning: '#ff8f00',
+    darkInfo: '#1565c0',
+    danger: '#FF3B30',           
+    primaryDark: '#005BB5',
+    lightText: '#E0E0E0',
+    primaryLight: '#66B2FF',
+    semitransparentwhite: '#ffffffcc',
+
+};
+
+export type Theme = {
+    colors: {
+        background: string;
+        text: string;
+        textSecondary: string;
+        primary: string;
+        border: string;
+        inputBackground: string;
+        error: string;
+        success: string;
+        warning: string;
+        info: string;
+        icon: string;
+        placeholder: string;
+        header: string;
+        card: string;
+    };
+    fonts: typeof fonts;
+};
+
+export const lightTheme: Theme = {
+    colors: {
+        background: colors.background,
+        text: colors.textPrimary,
+        textSecondary: colors.textSecondary,
+        primary: colors.primary,
+        border: colors.border,
+        inputBackground: colors.inputBackground,
+        error: colors.error,
+        success: colors.success,
+        warning: colors.warning,
+        info: colors.info,
+        icon: colors.icon,
+        placeholder: colors.textSecondary,
+        header: colors.lightHeader,
+        card: colors.lightCard,
+    },
+    fonts,
+};
+
+export const darkTheme: Theme = {
+    colors: {
+        background: colors.darkBackground,
+        text: colors.darkText,
+        textSecondary: colors.darkTextSecondary,
+        primary: colors.darkPrimary,
+        border: colors.darkBorder,
+        inputBackground: colors.darkInputBackground,
+        error: colors.darkError,
+        success: colors.darkSuccess,
+        warning: colors.darkWarning,
+        info: colors.darkInfo,
+        icon: colors.darkIcon,
+        placeholder: colors.darkPlaceholder,
+        header: colors.darkHeader,
+        card: colors.darkCard,
+    },
+    fonts,
+};

@@ -24,12 +24,18 @@
     "react-native": "0.79.2",
     "react-native-asset": "^2.1.1",
     "react-native-gesture-handler": "^2.25.0",
+    "react-native-google-places-autocomplete": "^2.5.7",
+    "react-native-image-picker": "^8.2.1",
+    "react-native-maps": "^1.23.8",
     "react-native-modal": "^14.0.0-rc.1",
+    "react-native-permissions": "^5.4.0",
     "react-native-reanimated": "^3.17.5",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",
     "react-native-skeleton-placeholder": "^5.2.4",
+    "react-native-toast-message": "^2.3.0",
     "react-native-vector-icons": "^10.2.0",
+    "sonner": "^2.0.3",
     "zod": "^3.24.4"
   },
   "devDependencies": {

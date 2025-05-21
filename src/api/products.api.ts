@@ -1,23 +1,38 @@
-import { Product } from '../types/Product';
+import apiClient, { API_BASE_URL } from './apiClient';
+import { Product, ApiResponse, ProductImage, SingleProductApiResponse  } from '../types/Product';
 
-export const fetchProductsApi = async (): Promise<Product[]> => {
-  try {
-    const productsData = require('../data/Products.json');
-    return productsData.data;
-  } catch (error) {
-    throw new Error('Failed to load products.');
-  }
+export const fetchProductsApi = async (page: number = 1): Promise<Product[]> => {
+  const response = await apiClient.get<ApiResponse>(`/api/products?page=${page}`);
+
+  return response.data.data.map((product: Product) => ({
+    ...product,
+    images: product.images.map((image: ProductImage) => ({
+      ...image,
+      fullUrl: `${API_BASE_URL}${image.url}`,
+    })),
+  }));
 };
 
-export const searchProductsApi = async (query: string): Promise<Product[]> => {
-  try {
-    const productsData = require('../data/Products.json');
-    const products: Product[] = productsData.data;
-    const filteredProducts = products.filter(product =>
-      product.title.toLowerCase().includes(query.toLowerCase())
-    );
-    return filteredProducts;
-  } catch (error) {
-    throw new Error('Failed to search products.');
-  }
+
+
+export const addProductApi = async (formData: FormData): Promise<Product> => {
+  const response = await apiClient.post<SingleProductApiResponse>('/api/products', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const product = response.data.data;
+
+  // Type cast the images from the API response to ProductImage type
+  const typedImages = product.images as ProductImage[];
+
+  return {
+    ...product,
+    images: typedImages.map((image) => ({
+      ...image,
+      fullUrl: `${API_BASE_URL}${image.url}`,
+    })),
+  };
 };
+

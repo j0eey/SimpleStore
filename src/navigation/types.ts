@@ -2,7 +2,7 @@ export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
   Signup: undefined;
-  Verification: undefined;
+  Verification: { email: string };
   Home: undefined;
   ProductDetails: {
     id: string;
@@ -10,6 +10,16 @@ export type RootStackParamList = {
     description: string;
     image: string;
     price: number;
+    location?: string;
+    postedDate?: string;
   };
   Profile: undefined;
+  Category: { category: string };
+  TabsNavigator: undefined;
+  ForgotPassword: undefined;
+  Notifications: undefined;
+  Search: undefined;
+  ViewAll: undefined;
+  AddNewProduct: undefined;
+  
 };

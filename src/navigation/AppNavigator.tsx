@@ -14,6 +14,7 @@ import { Share } from 'react-native';
 import { colors } from '../theme/Theme';
 import SplashScreen from '../screens/SplashScreen';
 import TabsNavigator from './TabsNavigator';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -43,7 +44,7 @@ const AppNavigator = () => {
         ) : isAuthenticated ? (
           <>
             <Stack.Screen
-              name="HomeTabs"
+              name="TabsNavigator"
               component={TabsNavigator}
               options={{ animation: 'fade' }}
             />
@@ -89,21 +90,7 @@ const AppNavigator = () => {
             <Stack.Screen
               name="Profile"
               component={ProfileScreen}
-              options={({ navigation }) => ({
-                headerShown: true,
-                headerTitle: 'My Profile',
-                headerStyle,
-                headerTintColor: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
-                headerLeft: () => (
-                  <Ionicons
-                    name="chevron-back"
-                    size={28}
-                    color={theme === 'dark' ? colors.lightHeader : colors.info}
-                    style={{ marginLeft: 16 }}
-                    onPress={() => navigation.goBack()}
-                  />
-                ),
-              })}
+              options={{ animation: 'fade' }}
             />
           </>
         ) : (
@@ -123,6 +110,11 @@ const AppNavigator = () => {
               component={VerificationScreen}
               options={{ animation: 'fade' }}
             />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+              options={{ animation: 'fade' }} 
+            />  
           </>
         )}
       </Stack.Navigator>

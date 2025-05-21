@@ -1,8 +1,24 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Modal from 'react-native-modal';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { colors, fonts } from '../theme/Theme';
-import { CustomModalProps } from './CustomModalTypes';
+
+
+type ButtonProps = {
+  label: string;
+  onPress: () => void;
+  type?: 'primary' | 'secondary' | 'text';
+};
+
+type CustomModalProps = {
+  isVisible: boolean;
+  title: string;
+  message: string;
+  buttons?: ButtonProps[];
+  onClose?: () => void;
+  showConfirmButton?: boolean;
+  confirmText?: string;
+  
+};
 
 const CustomModal: React.FC<CustomModalProps> = ({ 
   isVisible, 
@@ -17,61 +33,55 @@ const CustomModal: React.FC<CustomModalProps> = ({
   ];
 
   return (
-    <Modal
-      isVisible={isVisible}
-      onBackdropPress={onClose}
-      backdropOpacity={0.5}
-      backdropTransitionInTiming={200}
-      backdropTransitionOutTiming={200}
-      animationIn="fadeIn"
-      animationOut="fadeOut"
-      animationInTiming={200}
-      animationOutTiming={200}
-      useNativeDriver={true}
-      hideModalContentWhileAnimating={true}
-      statusBarTranslucent={true}
-    >
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>{title}</Text>
-        <Text style={styles.modalMessage}>{message}</Text>
-        
-        <View style={styles.buttonsContainer}>
-          {modalButtons.map((button, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.button,
-                button.type === 'secondary' ? styles.secondaryButton : 
-                button.type === 'text' ? styles.textButton : 
-                styles.primaryButton
-              ]}
-              onPress={button.onPress}
-              activeOpacity={0.7}
-            >
-              <Text style={[
-                styles.buttonText,
-                button.type === 'secondary' ? styles.secondaryButtonText : 
-                button.type === 'text' ? styles.textButtonText : 
-                styles.primaryButtonText
-              ]}>
-                {button.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+    <Modal visible={isVisible} transparent animationType="fade">
+      <View style={styles.modalBackground}>
+        <View style={styles.modalBox}>
+          {title && <Text style={styles.modalTitle}>{title}</Text>}
+          <Text style={styles.modalMessage}>{message}</Text>
+          
+          <View style={styles.buttonsContainer}>
+            {modalButtons.map((button, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.button,
+                  button.type === 'secondary' ? styles.secondaryButton : 
+                  button.type === 'text' ? styles.textButton : 
+                  styles.primaryButton
+                ]}
+                onPress={button.onPress}
+                activeOpacity={0.7}
+              >
+                <Text style={[
+                  styles.buttonText,
+                  button.type === 'secondary' ? styles.secondaryButtonText : 
+                  button.type === 'text' ? styles.textButtonText : 
+                  styles.primaryButtonText
+                ]}>
+                  {button.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </View>
     </Modal>
   );
 };
 
-export default CustomModal;
-
 const styles = StyleSheet.create({
-  modalContent: {
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalBox: {
     backgroundColor: colors.background,
     padding: 24,
     borderRadius: 12,
-    alignItems: 'center',
+    width: '100%',
   },
   modalTitle: {
     fontSize: 22,
@@ -128,3 +138,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
 });
+
+export default CustomModal;

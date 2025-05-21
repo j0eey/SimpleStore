@@ -6,7 +6,7 @@ import TabsNavigator from './TabsNavigator';
 const Stack = createNativeStackNavigator();
 
 const MainNavigator = () => {
-  const isLoggedIn = true; // later you can control it with Context or Redux
+  const isLoggedIn = true;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

@@ -4,18 +4,29 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import { fonts, colors } from '../theme/Theme';
-
+import { useTheme } from '../contexts/ThemeContext';
 
 type SplashScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Splash'>;
 
 const SplashScreen = () => {
     const navigation = useNavigation<SplashScreenNavigationProp>();
+    const { theme } = useTheme();
+    const isDarkMode = theme === 'dark';
+    
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Sample Store</Text>
+      <View style={[
+        styles.container,
+        isDarkMode && { backgroundColor: colors.darkBackground }
+      ]}>
+        <Text style={[
+          styles.text,
+          isDarkMode && { color: colors.darkText }
+        ]}>
+          Simple Store
+        </Text>
       </View>
     );
-  };
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -32,5 +43,3 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
-
-
