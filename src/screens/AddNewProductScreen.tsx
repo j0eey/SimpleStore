@@ -17,19 +17,26 @@ import { colors, fonts } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
 import { launchCamera, launchImageLibrary, Asset} from 'react-native-image-picker';
 import { addProductApi } from '../api/products.api';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { useFocusEffect } from '@react-navigation/native';
+import { LocationType } from '../navigation/types';
+
 
 const AddNewProductScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
+  
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [location, setLocation] = useState({
-    name: '',
-    latitude: 0,
-    longitude: 0,
-  });
+  const [location, setLocation] = useState<LocationType>({
+  name: '',
+  latitude: 0,
+  longitude: 0,
+});
+
   const [images, setImages] = useState<Asset[]>([]);
 
   const handleImagePick = async () => {
@@ -147,6 +154,19 @@ const AddNewProductScreen = () => {
 
   const themedColor = theme === 'dark';
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const currentRoute = navigation.getState().routes[navigation.getState().index];
+      if (currentRoute.params && 'selectedLocation' in currentRoute.params) {
+        const params = currentRoute.params as { selectedLocation?: LocationType };
+
+        if (params.selectedLocation) {
+          setLocation(params.selectedLocation);
+        }
+      }
+    }, [navigation])
+  );
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -213,7 +233,7 @@ const AddNewProductScreen = () => {
         numberOfLines={4}
       />
 
-      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Price</Text>
+      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Price (USD)</Text>
       <TextInput
         style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
         placeholder="Enter price"
@@ -223,14 +243,21 @@ const AddNewProductScreen = () => {
         onChangeText={setPrice}
       />
 
-      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Location Name</Text>
-      <TextInput
-        style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
-        placeholder="Location name"
-        placeholderTextColor={colors.darkBorder}
-        value={location.name}
-        onChangeText={(val) => setLocation({ ...location, name: val })}
-      />
+      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Location</Text>
+      <TouchableOpacity
+        style={[styles.input, { justifyContent: 'center', backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
+        onPress={() =>
+          navigation.navigate('MapsScreen', {
+            onLocationSelected: (selectedLocation: LocationType) => {
+              setLocation(selectedLocation);
+            },
+          })
+        }
+      >
+        <Text style={{ color: location.name ? colors.text : colors.darkBorder }}>
+          {location.name || 'Select location on map'}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.submitButton, { backgroundColor: themedColor ? colors.primary : colors.primaryDark }]}

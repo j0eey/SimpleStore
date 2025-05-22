@@ -20,8 +20,16 @@ export type RootStackParamList = {
   Notifications: undefined;
   Search: undefined;
   ViewAll: undefined;
-  AddNewProduct: { selectedLocation?: LocationType } | undefined;
-  SelectLocation: undefined;
+  MapsScreen: {
+    onLocationSelected: (location: LocationType) => void;
+  };
+  AddNewProduct: {
+    selectedLocation?: {
+      name: string;
+      latitude: number;
+      longitude: number;
+    };
+  };
   
 };
 

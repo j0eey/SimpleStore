@@ -15,10 +15,8 @@ import { colors } from '../theme/Theme';
 import SplashScreen from '../screens/SplashScreen';
 import TabsNavigator from './TabsNavigator';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
-// import SelectLocationScreen from '../screens/SelectLocationScreen';
+import MapsScreen from '../screens/MapsScreen';
 import AddNewProductScreen from '../screens/AddNewProductScreen';
-import { API_BASE_URL } from '../api/apiClient';
-import { refreshTokenApi } from '../api/auth.api';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -101,11 +99,11 @@ const AppNavigator = () => {
               component={AddNewProductScreen}
               options={{ animation: 'fade' }}
             />
-            {/* <Stack.Screen
-              name="SelectLocation"
-              component={SelectLocationScreen}
+            <Stack.Screen
+              name="MapsScreen"
+              component={MapsScreen}
               options={{ animation: 'fade' }}
-            /> */}
+            />
           </>
         ) : (
           <>
