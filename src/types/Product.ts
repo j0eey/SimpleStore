@@ -1,17 +1,28 @@
+
 export type Product = {
-  location: { name: string; longitude: number; latitude: number };
+  location: {
+    name: string;
+    longitude: number;
+    latitude: number;
+  };
   _id: string;
   title: string;
   description: string;
   price: number;
-  images: ProductImageWithFullUrl[];
-  user: string | { _id: string; email: string }; // Allow both string and object
+  images: Array<{
+    url: string;
+    _id: string;
+    fullUrl: string;
+  }>;
+  user: {
+    _id: string;
+    email: string;
+  };
   createdAt: string;
   updatedAt: string;
   __v: number;
 };
 
-// For API responses that return arrays of products
 export interface ApiResponse {
   success: boolean;
   data: Product[];
@@ -25,17 +36,32 @@ export interface ApiResponse {
   };
 }
 
-// For API responses that return a single product
-export interface SingleProductApiResponse {
-  success: boolean;
-  data: Product;
-}
-
 export interface ProductImage {
   url: string;
   _id: string;
 }
 
-export interface ProductImageWithFullUrl extends ProductImage {
-  fullUrl: string;
-}
+
+
+export type ProductData = {
+  title: string;
+  description: string;
+  price: number;
+  location: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  images: Asset[];  // Correctly typed now
+};
+export type Asset = {
+  uri: string;          // must be local file path or remote file URI
+  type?: string;        // e.g., 'image/jpeg'
+  fileName?: string;    // e.g., 'photo.jpg'
+};
+
+
+
+
+
+

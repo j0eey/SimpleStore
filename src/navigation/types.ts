@@ -20,6 +20,13 @@ export type RootStackParamList = {
   Notifications: undefined;
   Search: undefined;
   ViewAll: undefined;
-  AddNewProduct: undefined;
+  AddNewProduct: { selectedLocation?: LocationType } | undefined;
+  SelectLocation: undefined;
   
+};
+
+export type LocationType = {
+  name: string;
+  latitude: number;
+  longitude: number;
 };

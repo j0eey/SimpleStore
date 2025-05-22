@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { colors, fonts } from '../theme/Theme';
-import { searchProductsApi } from '../api/products.api';
+// import { searchProductsApi } from '../api/products.api';
 import { Product } from '../types/Product';
 import { useTheme } from '../contexts/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -25,17 +25,17 @@ const SearchScreen = () => {
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-    try {
-      const results = await searchProductsApi(query);
-      setSearchResults(results);
-    } catch (err) {
-      setError('Failed to search products');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    // setIsLoading(true);
+    // setError('');
+    // try {
+    //   const results = await searchProductsApi(query);
+    //   setSearchResults(results);
+    // } catch (err) {
+    //   setError('Failed to search products');
+    //   console.error(err);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const renderProductItem = ({ item }: { item: Product }) => (
