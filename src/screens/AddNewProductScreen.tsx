@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Alert,
-  PermissionsAndroid, 
-  Platform,
-  ActivityIndicator
-} from 'react-native';
+import { View,Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, PermissionsAndroid, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -23,6 +11,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import { LocationType } from '../navigation/types';
+import { getErrorMessage } from '../utils/getErrorMessage';
+import { getSuccessMessage } from '../utils/getSuccessMessage';
+import { getFailureMessage, getProductFailureCreationMessage } from '../utils/getFailureMessage';
 
 
 const AddNewProductScreen = () => {
@@ -45,7 +36,7 @@ const AddNewProductScreen = () => {
       const result = await launchImageLibrary({
         mediaType: 'photo',
         selectionLimit: 5,
-        includeBase64: true // Add this line
+        includeBase64: true
       });
 
       if (Array.isArray(result.assets)) {
@@ -54,7 +45,11 @@ const AddNewProductScreen = () => {
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      Alert.alert('Error', 'Failed to select images. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: getErrorMessage(error),
+        position: 'bottom'
+      });
     }
   };
 
@@ -62,30 +57,26 @@ const AddNewProductScreen = () => {
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Camera Permission',
-            message: 'App needs permission to access your camera',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
+          PermissionsAndroid.PERMISSIONS.CAMERA
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
         console.warn(err);
         return false;
       }
-    } else {
-      return true;
     }
+    return true;
   };
 
   const handleCameraCapture = async () => {
     const hasPermission = await requestCameraPermission();
 
     if (!hasPermission) {
-      Alert.alert('Permission denied', 'Camera permission is required to take photos.');
+      Toast.show({
+        type: 'error',
+        text1: getFailureMessage('Camera permission is required to take photos.'),
+        position: 'bottom'
+      });
       return;
     }
 
@@ -99,7 +90,11 @@ const AddNewProductScreen = () => {
       } else if (result.errorCode || result.errorMessage) {
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to capture image. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: getErrorMessage(error),
+        position: 'bottom'
+      });
     }
   };
 
@@ -109,7 +104,11 @@ const AddNewProductScreen = () => {
 
   const handleSubmit = async () => {
     if (!name || !description || !price || !location.name || images.length === 0) {
-      Alert.alert('Error', 'Please fill out all fields and add at least one image.');
+      Toast.show({
+        type: 'error',
+        text1: getFailureMessage('Please fill out all fields and add at least one image.'),
+        position: 'bottom'
+      });
       return;
     }
 
@@ -132,8 +131,12 @@ const AddNewProductScreen = () => {
         });
       });
 
-      await addProductApi(formData);
-      Alert.alert('Success', 'Product added successfully!');
+      const response = await addProductApi(formData);
+      Toast.show({
+        type: 'success',
+        text1: getSuccessMessage(response),
+        position: 'bottom'
+      });
       navigation.goBack();
     } catch (error) {
       if (typeof error === 'object' && error !== null) {
@@ -151,7 +154,11 @@ const AddNewProductScreen = () => {
       } else {
         console.error('Submit error details:', error);
       }
-      Alert.alert('Error', 'Failed to add product. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: getProductFailureCreationMessage(error),
+        position: 'bottom'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -326,6 +333,7 @@ const AddNewProductScreen = () => {
         <Text style={[styles.cancelText, { color: colors.primaryDark }]}>Cancel</Text>
       </TouchableOpacity>
 
+      <Toast />
     </ScrollView>
   );
 };
