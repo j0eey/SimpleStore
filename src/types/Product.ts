@@ -41,8 +41,6 @@ export interface ProductImage {
   _id: string;
 }
 
-
-
 export type ProductData = {
   title: string;
   description: string;

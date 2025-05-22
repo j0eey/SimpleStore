@@ -68,6 +68,7 @@ export const colors = {
     lightText: '#E0E0E0',
     primaryLight: '#66B2FF',
     semitransparentwhite: '#ffffffcc',
+    lightBorder: '#e0e0e0',
 
 };
 

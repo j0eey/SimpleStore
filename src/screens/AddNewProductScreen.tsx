@@ -8,7 +8,9 @@ import {
   ScrollView,
   Image,
   Alert,
-  PermissionsAndroid, Platform
+  PermissionsAndroid, 
+  Platform,
+  ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -27,17 +29,16 @@ const AddNewProductScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
   
-
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState<LocationType>({
-  name: '',
-  latitude: 0,
-  longitude: 0,
-});
-
+    name: '',
+    latitude: 0,
+    longitude: 0,
+  });
   const [images, setImages] = useState<Asset[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImagePick = async () => {
     try {
@@ -112,45 +113,49 @@ const AddNewProductScreen = () => {
       return;
     }
 
-  try {
-    const formData = new FormData();
-    formData.append('title', name);
-    formData.append('description', description);
-    formData.append('price', price);
-    formData.append('location[name]', location.name);
-    formData.append('location[latitude]', String(location.latitude));
-    formData.append('location[longitude]', String(location.longitude));
+    setIsSubmitting(true);
 
-    images.forEach((img, index) => {
-      formData.append('images', {
-        uri: img.uri!,
-        type: img.type!,
-        name: img.fileName || `photo${index}.jpg`,
-      });
-    });
+    try {
+      const formData = new FormData();
+      formData.append('title', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('location[name]', location.name);
+      formData.append('location[latitude]', String(location.latitude));
+      formData.append('location[longitude]', String(location.longitude));
 
-    await addProductApi(formData);
-    Alert.alert('Success', 'Product added successfully!');
-    navigation.goBack();
-  } catch (error) {
-    if (typeof error === 'object' && error !== null) {
-      console.error('Submit error details:', {
-        message: (error as any).message,
-        response: (error as any).response?.data,
-        stack: (error as any).stack,
-        images: images.map(img => ({
-          uri: img.uri,
-          type: img.type,
-          name: img.fileName,
-          size: img.fileSize
-        }))
+      images.forEach((img, index) => {
+        formData.append('images', {
+          uri: img.uri!,
+          type: img.type!,
+          name: img.fileName || `photo${index}.jpg`,
+        });
       });
-    } else {
-      console.error('Submit error details:', error);
+
+      await addProductApi(formData);
+      Alert.alert('Success', 'Product added successfully!');
+      navigation.goBack();
+    } catch (error) {
+      if (typeof error === 'object' && error !== null) {
+        console.error('Submit error details:', {
+          message: (error as any).message,
+          response: (error as any).response?.data,
+          stack: (error as any).stack,
+          images: images.map(img => ({
+            uri: img.uri,
+            type: img.type,
+            name: img.fileName,
+            size: img.fileSize
+          }))
+        });
+      } else {
+        console.error('Submit error details:', error);
+      }
+      Alert.alert('Error', 'Failed to add product. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-    Alert.alert('Error', 'Failed to add product. Please try again.');
-  }
-};
+  };
 
   const themedColor = theme === 'dark';
 
@@ -184,6 +189,7 @@ const AddNewProductScreen = () => {
         <TouchableOpacity
           style={[styles.imageUpload, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
           onPress={handleImagePick}
+          disabled={isSubmitting}
         >
           <Ionicons name="image-outline" size={28} color={colors.primary} />
           <Text style={[styles.uploadText, { color: colors.primary }]}>Get from Gallery</Text>
@@ -192,6 +198,7 @@ const AddNewProductScreen = () => {
         <TouchableOpacity
           style={[styles.imageUpload, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
           onPress={handleCameraCapture}
+          disabled={isSubmitting}
         >
           <Ionicons name="camera-outline" size={28} color={colors.primary} />
           <Text style={[styles.uploadText, { color: colors.primary }]}>Take Photo</Text>
@@ -205,6 +212,7 @@ const AddNewProductScreen = () => {
             <TouchableOpacity
               style={styles.removeIcon}
               onPress={() => removeImage(idx)}
+              disabled={isSubmitting}
             >
               <Ionicons name="close-circle" size={22} color={colors.primaryDark} />
             </TouchableOpacity>
@@ -212,35 +220,55 @@ const AddNewProductScreen = () => {
         ))}
       </ScrollView>
 
-
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Name</Text>
       <TextInput
-        style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
+        style={[
+          styles.input, 
+          { 
+            backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
+            color: themedColor ? colors.lightText : colors.darkText  
+          }
+        ]}
         placeholder="Enter product name"
         placeholderTextColor={colors.darkBorder}
         value={name}
         onChangeText={setName}
+        editable={!isSubmitting}
       />
 
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Description</Text>
       <TextInput
-        style={[styles.input, styles.textArea, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
+        style={[
+          styles.input, 
+          { 
+            backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
+            color: themedColor ? colors.lightText : colors.darkText  
+          }
+        ]}
         placeholder="Enter description"
         placeholderTextColor={colors.darkBorder}
         value={description}
         onChangeText={setDescription}
         multiline
         numberOfLines={4}
+        editable={!isSubmitting}
       />
 
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Price (USD)</Text>
       <TextInput
-        style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
+        style={[
+          styles.input, 
+          { 
+            backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
+            color: themedColor ? colors.lightText : colors.darkText  
+          }
+        ]}
         placeholder="Enter price"
         placeholderTextColor={colors.darkBorder}
         keyboardType="numeric"
         value={price}
         onChangeText={setPrice}
+        editable={!isSubmitting}
       />
 
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Location</Text>
@@ -253,18 +281,36 @@ const AddNewProductScreen = () => {
             },
           })
         }
+        disabled={isSubmitting}
       >
-        <Text style={{ color: location.name ? colors.text : colors.darkBorder }}>
+        <Text style={{ color: location.name ? colors.lightText  : colors.darkBorder }}>
           {location.name || 'Select location on map'}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: themedColor ? colors.primary : colors.primaryDark }]}
+        style={[
+          styles.submitButton, 
+          { 
+            backgroundColor: isSubmitting 
+              ? (themedColor ? colors.darkBorder : colors.lightBorder)
+              : (themedColor ? colors.primary : colors.primaryDark),
+            opacity: isSubmitting ? 0.7 : 1
+          }
+        ]}
         onPress={handleSubmit}
+        disabled={isSubmitting}
       >
-        <Text style={styles.submitText}>Submit Product</Text>
+        {isSubmitting ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color={colors.lightHeader} size="small" />
+            <Text style={[styles.submitText, { marginLeft: 8 }]}>Submitting...</Text>
+          </View>
+        ) : (
+          <Text style={styles.submitText}>Submit Product</Text>
+        )}
       </TouchableOpacity>
+
       <TouchableOpacity
         style={[styles.cancelButton, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
         onPress={() => {
@@ -275,6 +321,7 @@ const AddNewProductScreen = () => {
           setImages([]);
           navigation.goBack();
         }}
+        disabled={isSubmitting}
       >
         <Text style={[styles.cancelText, { color: colors.primaryDark }]}>Cancel</Text>
       </TouchableOpacity>
@@ -324,7 +371,8 @@ const styles = StyleSheet.create({
   uploadText: { 
     fontSize: 14, 
     fontFamily: fonts.medium, 
-    marginLeft: 8 
+    marginLeft: 8,
+
   },
   imagePreviewContainer: { 
     marginBottom: 16 
@@ -345,6 +393,10 @@ const styles = StyleSheet.create({
     color: colors.lightHeader,
     fontSize: 16, 
     fontFamily: fonts.semiBold
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   imageWrapper: {
     position: 'relative',
@@ -371,9 +423,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.medium,
   },
-
-
-
 });
 
 export default AddNewProductScreen;
