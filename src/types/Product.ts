@@ -52,7 +52,7 @@ export type ProductData = {
     latitude: number;
     longitude: number;
   };
-  images: Asset[];  // Correctly typed now
+  images: Asset[];
 };
 export type Asset = {
   uri: string;          // must be local file path or remote file URI

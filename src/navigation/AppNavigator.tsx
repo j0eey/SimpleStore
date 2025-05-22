@@ -15,7 +15,7 @@ import { colors } from '../theme/Theme';
 import SplashScreen from '../screens/SplashScreen';
 import TabsNavigator from './TabsNavigator';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
-import SelectLocationScreen from '../screens/SelectLocationScreen';
+// import SelectLocationScreen from '../screens/SelectLocationScreen';
 import AddNewProductScreen from '../screens/AddNewProductScreen';
 import { API_BASE_URL } from '../api/apiClient';
 import { refreshTokenApi } from '../api/auth.api';
@@ -101,11 +101,11 @@ const AppNavigator = () => {
               component={AddNewProductScreen}
               options={{ animation: 'fade' }}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
               name="SelectLocation"
               component={SelectLocationScreen}
               options={{ animation: 'fade' }}
-            />
+            /> */}
           </>
         ) : (
           <>

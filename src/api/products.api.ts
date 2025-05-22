@@ -15,50 +15,25 @@ export const fetchProductsApi = async (page: number = 1): Promise<Product[]> => 
 };
 
 
-export const addProductApi = async (product: ProductData): Promise<any> => {
-  const formData = new FormData();
-
-  console.log('Preparing FormData for product:');
-
-  formData.append('title', product.title);
-  console.log('title:', product.title);
-
-  formData.append('description', product.description);
-  console.log('description:', product.description);
-
-  formData.append('price', product.price.toString());
-  console.log('price:', product.price);
-
-  formData.append('location', JSON.stringify(product.location));
-  console.log('Clean location:', product.location);
-  console.log('Location string:', JSON.stringify(product.location));
-
-
-  product.images.forEach((image, index) => {
-    if (image.uri) {
-      const imageData = {
-        uri: image.uri,
-        type: image.type || 'image/jpeg',
-        name: image.fileName || `image_${index}.jpg`,
-      };
-
-      formData.append('images', imageData as any);
-      console.log(`image[${index}]:`, imageData);
-    }
+export const addProductApi = async (formData: FormData): Promise<Product> => {
+  const response = await apiClient.post('/api/products', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 
-  try {
-    const response: AxiosResponse = await apiClient.post('/api/products', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  const product = response.data.data;
 
-    return response.data;
-  } catch (error: any) {
-    console.error('API error:', error.response?.data || error.message);
-    throw error;
-  }
+  // Type cast the images from the API response to ProductImage type
+  const typedImages = product.images as ProductImage[];
+
+  return {
+    ...product,
+    images: typedImages.map((image) => ({
+      ...image,
+      fullUrl: `${API_BASE_URL}${image.url}`,
+    })),
+  };
 };
 
 

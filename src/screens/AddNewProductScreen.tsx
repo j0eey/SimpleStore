@@ -17,20 +17,9 @@ import { colors, fonts } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
 import { launchCamera, launchImageLibrary, Asset} from 'react-native-image-picker';
 import { addProductApi } from '../api/products.api';
-import { ProductData } from '../types/Product';
-import { RootStackParamList } from '../navigation/types';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useRoute, useFocusEffect, RouteProp } from '@react-navigation/native';
-
-
-type NavigationProp = StackNavigationProp<RootStackParamList, 'AddNewProduct'>;
-type AddNewProductRouteProp = RouteProp<RootStackParamList, 'AddNewProduct'>;
-
-
 
 const AddNewProductScreen = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const route = useRoute<AddNewProductRouteProp>();
+  const navigation = useNavigation();
   const { theme } = useTheme();
 
   const [name, setName] = useState('');
@@ -41,20 +30,6 @@ const AddNewProductScreen = () => {
     latitude: 0,
     longitude: 0,
   });
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params?.selectedLocation) {
-        setLocation(route.params.selectedLocation);
-
-        // Clear param so it won't trigger again when navigating back
-        navigation.setParams({ selectedLocation: undefined });
-      }
-    }, [route.params?.selectedLocation])
-  );
-
-
-
   const [images, setImages] = useState<Asset[]>([]);
 
   const handleImagePick = async () => {
@@ -89,66 +64,70 @@ const AddNewProductScreen = () => {
     }
   };
 
+
   const handleCameraCapture = async () => {
-    const hasPermission = await requestCameraPermission();
+  const hasPermission = await requestCameraPermission();
 
-    if (!hasPermission) {
-      Alert.alert('Permission denied', 'Camera permission is required to take photos.');
-      return;
-    }
-
-    try {
-      const result = await launchCamera({ mediaType: 'photo' });
-
-      if (Array.isArray(result.assets)) {
-        const assets = result.assets as Asset[];
-        setImages(prev => [...prev, ...assets].slice(0, 5));
-      } else if (result.didCancel) {
-      } else if (result.errorCode || result.errorMessage) {
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to capture image. Please try again.');
-    }
-  };
-
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-const handleSubmit = async () => {
-  if (!name || !description || !price || !location.name || images.length === 0) {
-    Alert.alert('Missing Fields', 'Please fill in all fields and upload at least one image.');
+  if (!hasPermission) {
+    Alert.alert('Permission denied', 'Camera permission is required to take photos.');
     return;
   }
 
   try {
-    const productData: ProductData = {
-      title: name,
-      description,
-      price: Number(price),
-      location,
-      images: images
-        .filter((img): img is Asset & { uri: string } => typeof img.uri === 'string')
-        .map(img => ({
-          ...img,
-          uri: img.uri as string,
-        })),
-    };
+    const result = await launchCamera({ mediaType: 'photo' });
 
-    const res = await addProductApi(productData);
-    Toast.show({ type: 'success', text1: 'Product added successfully!' });
-    navigation.goBack();
-  } catch (error: any) {
-    console.error('Submit Error:', error);
-    Toast.show({ type: 'error', text1: 'Failed to add product' });
+    if (Array.isArray(result.assets)) {
+      const assets = result.assets as Asset[];
+      setImages(prev => [...prev, ...assets].slice(0, 5));
+    } else if (result.didCancel) {
+    } else if (result.errorCode || result.errorMessage) {
+    }
+  } catch (error) {
+    Alert.alert('Error', 'Failed to capture image. Please try again.');
   }
 };
 
 
 
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+
+
+  const handleSubmit = async () => {
+    if (!name || !description || !price || !location.name || images.length === 0) {
+      Alert.alert('Error', 'Please fill out all fields and add at least one image.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('title', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('location[name]', location.name);
+      formData.append('location[latitude]', String(location.latitude));
+      formData.append('location[longitude]', String(location.longitude));
+
+      images.forEach((img, index) => {
+        formData.append('images', {
+          uri: img.uri!,
+          type: img.type!,
+          name: img.fileName || `photo${index}.jpg`,
+        });
+      });
+
+      await addProductApi(formData);
+      Alert.alert('Success', 'Product added successfully!');
+      navigation.goBack();
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to add product. Please try again.');
+    }
+  };
 
   const themedColor = theme === 'dark';
-  
 
   return (
     <ScrollView
@@ -195,6 +174,7 @@ const handleSubmit = async () => {
         ))}
       </ScrollView>
 
+
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Name</Text>
       <TextInput
         style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
@@ -225,18 +205,14 @@ const handleSubmit = async () => {
         onChangeText={setPrice}
       />
 
-      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Location</Text>
-      <TouchableOpacity
-        style={[styles.input, { justifyContent: 'center' }]}
-        onPress={() => navigation.navigate('SelectLocation')}
-      >
-        <Text style={{ color: location.name ? colors.text : colors.darkBorder }}>
-          {location.name || 'Select Location from Map'}
-        </Text>
-      </TouchableOpacity>
-
-
-
+      <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>Location Name</Text>
+      <TextInput
+        style={[styles.input, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
+        placeholder="Location name"
+        placeholderTextColor={colors.darkBorder}
+        value={location.name}
+        onChangeText={(val) => setLocation({ ...location, name: val })}
+      />
 
       <TouchableOpacity
         style={[styles.submitButton, { backgroundColor: themedColor ? colors.primary : colors.primaryDark }]}
@@ -258,21 +234,19 @@ const handleSubmit = async () => {
         <Text style={[styles.cancelText, { color: colors.primaryDark }]}>Cancel</Text>
       </TouchableOpacity>
 
-      
-
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 60 },
-    title: {
-    fontSize: 28,
-    fontWeight: '700',
-    fontFamily: fonts.semiBold,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
+  title: {
+  fontSize: 28,
+  fontWeight: '700',
+  fontFamily: fonts.semiBold,
+  textAlign: 'center',
+  marginBottom: 20,
+},
   
   label: { fontSize: 16, fontFamily: fonts.semiBold, marginBottom: 6 },
   input: {
@@ -331,6 +305,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.medium,
   },
+
+
 
 });
 
