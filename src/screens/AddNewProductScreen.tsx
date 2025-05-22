@@ -33,11 +33,20 @@ const AddNewProductScreen = () => {
   const [images, setImages] = useState<Asset[]>([]);
 
   const handleImagePick = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 5 });
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 5,
+        includeBase64: true // Add this line
+      });
 
-    if (Array.isArray(result.assets)) {
-      const assets = result.assets as Asset[];
-      setImages(prev => [...prev, ...assets].slice(0, 5));
+      if (Array.isArray(result.assets)) {
+        const assets = result.assets as Asset[];
+        setImages(prev => [...prev, ...assets].slice(0, 5));
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to select images. Please try again.');
     }
   };
 
@@ -66,26 +75,26 @@ const AddNewProductScreen = () => {
 
 
   const handleCameraCapture = async () => {
-  const hasPermission = await requestCameraPermission();
+    const hasPermission = await requestCameraPermission();
 
-  if (!hasPermission) {
-    Alert.alert('Permission denied', 'Camera permission is required to take photos.');
-    return;
-  }
-
-  try {
-    const result = await launchCamera({ mediaType: 'photo' });
-
-    if (Array.isArray(result.assets)) {
-      const assets = result.assets as Asset[];
-      setImages(prev => [...prev, ...assets].slice(0, 5));
-    } else if (result.didCancel) {
-    } else if (result.errorCode || result.errorMessage) {
+    if (!hasPermission) {
+      Alert.alert('Permission denied', 'Camera permission is required to take photos.');
+      return;
     }
-  } catch (error) {
-    Alert.alert('Error', 'Failed to capture image. Please try again.');
-  }
-};
+
+    try {
+      const result = await launchCamera({ mediaType: 'photo' });
+
+      if (Array.isArray(result.assets)) {
+        const assets = result.assets as Asset[];
+        setImages(prev => [...prev, ...assets].slice(0, 5));
+      } else if (result.didCancel) {
+      } else if (result.errorCode || result.errorMessage) {
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to capture image. Please try again.');
+    }
+  };
 
 
 
@@ -101,31 +110,45 @@ const AddNewProductScreen = () => {
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append('title', name);
-      formData.append('description', description);
-      formData.append('price', price);
-      formData.append('location[name]', location.name);
-      formData.append('location[latitude]', String(location.latitude));
-      formData.append('location[longitude]', String(location.longitude));
+  try {
+    const formData = new FormData();
+    formData.append('title', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('location[name]', location.name);
+    formData.append('location[latitude]', String(location.latitude));
+    formData.append('location[longitude]', String(location.longitude));
 
-      images.forEach((img, index) => {
-        formData.append('images', {
-          uri: img.uri!,
-          type: img.type!,
-          name: img.fileName || `photo${index}.jpg`,
-        });
+    images.forEach((img, index) => {
+      formData.append('images', {
+        uri: img.uri!,
+        type: img.type!,
+        name: img.fileName || `photo${index}.jpg`,
       });
+    });
 
-      await addProductApi(formData);
-      Alert.alert('Success', 'Product added successfully!');
-      navigation.goBack();
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Failed to add product. Please try again.');
+    await addProductApi(formData);
+    Alert.alert('Success', 'Product added successfully!');
+    navigation.goBack();
+  } catch (error) {
+    if (typeof error === 'object' && error !== null) {
+      console.error('Submit error details:', {
+        message: (error as any).message,
+        response: (error as any).response?.data,
+        stack: (error as any).stack,
+        images: images.map(img => ({
+          uri: img.uri,
+          type: img.type,
+          name: img.fileName,
+          size: img.fileSize
+        }))
+      });
+    } else {
+      console.error('Submit error details:', error);
     }
-  };
+    Alert.alert('Error', 'Failed to add product. Please try again.');
+  }
+};
 
   const themedColor = theme === 'dark';
 

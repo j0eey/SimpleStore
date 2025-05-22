@@ -1,6 +1,6 @@
-import apiClient, { API_BASE_URL } from './apiClient';
-import { Product, ApiResponse, ProductImage, ProductData } from '../types/Product';
-import { AxiosResponse } from 'axios';
+  import apiClient, { API_BASE_URL } from './apiClient';
+  import { Product, ApiResponse, ProductImage, ProductData } from '../types/Product';
+
 
 export const fetchProductsApi = async (page: number = 1): Promise<Product[]> => {
   const response = await apiClient.get<ApiResponse>(`/api/products?page=${page}`);
