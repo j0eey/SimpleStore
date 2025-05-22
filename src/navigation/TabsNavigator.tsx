@@ -1,26 +1,31 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import CartScreen from '../screens/CartScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import AddNewProductScreen from '../screens/AddNewProductScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigation } from '@react-navigation/native';
+
 
 const Tab = createBottomTabNavigator();
 
-const CustomTabBarButton = ({ children, onPress }: any) => (
-  <TouchableOpacity
-    style={styles.customButtonContainer}
-    onPress={onPress}
-    activeOpacity={0.7}
-  >
-    <View style={styles.customButton}>{children}</View>
-  </TouchableOpacity>
-);
+const CustomTabBarButton = ({ children }: any) => {
+  const navigation = useNavigation<any>();
+
+  return (
+    <TouchableOpacity
+      style={styles.customButtonContainer}
+      onPress={() => navigation.navigate('AddNewProduct')}
+      activeOpacity={0.7}
+    >
+      <View style={styles.customButton}>{children}</View>
+    </TouchableOpacity>
+  );
+};
 
 const TabsNavigator = () => {
   const { theme } = useTheme();
@@ -30,8 +35,8 @@ const TabsNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: isDark ? colors.primaryDark : colors.primaryDark,
-        tabBarInactiveTintColor: isDark ? colors.darkSearch : colors.darkSearch,
+        tabBarActiveTintColor: colors.primaryDark,
+        tabBarInactiveTintColor: colors.darkSearch,
         tabBarStyle: {
           backgroundColor: isDark ? colors.darkHeader : colors.lightHeader,
           borderTopWidth: 0,
@@ -39,7 +44,7 @@ const TabsNavigator = () => {
           position: 'absolute',
         },
         tabBarIcon: ({ focused, color }) => {
-          let iconName: string = '';
+          let iconName = '';
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
           else if (route.name === 'Search') iconName = focused ? 'search' : 'search-outline';
           else if (route.name === 'Cart') iconName = focused ? 'cart' : 'cart-outline';
@@ -51,8 +56,8 @@ const TabsNavigator = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Search" component={SearchScreen} />
       <Tab.Screen
-        name="AddNewProduct"
-        component={AddNewProductScreen}
+        name="CreateNewProduct"
+        component={() => null}
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => (
@@ -61,7 +66,6 @@ const TabsNavigator = () => {
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
       />
-
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>

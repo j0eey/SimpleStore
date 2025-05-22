@@ -20,6 +20,7 @@ import AddNewProductScreen from '../screens/AddNewProductScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+
 const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
@@ -42,7 +43,9 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isSplashVisible ? (
-          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen
+           name="Splash" 
+           component={SplashScreen} />
         ) : isAuthenticated ? (
           <>
             <Stack.Screen
@@ -97,13 +100,14 @@ const AppNavigator = () => {
             <Stack.Screen
               name="AddNewProduct"
               component={AddNewProductScreen}
-              options={{ animation: 'fade' }}
+              options={{ animation: 'fade', presentation: 'modal' }}
             />
             <Stack.Screen
               name="MapsScreen"
               component={MapsScreen}
               options={{ animation: 'fade' }}
             />
+            
           </>
         ) : (
           <>
