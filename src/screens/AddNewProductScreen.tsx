@@ -73,7 +73,6 @@ const AddNewProductScreen = () => {
     }
   };
 
-
   const handleCameraCapture = async () => {
     const hasPermission = await requestCameraPermission();
 
@@ -96,13 +95,9 @@ const AddNewProductScreen = () => {
     }
   };
 
-
-
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
-
-
 
   const handleSubmit = async () => {
     if (!name || !description || !price || !location.name || images.length === 0) {
@@ -262,16 +257,22 @@ const AddNewProductScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, paddingBottom: 60 },
+  container: {
+   padding: 16, 
+   paddingBottom: 60 
+  },
   title: {
-  fontSize: 28,
-  fontWeight: '700',
-  fontFamily: fonts.semiBold,
-  textAlign: 'center',
-  marginBottom: 20,
-},
-  
-  label: { fontSize: 16, fontFamily: fonts.semiBold, marginBottom: 6 },
+    fontSize: 28,
+    fontWeight: '700',
+    fontFamily: fonts.semiBold,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  label: { 
+    fontSize: 16, 
+    fontFamily: fonts.semiBold, 
+    marginBottom: 6 
+  },
   input: {
     borderRadius: 10,
     paddingHorizontal: 14,
@@ -280,7 +281,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     marginBottom: 16,
   },
-  textArea: { height: 100, textAlignVertical: 'top' },
+  textArea: { 
+    height: 100, 
+    textAlignVertical: 'top' 
+  },
+
   imageUpload: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -289,9 +294,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginRight: 10,
   },
-  uploadText: { fontSize: 14, fontFamily: fonts.medium, marginLeft: 8 },
-  imagePreviewContainer: { marginBottom: 16 },
-  imagePreview: { width: 80, height: 80, borderRadius: 8, marginRight: 8 },
+  uploadText: { 
+    fontSize: 14, 
+    fontFamily: fonts.medium, 
+    marginLeft: 8 
+  },
+  imagePreviewContainer: { 
+    marginBottom: 16 
+  },
+  imagePreview: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 8, 
+    marginRight: 8 
+  },
   submitButton: {
     padding: 16,
     borderRadius: 10,
