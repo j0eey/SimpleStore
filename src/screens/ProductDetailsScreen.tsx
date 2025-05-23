@@ -1,4 +1,4 @@
-import React, { useState, FC, useEffect } from 'react';
+import React, { useState, FC, useEffect, useCallback  } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -27,6 +27,7 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   const [quantity, setQuantity] = useState(1);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -47,12 +48,22 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
 
   const handleIncrease = () => setQuantity(prev => prev + 1);
   const handleDecrease = () => quantity > 1 && setQuantity(prev => prev - 1);
-  const handleRefresh = () => {
-    setLoading(true);
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
     setErrorMessage(null);
-  };
+    try {
+      const productData = await fetchProductByIdApi(id);
+      setProduct(productData);
+      setQuantity(1);
+      setErrorMessage(null);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to load product details');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [id]);
 
-  if (loading) {
+  if (loading || refreshing) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: isDark ? colors.darkHeader : colors.background }]}>
         <ActivityIndicator size="large" color={isDark ? colors.lightHeader : colors.darkHeader} />
