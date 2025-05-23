@@ -12,14 +12,14 @@ import { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import { LocationType } from '../navigation/types';
 import { getErrorMessage } from '../utils/getErrorMessage';
-import { getSuccessMessage } from '../utils/getSuccessMessage';
+import { getProductSuccessMessage } from '../utils/getSuccessMessage';
 import { getFailureMessage, getProductFailureCreationMessage } from '../utils/getFailureMessage';
 
 
 const AddNewProductScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
-  
+  const themedColor = theme === 'dark';
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -44,29 +44,30 @@ const AddNewProductScreen = () => {
         setImages(prev => [...prev, ...assets].slice(0, 5));
       }
     } catch (error) {
-      console.error('Image picker error:', error);
       Toast.show({
         type: 'error',
         text1: getErrorMessage(error),
-        position: 'bottom'
       });
     }
   };
 
   const requestCameraPermission = async (): Promise<boolean> => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: getErrorMessage(err),
+      });
+      return false;
     }
-    return true;
-  };
+  }
+  return true;
+};
 
   const handleCameraCapture = async () => {
     const hasPermission = await requestCameraPermission();
@@ -75,7 +76,7 @@ const AddNewProductScreen = () => {
       Toast.show({
         type: 'error',
         text1: getFailureMessage('Camera permission is required to take photos.'),
-        position: 'bottom'
+        
       });
       return;
     }
@@ -93,7 +94,6 @@ const AddNewProductScreen = () => {
       Toast.show({
         type: 'error',
         text1: getErrorMessage(error),
-        position: 'bottom'
       });
     }
   };
@@ -103,68 +103,50 @@ const AddNewProductScreen = () => {
   };
 
   const handleSubmit = async () => {
-    if (!name || !description || !price || !location.name || images.length === 0) {
-      Toast.show({
-        type: 'error',
-        text1: getFailureMessage('Please fill out all fields and add at least one image.'),
-        position: 'bottom'
+  if (!name || !description || !price || !location.name || images.length === 0) {
+    Toast.show({
+      type: 'error',
+      text1: getFailureMessage('Please fill out all fields and add at least one image.'),
+    });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('title', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('location[name]', location.name);
+    formData.append('location[latitude]', String(location.latitude));
+    formData.append('location[longitude]', String(location.longitude));
+
+    images.forEach((img, index) => {
+      formData.append('images', {
+        uri: img.uri!,
+        type: img.type!,
+        name: img.fileName || `photo${index}.jpg`,
       });
-      return;
-    }
+    });
 
-    setIsSubmitting(true);
+    const response = await addProductApi(formData);
+    Toast.show({
+      type: 'success',
+      text1: getProductSuccessMessage(response),
+    });
+    navigation.goBack();
+  } catch (error) {
+    Toast.show({
+      type: 'error',
+      text1: getProductFailureCreationMessage(error),
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    try {
-      const formData = new FormData();
-      formData.append('title', name);
-      formData.append('description', description);
-      formData.append('price', price);
-      formData.append('location[name]', location.name);
-      formData.append('location[latitude]', String(location.latitude));
-      formData.append('location[longitude]', String(location.longitude));
-
-      images.forEach((img, index) => {
-        formData.append('images', {
-          uri: img.uri!,
-          type: img.type!,
-          name: img.fileName || `photo${index}.jpg`,
-        });
-      });
-
-      const response = await addProductApi(formData);
-      Toast.show({
-        type: 'success',
-        text1: getSuccessMessage(response),
-        position: 'bottom'
-      });
-      navigation.goBack();
-    } catch (error) {
-      if (typeof error === 'object' && error !== null) {
-        console.error('Submit error details:', {
-          message: (error as any).message,
-          response: (error as any).response?.data,
-          stack: (error as any).stack,
-          images: images.map(img => ({
-            uri: img.uri,
-            type: img.type,
-            name: img.fileName,
-            size: img.fileSize
-          }))
-        });
-      } else {
-        console.error('Submit error details:', error);
-      }
-      Toast.show({
-        type: 'error',
-        text1: getProductFailureCreationMessage(error),
-        position: 'bottom'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const themedColor = theme === 'dark';
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -333,7 +315,6 @@ const AddNewProductScreen = () => {
         <Text style={[styles.cancelText, { color: colors.primaryDark }]}>Cancel</Text>
       </TouchableOpacity>
 
-      <Toast />
     </ScrollView>
   );
 };

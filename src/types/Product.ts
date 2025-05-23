@@ -17,21 +17,12 @@ export type Product = {
   user: {
     _id: string;
     email: string;
+    name?: string; // Add as optional property
   };
   createdAt: string;
   updatedAt: string;
   __v: number;
 };
-
-// export interface Product {
-//   _id: string;
-//   title: string;
-//   description: string;
-//   price: number;
-//   location?: string;
-//   // ... other fields
-//   images: ProductImage[];
-// }
 
 export interface ApiResponse {
   success: boolean;
