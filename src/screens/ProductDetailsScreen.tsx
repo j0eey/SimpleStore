@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, Linking, Alert } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
@@ -10,6 +10,7 @@ import { Product } from '../types/Product';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Swiper from 'react-native-swiper';
 import MapView, { Marker } from 'react-native-maps';
+import { productInquiryTemplate } from '../utils/emailTemplates';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -50,6 +51,7 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
 
   const handleIncrease = () => setQuantity(prev => prev + 1);
   const handleDecrease = () => quantity > 1 && setQuantity(prev => prev - 1);
+  
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     setErrorMessage(null);
@@ -64,6 +66,15 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
       setRefreshing(false);
     }
   }, [id]);
+
+  const handleEmailPress = () => {
+  if (product?.user?.email) {
+    const { subject, body } = productInquiryTemplate(product.title);
+    
+    Linking.openURL(`mailto:${product.user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
+      .catch(() => Alert.alert('Error', 'Unable to open email client'));
+  }
+};
 
   if (loading || refreshing) {
     return (
@@ -211,9 +222,31 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
       <Text style={[styles.sectionTitle, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>
         Seller Information
       </Text>
-      <Text style={[styles.detailText, { color: isDark ? colors.border : colors.text }]}>
-        {product.user.email}
-      </Text>
+      
+      <View style={styles.sellerContainer}>
+        <View style={styles.sellerInfo}>
+          <MaterialCommunityIcons 
+            name="account-circle" 
+            size={24} 
+            color={isDark ? colors.border : colors.text} 
+          />
+          <Text style={[styles.sellerText, { color: isDark ? colors.border : colors.text }]}>
+            {product.user.email}
+          </Text>
+        </View>
+        
+        <TouchableOpacity 
+          style={[styles.emailButton, { backgroundColor: isDark ? colors.primary : colors.primaryDark }]}
+          onPress={handleEmailPress}
+        >
+          <MaterialCommunityIcons 
+            name="email-outline" 
+            size={20} 
+            color={colors.lightHeader} 
+          />
+          <Text style={styles.emailButtonText}>Contact Seller</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={[styles.separator, { backgroundColor: isDark ? colors.lineDark : colors.nameCardDark }]} />
 
@@ -343,6 +376,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     fontFamily: fonts.regular,
+  },
+  sellerContainer: {
+    marginBottom: 16,
+  },
+  sellerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sellerText: {
+    fontSize: 16,
+    marginLeft: 8,
+    fontFamily: fonts.regular,
+  },
+  emailButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  emailButtonText: {
+    color: colors.lightHeader,
+    fontSize: 16,
+    marginLeft: 8,
+    fontFamily: fonts.semiBold,
   },
   mapContainer: {
     height: 200,
