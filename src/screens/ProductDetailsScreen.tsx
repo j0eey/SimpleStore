@@ -9,6 +9,7 @@ import { fetchProductByIdApi } from '../api/products.api';
 import { Product } from '../types/Product';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Swiper from 'react-native-swiper';
+import MapView, { Marker } from 'react-native-maps';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -214,6 +215,36 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
         {product.user.email}
       </Text>
 
+      <View style={[styles.separator, { backgroundColor: isDark ? colors.lineDark : colors.nameCardDark }]} />
+
+      <Text style={[styles.sectionTitle, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>
+        Location
+      </Text>
+      <View style={styles.mapContainer}>
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: product.location.latitude,
+            longitude: product.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          pitchEnabled={false}
+          rotateEnabled={false}
+        >
+          <Marker
+            coordinate={{
+              latitude: product.location.latitude,
+              longitude: product.location.longitude,
+            }}
+            title={product.title}
+            description={product.location.name}
+          />
+        </MapView>
+      </View>
+
       <TouchableOpacity style={styles.addButton}>
         <Text style={styles.addButtonText}>Add to Cart</Text>
       </TouchableOpacity>
@@ -312,6 +343,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     fontFamily: fonts.regular,
+  },
+  mapContainer: {
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
   addButton: {
     backgroundColor: colors.success,
