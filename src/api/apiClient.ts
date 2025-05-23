@@ -2,29 +2,34 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshTokenApi } from '../api/auth.api';
 
+// Your backend base URL
 export const API_BASE_URL = 'https://backend-practice.eurisko.me';
+
+// Google APIs base URLs and key
+export const GOOGLE_PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place';
+export const GOOGLE_MAPS_API_KEY = 'AIzaSyCgmFqtBZFWykJ0QsVpswIsgoBNOrOpKD4';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
 });
 
 api.interceptors.request.use(
-  async config => {
+  async (config) => {
     const token = await AsyncStorage.getItem('@accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  response => response,
-  async error => {
+  (response) => response,
+  async (error) => {
     const originalRequest = error.config;
 
     if (
@@ -60,7 +65,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
 
 export default api;

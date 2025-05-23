@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const Tab = createBottomTabNavigator();
+const DummyScreen = () => null;
 
 const CustomTabBarButton = ({ children }: any) => {
   const navigation = useNavigation<any>();
@@ -57,7 +58,7 @@ const TabsNavigator = () => {
       <Tab.Screen name="Search" component={SearchScreen} />
       <Tab.Screen
         name="CreateNewProduct"
-        component={() => null}
+        component={DummyScreen}
         options={{
           tabBarLabel: () => null,
           tabBarIcon: () => (

@@ -203,7 +203,6 @@ const HomeScreen = () => {
   // Fetch first page only once on mount
   useEffect(() => {
     fetchProducts(1, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Refresh handler resets everything

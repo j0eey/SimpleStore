@@ -53,11 +53,13 @@ export type ProductData = {
   images: Asset[];
 };
 export type Asset = {
-  uri: string;          // must be local file path or remote file URI
-  type?: string;        // e.g., 'image/jpeg'
-  fileName?: string;    // e.g., 'photo.jpg'
+  uri: string;         
+  type?: string;        
+  fileName?: string; 
 };
 
+
+ 
 
 
 

@@ -38,3 +38,42 @@ export type LocationType = {
   latitude: number;
   longitude: number;
 };
+
+export type Prediction = {
+  place_id: string;
+  description: string;
+};
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      profileImage?: string | object;
+      updatedAt: string;
+    };
+  };
+}
+
+export interface SelectedImage {
+  uri: string;
+  type: string;
+  fileName: string;
+}
+
+
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  photoUrl?: string;
+}
+
+export interface EditableProfile {
+  firstName: string;
+  lastName: string;
+}

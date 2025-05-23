@@ -233,7 +233,7 @@ const AddNewProductScreen = () => {
           styles.input, 
           { 
             backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
-            color: themedColor ? colors.lightText : colors.darkText  
+            color: themedColor ? colors.lightText : colors.textPrimary  
           }
         ]}
         placeholder="Enter product name"
@@ -249,7 +249,7 @@ const AddNewProductScreen = () => {
           styles.input, 
           { 
             backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
-            color: themedColor ? colors.lightText : colors.darkText  
+            color: themedColor ? colors.lightText : colors.textPrimary  
           }
         ]}
         placeholder="Enter description"
@@ -267,7 +267,7 @@ const AddNewProductScreen = () => {
           styles.input, 
           { 
             backgroundColor: themedColor ? colors.darkCard : colors.lightCard,
-            color: themedColor ? colors.lightText : colors.darkText  
+            color: themedColor ? colors.lightText : colors.textPrimary  
           }
         ]}
         placeholder="Enter price"
@@ -300,7 +300,7 @@ const AddNewProductScreen = () => {
           styles.submitButton, 
           { 
             backgroundColor: isSubmitting 
-              ? (themedColor ? colors.darkBorder : colors.lightBorder)
+              ? (themedColor ? colors.darkBorder : colors.lightText)
               : (themedColor ? colors.primary : colors.primaryDark),
             opacity: isSubmitting ? 0.7 : 1
           }

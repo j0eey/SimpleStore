@@ -13,6 +13,7 @@ export const fonts = {
     extraLightItalic: 'Poppins-ExtraLightItalic',
     extraBoldItalic: 'Poppins-ExtraBoldItalic',
     medium: 'Poppins-Medium',
+
 };
 
 export const colors = {
@@ -68,7 +69,17 @@ export const colors = {
     lightText: '#E0E0E0',
     primaryLight: '#66B2FF',
     semitransparentwhite: '#ffffffcc',
-    lightBorder: '#e0e0e0',
+    geometry: '#242f3e',
+    labelstextfill:'#746855',
+    labelstextstroke: '#242f3e',
+    administrativelocality: '#d59563',
+    poipark:'#263c3f',
+    road: '#38414e',
+    roadstroke: '#212a37',
+    roadtextfill: '#9ca5b3',
+    transit: '#2f3948',
+    water: '#17263c',
+
 
 };
 
