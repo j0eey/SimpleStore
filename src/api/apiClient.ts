@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshTokenApi } from '../api/auth.api';
 import Config from 'react-native-config';
 
+console.log('API_BASE_URL:', Config.API_BASE_URL); 
 
 export const API_BASE_URL = Config.API_BASE_URL;
 export const GOOGLE_PLACES_API_BASE_URL = Config.GOOGLE_PLACES_API_BASE_URL;
