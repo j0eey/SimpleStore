@@ -73,3 +73,17 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Environment files (backups)
+*.env.backup
+*.env.local.backup
+
+# React Native specific env files
+.env.development
+.env.staging
+.env.production

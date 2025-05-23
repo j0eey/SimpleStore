@@ -1,13 +1,12 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshTokenApi } from '../api/auth.api';
+import Config from 'react-native-config';
 
-// Your backend base URL
-export const API_BASE_URL = 'https://backend-practice.eurisko.me';
 
-// Google APIs base URLs and key
-export const GOOGLE_PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place';
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyCgmFqtBZFWykJ0QsVpswIsgoBNOrOpKD4';
+export const API_BASE_URL = Config.API_BASE_URL;
+export const GOOGLE_PLACES_API_BASE_URL = Config.GOOGLE_PLACES_API_BASE_URL;
+export const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
