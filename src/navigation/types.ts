@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Search: undefined;
   ViewAll: undefined;
   MapsScreen: {
+    initialLocation?: LocationType;
     onLocationSelected: (location: LocationType) => void;
   };
   AddNewProduct: {
@@ -31,6 +32,8 @@ export type RootStackParamList = {
       longitude: number;
     };
   };
+  EditProfile: undefined;
+  EditProduct: { productId: string };
   
 };
 

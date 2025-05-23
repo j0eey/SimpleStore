@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, Tokens } from './AuthContextType';
 import { refreshTokenApi } from '../api/auth.api';
+import { fetchUserProfile } from '../api/user.api';
 import api from '../api/apiClient';
 
 interface UserProfile {
@@ -24,6 +25,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     const loadAuthState = async () => {
@@ -34,12 +36,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           savedAccessToken,
           savedRefreshToken,
           savedVerified,
+          savedUserId,
         ] = await Promise.all([
           AsyncStorage.getItem('@auth'),
           AsyncStorage.getItem('@userEmail'),
           AsyncStorage.getItem('@accessToken'),
           AsyncStorage.getItem('@refreshToken'),
           AsyncStorage.getItem('@isVerified'),
+          AsyncStorage.getItem('@userId'),
         ]);
 
         if (savedAuth !== null) setIsAuthenticated(JSON.parse(savedAuth));
@@ -47,6 +51,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (savedAccessToken) setAccessToken(savedAccessToken);
         if (savedRefreshToken) setRefreshToken(savedRefreshToken);
         if (savedVerified) setIsVerified(savedVerified === 'true');
+        if (savedUserId) setUserId(savedUserId);
+
+        // If authenticated but no userId, fetch user profile
+        if (savedAuth === 'true' && savedAccessToken && !savedUserId) {
+          try {
+            const userProfile = await fetchUserProfile();
+            if (userProfile.data?.user?.id) {
+              setUserId(userProfile.data.user.id);
+              await AsyncStorage.setItem('@userId', userProfile.data.user.id);
+            }
+          } catch (error) {
+            console.error('Failed to fetch user profile on load', error);
+          }
+        }
       } catch (error) {
         console.error('Failed to load auth state', error);
       }
@@ -72,9 +90,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await AsyncStorage.setItem('@refreshToken', tokens.refreshToken);
   };
 
+  const setUserIdAsync = async (id: string) => {
+    setUserId(id);
+    await AsyncStorage.setItem('@userId', id);
+  };
+
   const login = async (tokens: Tokens) => {
     await setTokens(tokens);
     await setAuthState(true);
+    
+    // Fetch user profile to get user ID
+    try {
+      const userProfile = await fetchUserProfile();
+      if (userProfile.data?.user?.id) {
+        await setUserIdAsync(userProfile.data.user.id);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user profile after login', error);
+    }
   };
 
   const signup = async (newEmail: string) => {
@@ -96,12 +129,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       AsyncStorage.removeItem('@accessToken'),
       AsyncStorage.removeItem('@refreshToken'),
       AsyncStorage.removeItem('@isVerified'),
+      AsyncStorage.removeItem('@userId'),
     ]);
     setIsAuthenticated(false);
     setEmailState('');
     setAccessToken('');
     setRefreshToken('');
     setIsVerified(false);
+    setUserId('');
   };
 
   const refreshAccessToken = async (): Promise<string> => {
@@ -124,6 +159,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         isVerified,
         email,
         token: accessToken,
+        userId,
         login,
         signup,
         verify,

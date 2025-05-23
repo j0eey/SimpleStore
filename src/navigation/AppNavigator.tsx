@@ -17,6 +17,8 @@ import TabsNavigator from './TabsNavigator';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import MapsScreen from '../screens/MapsScreen';
 import AddNewProductScreen from '../screens/AddNewProductScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import EditProductScreen from '../screens/EditProductScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -106,7 +108,16 @@ const AppNavigator = () => {
               component={MapsScreen}
               options={{ animation: 'fade' }}
             />
-            
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfileScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="EditProduct"
+              component={EditProductScreen}
+              options={{ animation: 'fade', presentation: 'modal' }}
+            />
           </>
         ) : (
           <>

@@ -1,16 +1,33 @@
 import React, { useState, FC, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, Linking, Alert } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  ActivityIndicator,
+  Linking,
+  Alert,
+  Modal
+} from 'react-native';
+import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import { fonts, colors } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
-import { fetchProductByIdApi } from '../api/products.api';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchProductByIdApi, deleteProductApi } from '../api/products.api';
 import { Product } from '../types/Product';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Swiper from 'react-native-swiper';
 import MapView, { Marker } from 'react-native-maps';
 import { productInquiryTemplate } from '../utils/emailTemplates';
+import Toast from 'react-native-toast-message';
+import { getProductDeleteFailureMessage } from '../utils/getFailureMessage';
+import { getDeletedSuccessMessage } from '../utils/getSuccessMessage';
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -22,32 +39,48 @@ type Props = {
   navigation: ProductDetailsScreenNavigationProp;
 };
 
-const ProductDetailsScreen: FC<Props> = ({ route }) => {
+const ProductDetailsScreen: FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { theme } = useTheme();
+  const { userId } = useAuth();
   const isDark = theme === 'dark';
   const [refreshing, setRefreshing] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  
+  
 
-  useEffect(() => {
-    const loadProduct = async () => {
-      try {
-        setLoading(true);
-        setErrorMessage(null);
-        const productData = await fetchProductByIdApi(id);
-        setProduct(productData);
-      } catch (err) {
-        setErrorMessage(err instanceof Error ? err.message : 'Failed to load product details');
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      handleRefresh();
+      setShowMenu(false);
+      return () => {
+        setShowMenu(false);
+      };
+    }, [id])
+  );
 
-    loadProduct();
-  }, [id]);
+
+useEffect(() => {
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      setErrorMessage(null);
+      const productData = await fetchProductByIdApi(id);
+      setProduct(productData);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to load product details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadProduct();
+}, [id]);
+
 
   const handleIncrease = () => setQuantity(prev => prev + 1);
   const handleDecrease = () => quantity > 1 && setQuantity(prev => prev - 1);
@@ -68,13 +101,67 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   }, [id]);
 
   const handleEmailPress = () => {
-  if (product?.user?.email) {
-    const { subject, body } = productInquiryTemplate(product.title);
-    
-    Linking.openURL(`mailto:${product.user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
-      .catch(() => Alert.alert('Error', 'Unable to open email client'));
+    if (product?.user?.email) {
+      const { subject, body } = productInquiryTemplate(product.title);
+      
+      Linking.openURL(`mailto:${product.user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
+        .catch(() => Alert.alert('Error', 'Unable to open email client'));
+    }
+  };
+
+  const handleEdit = () => {
+  if (!product) {
+    Toast.show({
+      type: 'error',
+      text1: 'Product data not loaded',
+    });
+    return;
   }
+
+  navigation.navigate('EditProduct', { 
+    productId: product._id // Make sure this matches your Product type
+  });
 };
+
+  const handleDelete = async () => {
+    setShowMenu(false);
+    Alert.alert(
+      'Delete Product',
+      'Are you sure you want to delete this product?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            if (!product) {
+              Toast.show({
+                type: 'error',
+                text1: getProductDeleteFailureMessage('Failed to delete product'),
+              });
+              return;
+            }
+            try {
+              const response = await deleteProductApi(product._id);
+              Toast.show({
+                type: 'success',
+                text1: getDeletedSuccessMessage(response),
+              });
+              navigation.goBack();
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: getProductDeleteFailureMessage('Failed to delete product'),
+              });
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Check if current user is the owner of the product
+  const isOwner = product && userId && product.user._id === userId;
 
   if (loading || refreshing) {
     return (
@@ -167,13 +254,72 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
       style={[styles.scrollContainer, { backgroundColor: isDark ? colors.darkHeader : colors.background }]}
       showsVerticalScrollIndicator={false}
     >
+      {isOwner && (
+        <Modal
+          visible={showMenu}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowMenu(false)}
+        >
+          <TouchableOpacity 
+            style={styles.menuOverlay} 
+            activeOpacity={1} 
+            onPress={() => setShowMenu(false)}
+          >
+            <View style={[styles.menuContainer, { 
+              backgroundColor: isDark ? colors.darkCard : colors.light,
+              shadowColor: isDark ? colors.lightHeader : colors.darkHeader
+            }]}>
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={handleEdit}
+              >
+                <MaterialCommunityIcons 
+                  name="pencil-outline" 
+                  size={20} 
+                  color={isDark ? colors.border : colors.text} 
+                />
+                <Text style={[styles.menuItemText, { color: isDark ? colors.border : colors.text }]}>
+                  Edit
+                </Text>
+              </TouchableOpacity>
+              <View style={[styles.menuSeparator, { backgroundColor: isDark ? colors.lineDark : colors.nameCardDark }]} />
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={handleDelete}
+              >
+                <MaterialCommunityIcons 
+                  name="trash-can-outline" 
+                  size={20} 
+                  color={colors.error} 
+                />
+                <Text style={[styles.menuItemText, { color: colors.error }]}>
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
+
       <View style={styles.imageWrapper}>
         {renderImages()}
       </View>
 
-      <Text style={[styles.title, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>
-        {product.title}
-      </Text>
+      <View style={styles.titleContainer}>
+        <Text style={[styles.title, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>
+          {product.title}
+        </Text>
+        {isOwner && (
+          <TouchableOpacity onPress={() => setShowMenu(true)}>
+            <MaterialCommunityIcons 
+              name="dots-vertical" 
+              size={24} 
+              color={isDark ? colors.border : colors.text} 
+            />
+          </TouchableOpacity>
+        )}
+      </View>
 
       <View style={styles.detailRow}>
         <Text style={[styles.detailText, { color: isDark ? colors.border : colors.text }]}>
@@ -235,17 +381,19 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
           </Text>
         </View>
         
-        <TouchableOpacity 
-          style={[styles.emailButton, { backgroundColor: isDark ? colors.primary : colors.primaryDark }]}
-          onPress={handleEmailPress}
-        >
-          <MaterialCommunityIcons 
-            name="email-outline" 
-            size={20} 
-            color={colors.lightHeader} 
-          />
-          <Text style={styles.emailButtonText}>Contact Seller</Text>
-        </TouchableOpacity>
+        {!isOwner && (
+          <TouchableOpacity 
+            style={[styles.emailButton, { backgroundColor: isDark ? colors.primary : colors.primaryDark }]}
+            onPress={handleEmailPress}
+          >
+            <MaterialCommunityIcons 
+              name="email-outline" 
+              size={20} 
+              color={colors.lightHeader} 
+            />
+            <Text style={styles.emailButtonText}>Contact Seller</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={[styles.separator, { backgroundColor: isDark ? colors.lineDark : colors.nameCardDark }]} />
@@ -278,9 +426,11 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
         </MapView>
       </View>
 
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add to Cart</Text>
-      </TouchableOpacity>
+      {!isOwner && (
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add to Cart</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 };
@@ -318,9 +468,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 25,
-    marginBottom: 16,
+    flex: 1,
     textAlign: 'left',
     fontFamily: fonts.Bold,
   },
@@ -453,6 +609,39 @@ const styles = StyleSheet.create({
     color: colors.lightHeader,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  menuOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  menuContainer: {
+    width: 150,
+    borderRadius: 8,
+    paddingVertical: 8,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  menuItemText: {
+    fontSize: 16,
+    marginLeft: 12,
+    fontFamily: fonts.regular,
+  },
+  menuSeparator: {
+    height: 1,
+    marginVertical: 4,
   },
 });
 

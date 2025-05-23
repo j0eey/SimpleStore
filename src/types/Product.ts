@@ -17,7 +17,6 @@ export type Product = {
   user: {
     _id: string;
     email: string;
-    name?: string; // Add as optional property
   };
   createdAt: string;
   updatedAt: string;

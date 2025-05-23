@@ -3,6 +3,7 @@ export interface AuthContextType {
   isVerified: boolean;
   email: string;
   token: string;
+  userId: string;
   refreshAccessToken: () => Promise<string>;
   login: (tokens: Tokens) => Promise<void>;
   signup: (newEmail: string) => Promise<void>;
