@@ -23,6 +23,16 @@ export type Product = {
   __v: number;
 };
 
+// export interface Product {
+//   _id: string;
+//   title: string;
+//   description: string;
+//   price: number;
+//   location?: string;
+//   // ... other fields
+//   images: ProductImage[];
+// }
+
 export interface ApiResponse {
   success: boolean;
   data: Product[];

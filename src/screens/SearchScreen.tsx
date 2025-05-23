@@ -1,160 +1,254 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { colors, fonts } from '../theme/Theme';
-// import { searchProductsApi } from '../api/products.api';
-import { Product } from '../types/Product';
-import { useTheme } from '../contexts/ThemeContext';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState, useCallback, useMemo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  ListRenderItem,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Toast from 'react-native-toast-message';
+import { colors, fonts } from '../theme/Theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { searchProductsApi } from '../api/products.api';
+import { getErrorMessage } from '../utils/getErrorMessage';
+import { Product } from '../types/Product';
 import { RootStackParamList } from '../navigation/types';
+import { SearchState } from '../navigation/types';
 
+const SEARCH_MIN_LENGTH = 2;
+const SEARCH_PLACEHOLDER = 'Search products...';
 
-const SearchScreen = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+const SearchScreen: React.FC = () => {
+  const [searchState, setSearchState] = useState<SearchState>({
+    query: '',
+    results: [],
+    isLoading: false,
+    hasSearched: false,
+  });
+
   const { theme } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp>();
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (query.length < 2) {
-      setSearchResults([]);
+  const dynamicStyles = useMemo(() => ({
+    container: {
+      backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background,
+    },
+    searchContainer: {
+      backgroundColor: theme === 'dark' ? colors.darkSearchbar : colors.lightSearchbar,
+    },
+    searchInput: {
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+    productCard: {
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+    },
+    productTitle: {
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+    productPrice: {
+      color: theme === 'dark' ? colors.priceDark : colors.info,
+    },
+    emptyText: {
+      color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight,
+    },
+    iconColor: theme === 'dark' ? colors.darkSearch : colors.lightSearch,
+    loadingColor: theme === 'dark' ? colors.lightHeader : colors.primary,
+  }), [theme]);
+
+  // Handlers
+  const handleSearch = useCallback(async () => {
+    const { query } = searchState;
+    
+    if (query.length < SEARCH_MIN_LENGTH) {
+      setSearchState(prev => ({
+        ...prev,
+        results: [],
+        hasSearched: false,
+      }));
       return;
     }
 
-    // setIsLoading(true);
-    // setError('');
-    // try {
-    //   const results = await searchProductsApi(query);
-    //   setSearchResults(results);
-    // } catch (err) {
-    //   setError('Failed to search products');
-    //   console.error(err);
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  };
+    setSearchState(prev => ({
+      ...prev,
+      isLoading: true,
+      hasSearched: true,
+    }));
 
-  const renderProductItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      style={[
-        styles.productCard,
-        { backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard }
-      ]}
-      onPress={() => navigation.navigate('ProductDetails', {
-        id: item._id,
-        title: item.title,
-        description: item.description,
-        image: item.images[0].url,
-        price: item.price,
-      })}
-    >
-      <Image
-        source={{ uri: item.images[0].url }}
-        style={styles.productImage}
-        resizeMode="contain"
-      />
-      <View style={styles.productInfo}>
-        <Text 
-          style={[
-            styles.productTitle,
-            { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }
-          ]}
-          numberOfLines={1}
-        >
-          {item.title}
-        </Text>
-        <Text style={[
-          styles.productPrice,
-          { color: theme === 'dark' ? colors.priceDark : colors.info }
-        ]}>
-          ${item.price.toFixed(2)}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+    try {
+      const results = await searchProductsApi(query);
+      setSearchState(prev => ({
+        ...prev,
+        results,
+        isLoading: false,
+      }));
+    } catch (error) {
+      const errorMessage = getErrorMessage('Failed to search products');
+      Toast.show({
+        type: 'error',
+        text1: errorMessage,
+      });
+      
+      setSearchState(prev => ({
+        ...prev,
+        results: [],
+        isLoading: false,
+      }));
+    }
+  }, [searchState.query]);
 
-  return (
-    <View style={[
-      styles.container,
-      { backgroundColor: theme === 'dark' ? colors.darkHeader : colors.background }
-    ]}>
-      {/* Search Bar */}
-      <View style={[
-        styles.searchContainer,
-        { backgroundColor: theme === 'dark' ? colors.darkSearchbar : colors.lightSearchbar }
-      ]}>
-        <Ionicons 
-          name="search" 
-          size={20} 
-          color={theme === 'dark' ? colors.darkSearch : colors.lightSearch} 
-          style={styles.searchIcon}
+  const handleTextChange = useCallback((text: string) => {
+    setSearchState(prev => ({
+      ...prev,
+      query: text,
+      hasSearched: false,
+      ...(text.length < SEARCH_MIN_LENGTH && { results: [] }),
+    }));
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchState({
+      query: '',
+      results: [],
+      isLoading: false,
+      hasSearched: false,
+    });
+  }, []);
+
+  const handleProductPress = useCallback((product: Product) => {
+    const imageUrl = product.images[0]?.fullUrl;
+    
+    navigation.navigate('ProductDetails', {
+      id: product._id,
+      title: product.title,
+      description: product.description,
+      image: imageUrl,
+      price: product.price,
+    });
+  }, [navigation]);
+
+  // Render functions
+  const renderProductItem: ListRenderItem<Product> = useCallback(({ item }) => {
+    const imageUrl = item.images[0]?.fullUrl;
+
+
+    return (
+      <TouchableOpacity
+        style={[styles.productCard, dynamicStyles.productCard]}
+        onPress={() => handleProductPress(item)}
+        activeOpacity={0.7}
+      >
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.productImage}
+          resizeMode="contain"
         />
-        <TextInput
-          style={[
-            styles.searchInput,
-            { color: theme === 'dark' ? colors.lightHeader : colors.darkHeader }
-          ]}
-          placeholder="Search products..."
-          placeholderTextColor={theme === 'dark' ? colors.darkSearch : colors.lightSearch}
-          value={searchQuery}
-          onChangeText={handleSearch}
-          autoFocus
-        />
-        {searchQuery ? (
-          <TouchableOpacity onPress={() => {
-            setSearchQuery('');
-            setSearchResults([]);
-          }}>
-            <Ionicons 
-              name="close" 
-              size={20} 
-              color={theme === 'dark' ? colors.darkSearch : colors.lightSearch} 
-              style={styles.clearIcon}
-            />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-
-      {/* Search Results */}
-      {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator 
-            size="large" 
-            color={theme === 'dark' ? colors.lightHeader : colors.primary} 
-          />
-        </View>
-      ) : error ? (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight }]}>
-            {error}
+        <View style={styles.productInfo}>
+          <Text
+            style={[styles.productTitle, dynamicStyles.productTitle]}
+            numberOfLines={2}
+          >
+            {item.title}
+          </Text>
+          <Text style={[styles.productPrice, dynamicStyles.productPrice]}>
+            ${item.price.toFixed(2)}
           </Text>
         </View>
-      ) : searchResults.length > 0 ? (
+      </TouchableOpacity>
+    );
+  }, [dynamicStyles, handleProductPress]);
+
+  const renderEmptyState = useCallback(() => {
+    let message = SEARCH_PLACEHOLDER;
+    
+    if (searchState.query.length > 0 && searchState.query.length < SEARCH_MIN_LENGTH) {
+      message = `Type at least ${SEARCH_MIN_LENGTH} characters and press search...`;
+    } else if (searchState.hasSearched && searchState.results.length === 0) {
+      message = 'No products found';
+    }
+
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={[styles.emptyText, dynamicStyles.emptyText]}>
+          {message}
+        </Text>
+      </View>
+    );
+  }, [searchState, dynamicStyles.emptyText]);
+
+  const renderContent = useCallback(() => {
+    if (searchState.isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={dynamicStyles.loadingColor} />
+        </View>
+      );
+    }
+
+    if (searchState.results.length > 0) {
+      return (
         <FlatList
-          data={searchResults}
+          data={searchState.results}
           renderItem={renderProductItem}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
-      ) : searchQuery.length >= 2 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight }]}>
-            No products found
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight }]}>
-            {searchQuery.length === 0 
-              ? 'Search for products...' 
-              : 'Type at least 2 characters...'}
-          </Text>
-        </View>
-      )}
+      );
+    }
+
+    return renderEmptyState();
+  }, [searchState, dynamicStyles.loadingColor, renderProductItem, renderEmptyState]);
+
+  return (
+    <View style={[styles.container, dynamicStyles.container]}>
+      {/* Search Bar */}
+      <View style={[styles.searchContainer, dynamicStyles.searchContainer]}>
+        <TouchableOpacity onPress={handleSearch} style={styles.searchIconContainer}>
+          <Ionicons
+            name="search"
+            size={20}
+            color={dynamicStyles.iconColor}
+          />
+        </TouchableOpacity>
+        
+        <TextInput
+          style={[styles.searchInput, dynamicStyles.searchInput]}
+          placeholder={SEARCH_PLACEHOLDER}
+          placeholderTextColor={dynamicStyles.iconColor}
+          value={searchState.query}
+          onChangeText={handleTextChange}
+          autoFocus
+          returnKeyType="search"
+          onSubmitEditing={handleSearch}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        
+        {searchState.query.length > 0 && (
+          <TouchableOpacity onPress={handleClearSearch} style={styles.clearIconContainer}>
+            <Ionicons
+              name="close"
+              size={20}
+              color={dynamicStyles.iconColor}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Content */}
+      {renderContent()}
     </View>
   );
 };
@@ -172,17 +266,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     height: 50,
   },
+  searchIconContainer: {
+    marginRight: 10,
+    padding: 4,
+  },
   searchInput: {
     flex: 1,
     height: '100%',
     fontSize: 16,
     fontFamily: fonts.medium,
   },
-  searchIcon: {
-    marginRight: 10,
-  },
-  clearIcon: {
+  clearIconContainer: {
     marginLeft: 10,
+    padding: 4,
   },
   loadingContainer: {
     flex: 1,
@@ -193,10 +289,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   emptyText: {
     fontSize: 18,
     fontFamily: fonts.medium,
+    textAlign: 'center',
+    lineHeight: 24,
   },
   listContainer: {
     paddingBottom: 20,
@@ -226,6 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.semiBold,
     marginBottom: 4,
+    lineHeight: 20,
   },
   productPrice: {
     fontSize: 16,

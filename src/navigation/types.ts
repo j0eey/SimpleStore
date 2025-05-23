@@ -1,3 +1,4 @@
+import { Product } from '../types/Product';
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
@@ -65,7 +66,6 @@ export interface SelectedImage {
   fileName: string;
 }
 
-
 export interface UserProfile {
   firstName: string;
   lastName: string;
@@ -76,4 +76,11 @@ export interface UserProfile {
 export interface EditableProfile {
   firstName: string;
   lastName: string;
+}
+
+export interface SearchState {
+  query: string;
+  results: Product[];
+  isLoading: boolean;
+  hasSearched: boolean;
 }
