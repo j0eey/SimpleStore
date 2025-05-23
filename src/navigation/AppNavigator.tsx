@@ -87,7 +87,6 @@ const AppNavigator = () => {
                     }}
                   />
                 ),
-                gestureEnabled: true,
                 animation: 'fade',
                 headerStyle,
               })}

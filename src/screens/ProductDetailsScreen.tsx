@@ -1,4 +1,4 @@
-import React, { useState, FC, useEffect, useCallback  } from 'react';
+import React, { useState, FC, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -8,6 +8,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { fetchProductByIdApi } from '../api/products.api';
 import { Product } from '../types/Product';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Swiper from 'react-native-swiper';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -114,26 +115,48 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
   }
 
   const totalPrice = (product.price * quantity).toFixed(2);
-  const mainImage = product.images[0]?.fullUrl;
+  const hasImages = product.images && product.images.length > 0;
+
+  const renderImages = () => {
+    if (!hasImages) {
+      return (
+        <View style={[styles.imagePlaceholder, { backgroundColor: isDark ? colors.darkCard : colors.light }]}>
+          <Text style={{ color: isDark ? colors.lightHeader : colors.darkHeader }}>No Image Available</Text>
+        </View>
+      );
+    }
+
+    return (
+      <Swiper
+        style={styles.swiper}
+        showsButtons={false}
+        showsPagination={true}
+        dotColor={isDark ? colors.border : colors.light}
+        activeDotColor={isDark ? colors.primary : colors.primaryDark}
+        paginationStyle={{ bottom: 10 }}
+        loop={false}
+      >
+        {product.images.map((image, index) => (
+          <View key={index} style={styles.slide}>
+            <Image
+              source={{ uri: image.fullUrl }}
+              style={styles.swiperImage}
+              resizeMode="contain"
+            />
+          </View>
+        ))}
+      </Swiper>
+    );
+  };
 
   return (
-    <ScrollView 
-      contentContainerStyle={styles.contentContainer} 
+    <ScrollView
+      contentContainerStyle={styles.contentContainer}
       style={[styles.scrollContainer, { backgroundColor: isDark ? colors.darkHeader : colors.background }]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.imageWrapper}>
-        {mainImage ? (
-          <Image 
-            source={{ uri: mainImage }} 
-            style={styles.image} 
-            resizeMode="contain" 
-          />
-        ) : (
-          <View style={[styles.imagePlaceholder, { backgroundColor: isDark ? colors.darkCard : colors.light }]}>
-            <Text style={{ color: isDark ? colors.lightHeader : colors.darkHeader }}>No Image Available</Text>
-          </View>
-        )}
+        {renderImages()}
       </View>
 
       <Text style={[styles.title, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>
@@ -151,8 +174,8 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
 
       <View style={styles.row}>
         <View style={styles.quantityContainer}>
-          <TouchableOpacity 
-            style={[styles.quantityButton, { backgroundColor: isDark ? colors.nameCardLight : colors.light }]} 
+          <TouchableOpacity
+            style={[styles.quantityButton, { backgroundColor: isDark ? colors.nameCardLight : colors.light }]}
             onPress={handleDecrease}
           >
             <Text style={[styles.quantityButtonText, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>-</Text>
@@ -160,8 +183,8 @@ const ProductDetailsScreen: FC<Props> = ({ route }) => {
 
           <Text style={[styles.quantityText, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>{quantity}</Text>
 
-          <TouchableOpacity 
-            style={[styles.quantityButton, { backgroundColor: isDark ? colors.nameCardLight : colors.light }]} 
+          <TouchableOpacity
+            style={[styles.quantityButton, { backgroundColor: isDark ? colors.nameCardLight : colors.light }]}
             onPress={handleIncrease}
           >
             <Text style={[styles.quantityButtonText, { color: isDark ? colors.lightHeader : colors.darkHeader }]}>+</Text>
@@ -209,11 +232,17 @@ const styles = StyleSheet.create({
   imageWrapper: {
     width: '100%',
     height: SCREEN_WIDTH * 0.8,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
   },
-  image: {
+  swiper: {
+    flex: 0,
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  swiperImage: {
     width: '100%',
     height: '100%',
     borderRadius: 8,
