@@ -17,13 +17,7 @@ const ThemedApp = () => {
   const barStyle: StatusBarStyle = theme === 'dark' ? 'light-content' : 'dark-content';
 
   useEffect(() => {
-    // Hide the native splash screen immediately when React Native is ready
-    // Your custom Lottie splash will handle the transition
-    const timer = setTimeout(() => {
-      SplashScreen.hide();
-    }, 100); // Very short delay to ensure smooth transition
-
-    return () => clearTimeout(timer);
+    SplashScreen.hide();
   }, []);
 
   return (
@@ -44,6 +38,7 @@ const App = () => {
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
+            {/* The FlyingCartProvider must wrap ThemedApp (which contains AppNavigator, and thus TabsNavigator) */}
             <FlyingCartProvider>
               <ThemedApp />
             </FlyingCartProvider>

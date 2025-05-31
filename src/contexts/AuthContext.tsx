@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const loadAuthState = async () => {
       try {
+        const startTime = Date.now();
+        
         const [
           savedAuth,
           savedEmail,
@@ -35,6 +37,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           AsyncStorage.getItem('@isVerified'),
           AsyncStorage.getItem('@userId'),
         ]);
+
+        const loadTime = Date.now() - startTime;
 
         if (savedAuth !== null) {
           setIsAuthenticated(JSON.parse(savedAuth));
@@ -55,30 +59,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUserId(savedUserId);
         }
 
-        // CRITICAL FIX: Set initialized immediately after loading stored data
-        setIsInitialized(true);
-
-        // Fetch user profile in the background (non-blocking)
+        // If authenticated but no userId, fetch user profile
         if (savedAuth === 'true' && savedAccessToken && !savedUserId) {
-          // Don't await this - let it run in background
-          fetchUserProfileInBackground(savedAccessToken);
+          try {
+            const profileStartTime = Date.now();
+            const userProfile = await fetchUserProfile();
+            const profileTime = Date.now() - profileStartTime;
+            
+            if (userProfile.data?.user?.id) {
+              setUserId(userProfile.data.user.id);
+              await AsyncStorage.setItem('@userId', userProfile.data.user.id);
+            }
+          } catch (error) {
+          }
         }
       } catch (error) {
-        console.error('Error loading auth state:', error);
-        setIsInitialized(true); // Still initialize even on error
-      }
-    };
-
-    // Separate function for background profile fetching
-    const fetchUserProfileInBackground = async (token: string) => {
-      try {
-        const userProfile = await fetchUserProfile();
-        if (userProfile.data?.user?.id) {
-          setUserId(userProfile.data.user.id);
-          await AsyncStorage.setItem('@userId', userProfile.data.user.id);
-        }
-      } catch (error) {
-        console.error('Error fetching user profile in background:', error);
+      } finally {
+        setIsInitialized(true);
+        // setTimeout(() => {
+        //   SplashScreen.hide();
+        // }, 150);
       }
     };
 
@@ -111,14 +111,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await setTokens(tokens);
     await setAuthState(true);
     
-    // Fetch user profile to get user ID (in background)
+    // Fetch user profile to get user ID
     try {
       const userProfile = await fetchUserProfile();
       if (userProfile.data?.user?.id) {
         await setUserIdAsync(userProfile.data.user.id);
       }
     } catch (error) {
-      console.error('Error fetching profile during login:', error);
     }
   };
 
@@ -167,6 +166,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   if (!isInitialized) {
     return null;
   }
+
 
   return (
     <AuthContext.Provider
