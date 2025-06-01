@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { StatusBar, StatusBarStyle } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import SplashScreen from 'react-native-splash-screen';
+import BootSplash from "react-native-bootsplash";
 import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
@@ -16,8 +16,12 @@ const ThemedApp = () => {
   const backgroundColor = theme === 'dark' ? 'black' : 'white';
   const barStyle: StatusBarStyle = theme === 'dark' ? 'light-content' : 'dark-content';
 
-  useEffect(() => {
-    SplashScreen.hide();
+    useEffect(() => {
+    const hideSplash = async () => {
+      await BootSplash.hide({ fade: true });
+    };
+    
+    hideSplash();
   }, []);
 
   return (
@@ -33,12 +37,13 @@ const ThemedApp = () => {
 };
 
 const App = () => {
+
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
-            {/* The FlyingCartProvider must wrap ThemedApp (which contains AppNavigator, and thus TabsNavigator) */}
             <FlyingCartProvider>
               <ThemedApp />
             </FlyingCartProvider>

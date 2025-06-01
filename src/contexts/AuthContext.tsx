@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SplashScreen from 'react-native-splash-screen';
 import { AuthContextType, Tokens } from '../types/AuthContextType';
 import { refreshTokenApi } from '../api/auth.api';
 import { fetchUserProfile } from '../api/user.api';
@@ -38,8 +37,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           AsyncStorage.getItem('@userId'),
         ]);
 
-        const loadTime = Date.now() - startTime;
-
         if (savedAuth !== null) {
           setIsAuthenticated(JSON.parse(savedAuth));
         }
@@ -62,9 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // If authenticated but no userId, fetch user profile
         if (savedAuth === 'true' && savedAccessToken && !savedUserId) {
           try {
-            const profileStartTime = Date.now();
             const userProfile = await fetchUserProfile();
-            const profileTime = Date.now() - profileStartTime;
             
             if (userProfile.data?.user?.id) {
               setUserId(userProfile.data.user.id);
@@ -76,9 +71,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } catch (error) {
       } finally {
         setIsInitialized(true);
-        // setTimeout(() => {
-        //   SplashScreen.hide();
-        // }, 150);
       }
     };
 
@@ -166,7 +158,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   if (!isInitialized) {
     return null;
   }
-
 
   return (
     <AuthContext.Provider

@@ -10,7 +10,6 @@ export interface AuthContextType {
   verify: () => Promise<void>;
   logout: () => Promise<void>;
   setEmail: (newEmail: string) => Promise<void>;
-   isProfileLoading?: boolean;
 }
 
 export type Tokens = {
