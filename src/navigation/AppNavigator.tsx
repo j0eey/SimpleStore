@@ -30,7 +30,7 @@ const AppNavigator = () => {
   const { theme } = useTheme();
   const [showLottieSplash, setShowLottieSplash] = useState(true);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
-  
+
   const headerStyle = {
     backgroundColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
     shadowColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
@@ -200,7 +200,26 @@ const AppNavigator = () => {
               options={{ presentation: 'modal' }}
             />
             <Stack.Screen name="MapsScreen" component={MapsScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfileScreen}
+              options={({ route, navigation }) => ({
+                headerShown: true,
+                headerTitle: '',
+                headerLeft: () => (
+                  <Ionicons
+                    name="arrow-back"
+                    size={24}
+                    color={theme === 'dark' ? colors.lightHeader : colors.darkHeader}
+                    style={{ position: 'absolute', left: 16, top: 20, zIndex: 1 }}
+                    onPress={() => {
+                      navigation.goBack();
+                    }}
+                  />
+                ),
+                headerStyle,
+              })}
+            />
             <Stack.Screen name="EditProduct" component={EditProductScreen} />
             <Stack.Screen name="Cart" component={CartScreen} />
           </>

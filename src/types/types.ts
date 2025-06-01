@@ -88,3 +88,7 @@ export interface SearchState {
   isLoading: boolean;
   hasSearched: boolean;
 }
+
+export const CONSTANTS = {
+  AVATAR_SIZE: 100,
+} as const;

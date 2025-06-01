@@ -9,6 +9,7 @@ import { fonts, colors } from '../theme/Theme';
 import { fetchUserProfile, updateUserProfile } from '../api/user.api';
 import { getErrorMessage } from '../utils/getErrorMessage';
 import { UserProfile, SelectedImage, EditableProfile } from '../types/types';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 // Constants
 const CONSTANTS = {
@@ -25,6 +26,97 @@ const IMAGE_PICKER_OPTIONS: ImageLibraryOptions = {
   maxWidth: CONSTANTS.MAX_IMAGE_DIMENSION,
   maxHeight: CONSTANTS.MAX_IMAGE_DIMENSION,
   includeExtra: true,
+};
+
+const EditProfileSkeleton = ({ theme }: { theme: string }) => {
+  const isDark = theme === 'dark';
+  const skeletonConfig = {
+    borderRadius: 4,
+    backgroundColor: isDark ? colors.darkPlaceholder : colors.lightPlaceholder,
+    highlightColor: isDark ? colors.darkHighlight : colors.lightHighlight,
+  };
+
+  return (
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? colors.darkHeader : colors.background },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      <SkeletonPlaceholder {...skeletonConfig}>
+        {/* Profile Section Skeleton */}
+        <SkeletonPlaceholder.Item
+          alignItems="center"
+          padding={20}
+          borderRadius={12}
+          marginTop={10}
+          marginBottom={30}
+          backgroundColor={isDark ? colors.darkCard : colors.lightCard}
+        >
+          {/* Avatar Skeleton with Camera Icon */}
+          <SkeletonPlaceholder.Item
+            width={CONSTANTS.AVATAR_SIZE}
+            height={CONSTANTS.AVATAR_SIZE}
+            borderRadius={CONSTANTS.AVATAR_SIZE / 2}
+            marginBottom={20}
+          />
+
+          {/* Form Fields Container */}
+          <SkeletonPlaceholder.Item width="100%">
+            {/* First Name Input Skeleton */}
+            <SkeletonPlaceholder.Item marginBottom={16}>
+              <SkeletonPlaceholder.Item
+                width={80}
+                height={14}
+                marginBottom={8}
+              />
+              <SkeletonPlaceholder.Item
+                width="100%"
+                height={48}
+                borderRadius={8}
+              />
+            </SkeletonPlaceholder.Item>
+
+            {/* Last Name Input Skeleton */}
+            <SkeletonPlaceholder.Item marginBottom={16}>
+              <SkeletonPlaceholder.Item
+                width={75}
+                height={14}
+                marginBottom={8}
+              />
+              <SkeletonPlaceholder.Item
+                width="100%"
+                height={48}
+                borderRadius={8}
+              />
+            </SkeletonPlaceholder.Item>
+
+            {/* Button Row Skeleton */}
+            <SkeletonPlaceholder.Item
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+              marginTop={16}
+            >
+              <SkeletonPlaceholder.Item
+                flex={1}
+                height={46}
+                borderRadius={8}
+                marginRight={6}
+              />
+              <SkeletonPlaceholder.Item
+                flex={1}
+                height={46}
+                borderRadius={8}
+                marginLeft={6}
+              />
+            </SkeletonPlaceholder.Item>
+          </SkeletonPlaceholder.Item>
+        </SkeletonPlaceholder.Item>
+      </SkeletonPlaceholder>
+    </ScrollView>
+  );
 };
 
 // Custom Hooks
@@ -454,11 +546,7 @@ const EditProfileScreen: React.FC = () => {
   }, [navigation, resetSelectedImage]);
 
   if (loading) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={colors.info} />
-      </View>
-    );
+    return <EditProfileSkeleton theme={theme} />;
   }
 
   return (

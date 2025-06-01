@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, ScrollView } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -17,14 +9,69 @@ import { useTheme } from '../contexts/ThemeContext';
 import { fonts, colors } from '../theme/Theme';
 import { fetchUserProfile } from '../api/user.api';
 import { getErrorMessage } from '../utils/getErrorMessage';
-import { UserProfile } from '../types/types';
+import { UserProfile, RootStackParamList, CONSTANTS } from '../types/types';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-// Constants
-const CONSTANTS = {
-  AVATAR_SIZE: 100,
-} as const;
 
-// Custom Hooks
+const ProfileSkeleton = ({ theme }: { theme: string }) => {
+  const isDark = theme === 'dark';
+  const skeletonConfig = {
+    borderRadius: 4,
+    backgroundColor: isDark ? colors.darkPlaceholder : colors.lightPlaceholder,
+    highlightColor: isDark ? colors.darkHighlight : colors.lightHighlight,
+  };
+
+  return (
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? colors.darkHeader : colors.background },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      <SkeletonPlaceholder {...skeletonConfig}>
+        {/* Profile Section Skeleton */}
+        <SkeletonPlaceholder.Item
+          alignItems="center"
+          padding={20}
+          borderRadius={12}
+          marginBottom={30}
+          backgroundColor={isDark ? colors.darkCard : colors.lightCard}
+        >
+          {/* Avatar Skeleton */}
+          <SkeletonPlaceholder.Item
+            width={CONSTANTS.AVATAR_SIZE}
+            height={CONSTANTS.AVATAR_SIZE}
+            borderRadius={CONSTANTS.AVATAR_SIZE / 2}
+            marginBottom={20}
+          />
+
+          {/* Name Skeleton */}
+          <SkeletonPlaceholder.Item
+            width={200}
+            height={22}
+            marginBottom={5}
+          />
+
+          {/* Email Skeleton */}
+          <SkeletonPlaceholder.Item
+            width={250}
+            height={16}
+          />
+        </SkeletonPlaceholder.Item>
+
+        {/* Logout Button Skeleton */}
+        <SkeletonPlaceholder.Item
+          width="100%"
+          height={52}
+          borderRadius={12}
+        />
+      </SkeletonPlaceholder>
+    </ScrollView>
+  );
+};
+
 const useProfileData = () => {
   const [profile, setProfile] = useState<UserProfile>({
     firstName: '',
@@ -71,7 +118,6 @@ const useProfileData = () => {
   };
 };
 
-// Components
 const ProfileImage: React.FC<{
   imageUrl?: string;
   theme: string;
@@ -94,19 +140,13 @@ const ProfileImage: React.FC<{
   </View>
 );
 
-// Main Component
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/types';
-
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { isAuthenticated, logout } = useAuth();
   const { theme } = useTheme();
-  
   const { profile, loading, loadProfile } = useProfileData();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Refresh data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       loadProfile();
@@ -117,11 +157,10 @@ const ProfileScreen: React.FC = () => {
     setIsLoggingOut(true);
     
     try {
-      // Notify the service that user is logging out (this will clear pending URLs and set logout flag)
       DeepLinkingService.updateAuthenticationState(false);
       
       DeepLinkingService.removeListener();
-      DeepLinkingService.reset(); // This will clear the logout flag
+      DeepLinkingService.reset();
       
       await logout();
     } catch (error) {
@@ -143,11 +182,7 @@ const ProfileScreen: React.FC = () => {
   }, [navigation]);
 
   if (loading) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={colors.info} />
-      </View>
-    );
+    return <ProfileSkeleton theme={theme} />;
   }
 
   return (

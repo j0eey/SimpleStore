@@ -20,11 +20,63 @@ import { searchProductsApi } from '../api/products.api';
 import { getErrorMessage } from '../utils/getErrorMessage';
 import { Product } from '../types/Product';
 import { RootStackParamList, SearchState } from '../types/types';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 const SEARCH_MIN_LENGTH = 2;
 const SEARCH_PLACEHOLDER = 'Search products...';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+const SearchResultItemSkeleton = ({ theme }: { theme: string }) => {
+  const isDark = theme === 'dark';
+  const skeletonConfig = {
+    borderRadius: 4,
+    backgroundColor: isDark ? colors.darkPlaceholder : colors.lightPlaceholder,
+    highlightColor: isDark ? colors.darkHighlight : colors.lightHighlight,
+  };
+
+  return (
+    <SkeletonPlaceholder {...skeletonConfig}>
+      <SkeletonPlaceholder.Item
+        flexDirection="row"
+        alignItems="center"
+        padding={12}
+        borderRadius={12}
+        marginBottom={12}
+        backgroundColor={isDark ? colors.darkCard : colors.lightCard}
+      >
+        {/* Product Image Skeleton */}
+        <SkeletonPlaceholder.Item
+          width={60}
+          height={60}
+          borderRadius={8}
+          marginRight={12}
+        />
+
+        {/* Product Info Skeleton */}
+        <SkeletonPlaceholder.Item flex={1}>
+          {/* Product Title Skeleton */}
+          <SkeletonPlaceholder.Item
+            width="85%"
+            height={16}
+            marginBottom={4}
+          />
+          <SkeletonPlaceholder.Item
+            width="60%"
+            height={16}
+            marginBottom={4}
+          />
+          
+          {/* Product Price Skeleton */}
+          <SkeletonPlaceholder.Item
+            width="30%"
+            height={16}
+          />
+        </SkeletonPlaceholder.Item>
+      </SkeletonPlaceholder.Item>
+    </SkeletonPlaceholder>
+  );
+};
 
 const SearchScreen: React.FC = () => {
   const [searchState, setSearchState] = useState<SearchState>({
@@ -138,7 +190,6 @@ const SearchScreen: React.FC = () => {
   const renderProductItem: ListRenderItem<Product> = useCallback(({ item }) => {
     const imageUrl = item.images[0]?.fullUrl;
 
-
     return (
       <TouchableOpacity
         style={[styles.productCard, dynamicStyles.productCard]}
@@ -186,8 +237,10 @@ const SearchScreen: React.FC = () => {
   const renderContent = useCallback(() => {
     if (searchState.isLoading) {
       return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={dynamicStyles.loadingColor} />
+        <View style={styles.listContainer}>
+          {[1, 2, 3, 4, 5, 6].map((index) => (
+            <SearchResultItemSkeleton key={index} theme={theme} />
+          ))}
         </View>
       );
     }
@@ -208,7 +261,7 @@ const SearchScreen: React.FC = () => {
     }
 
     return renderEmptyState();
-  }, [searchState, dynamicStyles.loadingColor, renderProductItem, renderEmptyState]);
+  }, [searchState, theme, renderProductItem, renderEmptyState]);
 
   return (
     <View style={[styles.container, dynamicStyles.container]}>
