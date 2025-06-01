@@ -20,7 +20,7 @@ import AddNewProductScreen from '../screens/AddNewProductScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import EditProductScreen from '../screens/EditProductScreen';
 import CartScreen from '../screens/CartScreen';
-import DeepLinkingService from '../services/DeepLinkingService';
+import DeepLinkingService from '../services/UniversalLinkingService';
 import HomeScreen from '../screens/HomeScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -40,37 +40,45 @@ const AppNavigator = () => {
     setShowLottieSplash(false);
   };
 
+  // Update authentication state whenever it changes
   useEffect(() => {
     DeepLinkingService.updateAuthenticationState(isAuthenticated);
   }, [isAuthenticated]);
 
+  // Initialize deep linking ONLY after splash screen is finished
   useEffect(() => {
     let urlListener: any;
+    
     const initDeepLinking = async () => {
-      if (navigationRef.current) {
+      if (navigationRef.current && !showLottieSplash) {
         DeepLinkingService.setNavigationRef(navigationRef.current);
         urlListener = await DeepLinkingService.initialize(isAuthenticated);
       }
     };
-    if (navigationRef.current?.isReady()) {
+
+    // Only initialize when splash is done and navigation is ready
+    if (!showLottieSplash && navigationRef.current?.isReady()) {
       initDeepLinking();
     }
+
     return () => {
       if (urlListener) {
         urlListener.remove();
       }
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, showLottieSplash]); // Added showLottieSplash dependency
 
   return (
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
-        if (navigationRef.current) {
+        // Only initialize deep linking if splash screen is finished
+        if (navigationRef.current && !showLottieSplash) {
           DeepLinkingService.setNavigationRef(navigationRef.current);
           DeepLinkingService.initialize(isAuthenticated);
         }
       }}
+      linking={!showLottieSplash ? DeepLinkingService.getLinkingConfig() : undefined}
     >
       <Stack.Navigator
         screenOptions={{

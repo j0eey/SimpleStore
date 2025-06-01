@@ -18,7 +18,7 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useFlyingCart } from '../contexts/FlyingCartContext';
-import DeepLinkingService from '../services/DeepLinkingService';
+import DeepLinkingService from '../services/UniversalLinkingService';
 
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
