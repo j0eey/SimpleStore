@@ -65,6 +65,21 @@ export interface ProductDeepLink {
   image?: string;
 };
 
+export interface ProductNotificationData {
+  _id: string;
+  title: string;
+  price: number;
+  location: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+  images: Array<{
+    url: string;
+    _id: string;
+    fullUrl: string;
+  }>;
+}
 
 
 

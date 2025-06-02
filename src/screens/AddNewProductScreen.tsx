@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View,Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, PermissionsAndroid, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, PermissionsAndroid, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import { colors, fonts } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
-import { launchCamera, launchImageLibrary, Asset} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
 import { addProductApi } from '../api/products.api';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, LocationType } from '../types/types';
@@ -13,12 +13,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getErrorMessage } from '../utils/getErrorMessage';
 import { getProductSuccessMessage } from '../utils/getSuccessMessage';
 import { getFailureMessage, getProductFailureCreationMessage } from '../utils/getFailureMessage';
-
+import OneSignalService from '../services/OneSignalService';
 
 const AddNewProductScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
   const themedColor = theme === 'dark';
+  
+  // Form state
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -30,6 +32,9 @@ const AddNewProductScreen = () => {
   const [images, setImages] = useState<Asset[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /**
+   * Handle image selection from gallery
+   */
   const handleImagePick = async () => {
     try {
       const result = await launchImageLibrary({
@@ -50,24 +55,30 @@ const AddNewProductScreen = () => {
     }
   };
 
+  /**
+   * Request camera permission on Android
+   */
   const requestCameraPermission = async (): Promise<boolean> => {
-  if (Platform.OS === 'android') {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: getErrorMessage(err),
-      });
-      return false;
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        Toast.show({
+          type: 'error',
+          text1: getErrorMessage(err),
+        });
+        return false;
+      }
     }
-  }
-  return true;
-};
+    return true;
+  };
 
+  /**
+   * Handle camera capture
+   */
   const handleCameraCapture = async () => {
     const hasPermission = await requestCameraPermission();
 
@@ -75,7 +86,6 @@ const AddNewProductScreen = () => {
       Toast.show({
         type: 'error',
         text1: getFailureMessage('Camera permission is required to take photos.'),
-        
       });
       return;
     }
@@ -86,8 +96,6 @@ const AddNewProductScreen = () => {
       if (Array.isArray(result.assets)) {
         const assets = result.assets as Asset[];
         setImages(prev => [...prev, ...assets].slice(0, 5));
-      } else if (result.didCancel) {
-      } else if (result.errorCode || result.errorMessage) {
       }
     } catch (error) {
       Toast.show({
@@ -97,56 +105,74 @@ const AddNewProductScreen = () => {
     }
   };
 
+  /**
+   * Remove image from selection
+   */
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  /**
+   * Handle form submission
+   */
   const handleSubmit = async () => {
-  if (!name || !description || !price || !location.name || images.length === 0) {
-    Toast.show({
-      type: 'error',
-      text1: getFailureMessage('Please fill out all fields and add at least one image.'),
-    });
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const formData = new FormData();
-    formData.append('title', name);
-    formData.append('description', description);
-    formData.append('price', price);
-    formData.append('location[name]', location.name);
-    formData.append('location[latitude]', String(location.latitude));
-    formData.append('location[longitude]', String(location.longitude));
-
-    images.forEach((img, index) => {
-      formData.append('images', {
-        uri: img.uri!,
-        type: img.type!,
-        name: img.fileName || `photo${index}.jpg`,
+    if (!name || !description || !price || !location.name || images.length === 0) {
+      Toast.show({
+        type: 'error',
+        text1: getFailureMessage('Please fill out all fields and add at least one image.'),
       });
-    });
+      return;
+    }
 
-    const response = await addProductApi(formData);
-    Toast.show({
-      type: 'success',
-      text1: getProductSuccessMessage(response),
-    });
-    navigation.goBack();
-  } catch (error) {
-    Toast.show({
-      type: 'error',
-      text1: getProductFailureCreationMessage(error),
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    setIsSubmitting(true);
 
-  
+    try {
+      const formData = new FormData();
+      formData.append('title', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('location[name]', location.name);
+      formData.append('location[latitude]', String(location.latitude));
+      formData.append('location[longitude]', String(location.longitude));
 
+      images.forEach((img, index) => {
+        formData.append('images', {
+          uri: img.uri!,
+          type: img.type!,
+          name: img.fileName || `photo${index}.jpg`,
+        });
+      });
+
+      const response = await addProductApi(formData);
+      
+      // Show success toast
+      Toast.show({
+        type: 'success',
+        text1: getProductSuccessMessage(response),
+      });
+
+      // Trigger OneSignal notification
+      try {
+        await OneSignalService.showProductAddedNotification(response);
+      } catch (notificationError) {
+        // Don't fail the entire operation if notification fails
+      }
+
+      // Navigate back
+      navigation.goBack();
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: getProductFailureCreationMessage(error),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /**
+   * Handle location selection from map
+   */
   useFocusEffect(
     React.useCallback(() => {
       const currentRoute = navigation.getState().routes[navigation.getState().index];
@@ -160,6 +186,18 @@ const AddNewProductScreen = () => {
     }, [navigation])
   );
 
+  /**
+   * Reset form and navigate back
+   */
+  const handleCancel = () => {
+    setName('');
+    setDescription('');
+    setPrice('');
+    setLocation({ name: '', latitude: 0, longitude: 0 });
+    setImages([]);
+    navigation.goBack();
+  };
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -170,9 +208,11 @@ const AddNewProductScreen = () => {
       <Text style={[styles.title, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>
         Add New Item
       </Text>
+      
       <Text style={[styles.label, { color: themedColor ? colors.lightHeader : colors.darkHeader }]}>
         Product Images
       </Text>
+      
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity
           style={[styles.imageUpload, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
@@ -301,22 +341,15 @@ const AddNewProductScreen = () => {
 
       <TouchableOpacity
         style={[styles.cancelButton, { backgroundColor: themedColor ? colors.darkCard : colors.lightCard }]}
-        onPress={() => {
-          setName('');
-          setDescription('');
-          setPrice('');
-          setLocation({ name: '', latitude: 0, longitude: 0 });
-          setImages([]);
-          navigation.goBack();
-        }}
+        onPress={handleCancel}
         disabled={isSubmitting}
       >
         <Text style={[styles.cancelText, { color: colors.primaryDark }]}>Cancel</Text>
       </TouchableOpacity>
-
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

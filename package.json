@@ -39,6 +39,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-maps": "^1.23.8",
     "react-native-modal": "^14.0.0-rc.1",
+    "react-native-onesignal": "^5.2.12",
     "react-native-permissions": "^5.4.0",
     "react-native-reanimated": "^3.17.5",
     "react-native-safe-area-context": "^5.4.0",

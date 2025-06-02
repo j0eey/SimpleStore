@@ -22,6 +22,7 @@ import EditProductScreen from '../screens/EditProductScreen';
 import CartScreen from '../screens/CartScreen';
 import DeepLinkingService from '../services/UniversalLinkingService';
 import HomeScreen from '../screens/HomeScreen';
+import { OneSignal } from 'react-native-onesignal';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -30,6 +31,9 @@ const AppNavigator = () => {
   const { theme } = useTheme();
   const [showLottieSplash, setShowLottieSplash] = useState(true);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+  
+  // Store notification data when app is killed and navigation isn't ready
+  const pendingNotificationRef = useRef<any>(null);
 
   const headerStyle = {
     backgroundColor: theme === 'dark' ? colors.darkHeader : colors.lightHeader,
@@ -40,12 +44,12 @@ const AppNavigator = () => {
     setShowLottieSplash(false);
   };
 
-  // Update authentication state whenever it changes
+  // Update authentication state for deep linking
   useEffect(() => {
     DeepLinkingService.updateAuthenticationState(isAuthenticated);
   }, [isAuthenticated]);
 
-  // Initialize deep linking ONLY after splash screen is finished
+  // Initialize deep linking after splash screen
   useEffect(() => {
     let urlListener: any;
     
@@ -56,7 +60,6 @@ const AppNavigator = () => {
       }
     };
 
-    // Only initialize when splash is done and navigation is ready
     if (!showLottieSplash && navigationRef.current?.isReady()) {
       initDeepLinking();
     }
@@ -66,13 +69,66 @@ const AppNavigator = () => {
         urlListener.remove();
       }
     };
-  }, [isAuthenticated, showLottieSplash]); // Added showLottieSplash dependency
+  }, [isAuthenticated, showLottieSplash]);
+
+  // Set up OneSignal notification click handler
+  useEffect(() => {
+    // Only set up after splash screen and when authenticated
+    if (!showLottieSplash && isAuthenticated && navigationRef.current?.isReady()) {
+      // Handle notification click events
+      const handleNotificationClick = (event: any) => {
+        const notificationData = event.notification.additionalData as any;
+        
+        // Check if this is a product notification
+        if (notificationData?.type === 'product_added' && notificationData?.productId) {
+          const navigationParams = {
+            id: notificationData.productId as string,
+            title: (notificationData.productTitle as string) || 'Product Details',
+            description: '', // Not available in notification data
+            image: '', // Not available in notification data  
+            price: parseFloat(notificationData.price as string) || 0,
+          };
+          
+          // Navigate to ProductDetails screen
+          if (navigationRef.current?.isReady()) {
+            navigationRef.current.navigate('ProductDetails', navigationParams);
+          } else {
+            // Store the notification data to handle after app loads
+            pendingNotificationRef.current = navigationParams;
+          }
+        }
+      };
+      
+      OneSignal.Notifications.addEventListener('click', handleNotificationClick);
+      
+      // Clean up listener
+      return () => {
+        const cleanupHandler = (event: any) => {};
+        OneSignal.Notifications.removeEventListener('click', cleanupHandler);
+      };
+    }
+  }, [showLottieSplash, isAuthenticated]);
+
+  // Handle pending notification when navigation becomes ready (for killed app scenario)
+  useEffect(() => {
+    if (navigationRef.current?.isReady() && pendingNotificationRef.current && !showLottieSplash && isAuthenticated) {
+      const params = pendingNotificationRef.current;
+      
+      // Delay to ensure app is fully loaded
+      setTimeout(() => {
+        if (navigationRef.current?.isReady()) {
+          navigationRef.current.navigate('ProductDetails', params);
+          pendingNotificationRef.current = null; // Clear the pending notification
+        }
+      }, 1000);
+    }
+  }, [showLottieSplash, isAuthenticated, navigationRef.current?.isReady()]);
 
   return (
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
-        // Only initialize deep linking if splash screen is finished
+        // Initialize deep linking when navigation is ready
         if (navigationRef.current && !showLottieSplash) {
           DeepLinkingService.setNavigationRef(navigationRef.current);
           DeepLinkingService.initialize(isAuthenticated);
@@ -145,7 +201,9 @@ const AppNavigator = () => {
                           message: shareContent.message,
                           url: shareContent.url,
                         });
-                      } catch (error) {/* Handle Share error */}
+                      } catch (error) {
+                        // Handle Share error silently
+                      }
                     }}
                   />
                 ),
@@ -211,7 +269,7 @@ const AppNavigator = () => {
             <Stack.Screen
               name="EditProfile"
               component={EditProfileScreen}
-              options={({ route, navigation }) => ({
+              options={({ navigation }) => ({
                 headerShown: true,
                 headerTitle: '',
                 headerLeft: () => (
@@ -220,9 +278,7 @@ const AppNavigator = () => {
                     size={24}
                     color={theme === 'dark' ? colors.lightHeader : colors.darkHeader}
                     style={{ position: 'absolute', left: 16, top: 20, zIndex: 1 }}
-                    onPress={() => {
-                      navigation.goBack();
-                    }}
+                    onPress={() => navigation.goBack()}
                   />
                 ),
                 headerStyle,
@@ -243,30 +299,5 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'transparent',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  editButton: {
-    padding: 8,
-  },
-  headerContainer: {
-    zIndex: 10,
-    elevation: 10,
-  },
-});
 
 export default AppNavigator;
