@@ -17,7 +17,6 @@ class UniversalLinkingService {
   private isLoggingOut = false;
   private readonly PENDING_URL_TIMEOUT = 5 * 60 * 1000;
 
-  // React Navigation linking configuration - only API URLs
   public linking = {
     prefixes: [API_BASE_URL],
     config: {

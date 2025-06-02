@@ -1,24 +1,9 @@
-import { OneSignal } from 'react-native-onesignal';
-
-export interface ProductNotificationData {
-  _id: string;
-  title: string;
-  price: number;
-  location: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  images: Array<{
-    url: string;
-    _id: string;
-    fullUrl: string;
-  }>;
-}
+import Config from 'react-native-config';
+import { ProductNotificationData } from "../types/Product";
 
 class OneSignalService {
-  private appId = '1a69ea62-a8dc-4df7-8000-1ba3c2f7fa55';
-  private restApiKey = 'os_v2_app_dju6uyvi3rg7paaador4f572kwt4qynegw4uzdvubnzrvjb5frhldf2hdzfjakvyjoa7xxas4ykte4zlsfyhwiy253tj76tjaxmuj7q';
+  private appId = Config.ONESIGNAL_APP_ID;
+  private restApiKey = Config.ONESIGNAL_REST_API_KEY;
 
   /**
    * Send push notification to all users when a new product is added
