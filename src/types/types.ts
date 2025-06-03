@@ -92,3 +92,8 @@ export interface SearchState {
 export const CONSTANTS = {
   AVATAR_SIZE: 100,
 } as const;
+
+
+export type RouteParams = {
+  productId: string;
+};

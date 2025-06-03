@@ -1,16 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Image,
-  PermissionsAndroid,
-  Platform,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, PermissionsAndroid, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -21,18 +10,11 @@ import { colors, fonts } from '../theme/Theme';
 import { useTheme } from '../contexts/ThemeContext';
 import { updateProductApi, fetchProductByIdApi } from '../api/products.api';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, LocationType } from '../types/types';
+import { RootStackParamList, LocationType, RouteParams } from '../types/types';
 import { getUpdatedProductSuccessMessage} from '../utils/getSuccessMessage';
 import { getErrorMessage } from '../utils/getErrorMessage';
-type RouteParams = {
-  productId: string;
-};
 
-type ImageSource = {
-  uri: string;
-  type?: string;
-  fileName?: string;
-};
+
 
 const MAX_IMAGES = 5;
 
@@ -60,15 +42,17 @@ const EditProductScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Derived values
-  const themedStyles = getThemedStyles(theme);
-  const availableImageSlots = MAX_IMAGES - (existingImages.length - imagesToDelete.length + images.length);
+  const remainingExistingImages = existingImages.filter(img => !imagesToDelete.includes(img));
+  const totalCurrentImages = remainingExistingImages.length + images.length;
+  const availableImageSlots = Math.max(0, MAX_IMAGES - totalCurrentImages);
   const canAddMoreImages = availableImageSlots > 0;
+  const themedStyles = getThemedStyles(theme);
   const isFormValid = Boolean(
     formData.name &&
     formData.description &&
     formData.price &&
     formData.location.name &&
-    (existingImages.length - imagesToDelete.length + images.length) > 0
+    totalCurrentImages > 0
   );
 
   // Data fetching
@@ -98,6 +82,11 @@ const EditProductScreen = () => {
 
   // Image handling
   const handleImagePick = async () => {
+    if (availableImageSlots <= 0) {
+      showErrorToast(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+
     try {
       const result = await launchImageLibrary({
         mediaType: 'photo',
@@ -106,7 +95,8 @@ const EditProductScreen = () => {
       });
 
       if (result.assets?.length) {
-        setImages(prev => [...prev, ...result.assets as Asset[]].slice(0, MAX_IMAGES - (existingImages.length - imagesToDelete.length)));
+        const newAssetsToAdd = result.assets.slice(0, availableImageSlots);
+        setImages(prev => [...prev, ...newAssetsToAdd]);
       }
     } catch (error) {
       showErrorToast(error);
@@ -134,10 +124,15 @@ const EditProductScreen = () => {
       return;
     }
 
+    if (availableImageSlots <= 0) {
+      showErrorToast(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+
     try {
       const result = await launchCamera({ mediaType: 'photo' });
       if (result.assets?.length) {
-        setImages(prev => [...prev, ...result.assets as Asset[]].slice(0, MAX_IMAGES - (existingImages.length - imagesToDelete.length)));
+        setImages(prev => [...prev, ...result.assets as Asset[]]);
       }
     } catch (error) {
       showErrorToast(error);
@@ -148,10 +143,8 @@ const EditProductScreen = () => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeExistingImage = (index: number) => {
-    const imageToDelete = existingImages[index];
-    setImagesToDelete(prev => [...prev, imageToDelete]);
-    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  const removeExistingImage = (imageUrl: string) => {
+    setImagesToDelete(prev => [...prev, imageUrl]);
   };
 
   // Form submission
@@ -188,8 +181,8 @@ const EditProductScreen = () => {
     formDataPayload.append('location[longitude]', String(formData.location.longitude));
 
     // Add images to delete
-    imagesToDelete.forEach(img => {
-      formDataPayload.append('imagesToDelete[]', img);
+    imagesToDelete.forEach(imgUrl => {
+      formDataPayload.append('imagesToDelete[]', imgUrl);
     });
 
     // Add new images
@@ -198,7 +191,7 @@ const EditProductScreen = () => {
         uri: img.uri!,
         type: img.type!,
         name: img.fileName || `photo${index}.jpg`,
-      } as ImageSource);
+      } as any);
     });
 
     return formDataPayload;
@@ -255,6 +248,7 @@ const EditProductScreen = () => {
       <ImagePreviewSection
         themedStyles={themedStyles}
         existingImages={existingImages}
+        imagesToDelete={imagesToDelete}
         newImages={images}
         isSubmitting={isSubmitting}
         onRemoveExisting={removeExistingImage}
@@ -365,6 +359,7 @@ const ImageUploadSection = ({
 const ImagePreviewSection = ({
   themedStyles,
   existingImages,
+  imagesToDelete,
   newImages,
   isSubmitting,
   onRemoveExisting,
@@ -372,38 +367,52 @@ const ImagePreviewSection = ({
 }: {
   themedStyles: any;
   existingImages: string[];
+  imagesToDelete: string[];
   newImages: Asset[];
   isSubmitting: boolean;
-  onRemoveExisting: (index: number) => void;
+  onRemoveExisting: (imageUrl: string) => void;
   onRemoveNew: (index: number) => void;
-}) => (
-  <ScrollView horizontal style={themedStyles.imagePreviewContainer}>
-    {existingImages.map((img, idx) => (
-      <View key={`existing-${idx}`} style={themedStyles.imageWrapper}>
-        <Image source={{ uri: img }} style={themedStyles.imagePreview} />
-        <TouchableOpacity
-          style={themedStyles.removeIcon}
-          onPress={() => onRemoveExisting(idx)}
-          disabled={isSubmitting}
-        >
-          <Ionicons name="close-circle" size={22} color={colors.primaryDark} />
-        </TouchableOpacity>
-      </View>
-    ))}
-    {newImages.map((img, idx) => (
-      <View key={`new-${idx}`} style={themedStyles.imageWrapper}>
-        <Image source={{ uri: img.uri }} style={themedStyles.imagePreview} />
-        <TouchableOpacity
-          style={themedStyles.removeIcon}
-          onPress={() => onRemoveNew(idx)}
-          disabled={isSubmitting}
-        >
-          <Ionicons name="close-circle" size={22} color={colors.primaryDark} />
-        </TouchableOpacity>
-      </View>
-    ))}
-  </ScrollView>
-);
+}) => {
+  const displayedExistingImages = existingImages.filter(img => !imagesToDelete.includes(img));
+  
+  return (
+    <View style={{flexDirection: 'row', backgroundColor: themedStyles.container.backgroundColor, padding: 5}}>
+      {/* Render existing images */}
+      {displayedExistingImages.map((img) => (
+        <View key={`existing-${img}`} style={themedStyles.imageWrapper}>
+          <Image source={{ uri: img }} style={themedStyles.imagePreview} />
+          <TouchableOpacity
+            style={themedStyles.removeIcon}
+            onPress={() => onRemoveExisting(img)}
+            disabled={isSubmitting}
+          >
+            <Ionicons name="close-circle" size={22} color={colors.primaryDark} />
+          </TouchableOpacity>
+        </View>
+      ))}
+      
+      {/* Render new images */}
+      {newImages.map((img, idx) => {
+        const imageSource = img.base64 
+          ? { uri: `data:${img.type || 'image/jpeg'};base64,${img.base64}` }
+          : { uri: img.uri || '' };
+        
+        return (
+          <View key={`new-${idx}`} style={themedStyles.imageWrapper}>
+            <Image source={imageSource} style={themedStyles.imagePreview} />
+            <TouchableOpacity
+              style={themedStyles.removeIcon}
+              onPress={() => onRemoveNew(idx)}
+              disabled={isSubmitting}
+            >
+              <Ionicons name="close-circle" size={22} color={colors.primaryDark} />
+            </TouchableOpacity>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
 
 const FormField = ({
   label,
@@ -573,6 +582,7 @@ const getThemedStyles = (theme: string) => {
     },
     imagePreviewContainer: {
       marginBottom: 16,
+      height: 100,
     },
     imagePreview: {
       width: 80,
@@ -603,6 +613,9 @@ const getThemedStyles = (theme: string) => {
       position: 'relative',
       marginRight: 8,
       marginTop: 10,
+      width: 80,
+      height: 80,
+      flexShrink: 0,
     },
     removeIcon: {
       position: 'absolute',
