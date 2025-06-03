@@ -1,4 +1,5 @@
 import { Product } from '../types/Product';
+
 export type RootStackParamList = {
   LottieSplash: undefined;
   Login: undefined;
@@ -93,7 +94,10 @@ export const CONSTANTS = {
   AVATAR_SIZE: 100,
 } as const;
 
-
 export type RouteParams = {
   productId: string;
 };
+
+
+
+

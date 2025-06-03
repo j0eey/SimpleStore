@@ -1,0 +1,796 @@
+import React, { memo, useRef, useCallback, useMemo } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, Animated, Easing, Share } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FastImage from 'react-native-fast-image';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Product } from '../../types/Product';
+import { categories } from '../../types/categories';
+import { fonts, colors } from '../../theme/Theme';
+import { getTimeAgo } from '../../utils/getTimeAgo';
+import { LAYOUT, scaleFont, getTimeOfDay } from './constants';
+import DeepLinkingService from '../../services/UniversalLinkingService';
+
+// Types
+interface ProductItemProps {
+  item: Product;
+  onPress: (product: Product) => void;
+  onAddToCart: (product: Product, position: {x: number, y: number, width: number, height: number}) => void;
+  isOwner: boolean;
+}
+
+interface CategoryListProps {
+  loading: boolean;
+  onCategoryPress: (categoryName: string) => void;
+}
+
+interface LocationSelectorProps {
+  selectedLocation: string;
+  onSelect: (location: string) => void;
+}
+
+interface ErrorDisplayProps {
+  errorMessage: string;
+  onRetry: () => void;
+}
+
+interface HomeHeaderProps {
+  onProfilePress: () => void;
+}
+
+// Home Header Component
+export const HomeHeader = memo<HomeHeaderProps>(({ onProfilePress }) => {
+  const { theme } = useTheme();
+  
+  const headerStyles = useMemo(() => ({
+    header: {
+      paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
+      paddingTop: 10,
+      paddingBottom: 16,
+    },
+    headerContent: {
+      flexDirection: 'row' as const,
+      justifyContent: 'space-between' as const,
+      alignItems: 'center' as const,
+    },
+    greetingText: {
+      fontSize: scaleFont(14),
+      fontFamily: fonts.regular,
+      opacity: 0.8,
+      color: theme === 'dark' ? colors.lightText : colors.darkSearchbar,
+    },
+    titleText: {
+      fontSize: scaleFont(22),
+      fontFamily: fonts.Bold,
+      marginTop: 2,
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+    profileButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      elevation: 2,
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+    },
+  }), [theme]);
+
+  return (
+    <View style={headerStyles.header}>
+      <View style={headerStyles.headerContent}>
+        <View>
+          <Text style={headerStyles.greetingText}>Good {getTimeOfDay()},</Text>
+          <Text style={headerStyles.titleText}>Find Great Deals Nearby</Text>
+        </View>
+        <TouchableOpacity onPress={onProfilePress} style={headerStyles.profileButton}>
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color={theme === 'dark' ? colors.primaryDark : colors.primaryDark}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+});
+
+// Location Selector Component
+export const LocationSelector = memo<LocationSelectorProps>(({ selectedLocation, onSelect }) => {
+  const { theme } = useTheme();
+
+  const selectorStyles = useMemo(() => ({
+    container: {
+      paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
+      marginBottom: 8,
+    },
+    selector: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderRadius: 10,
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.textPrimary,
+    },
+    text: {
+      fontSize: scaleFont(14),
+      fontFamily: fonts.semiBold,
+      marginLeft: 8,
+      flex: 1,
+      color: theme === 'dark' ? colors.lightText : colors.darkText,
+    },
+  }), [theme]);
+
+  const handlePress = useCallback(() => {
+    onSelect(selectedLocation);
+  }, [onSelect, selectedLocation]);
+
+  return (
+    <View style={selectorStyles.container}>
+      <TouchableOpacity style={selectorStyles.selector} onPress={handlePress}>
+        <Ionicons name="location-outline" size={16} color={theme === 'dark' ? colors.primary : colors.darkText} />
+        <Text style={selectorStyles.text}>{selectedLocation}</Text>
+        <Ionicons name="chevron-down-outline" size={16} color={theme === 'dark' ? colors.lightText : colors.darkText} />
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+// Product Item Component
+export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart, isOwner }) => {
+  const { theme } = useTheme();
+  const imageRef = useRef<View>(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const cartIconScaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = useCallback(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 0.96,
+      duration: 100,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim]);
+
+  const handlePressOut = useCallback(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 150,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim]);
+
+  const handleAddToCartPressIn = useCallback(() => {
+    Animated.timing(cartIconScaleAnim, {
+      toValue: 1.2,
+      duration: 100,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [cartIconScaleAnim]);
+
+  const handleAddToCartPressOut = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(cartIconScaleAnim, {
+        toValue: 0.8,
+        duration: 80,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cartIconScaleAnim, {
+        toValue: 1,
+        duration: 150,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      imageRef.current?.measureInWindow((x, y, width, height) => {
+        onAddToCart(item, {x, y, width, height});
+      });
+    });
+  }, [cartIconScaleAnim, onAddToCart, item]);
+
+  const handleSharePress = useCallback(async () => {
+    try {
+      const shareContent = DeepLinkingService.generateShareContent({
+        id: item._id,
+        title: item.title,
+        price: `${item.price}`,
+        image: item.images[0]?.fullUrl || '',
+      });
+      await Share.share({
+        title: shareContent.title,
+        message: shareContent.message,
+        url: shareContent.url,
+      });
+    } catch (error) {
+      // Handle error silently
+    }
+  }, [item]);
+
+  const styles = useMemo(() => ({
+    card: {
+      width: LAYOUT.CARD_WIDTH,
+      borderRadius: 12,
+      overflow: 'hidden' as const,
+      elevation: 2,
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 2 },
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+      shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+      transform: [{ scale: scaleAnim }],
+    },
+    imageWrapper: {
+      width: '100%' as const,
+      height: LAYOUT.CARD_WIDTH * 0.9,
+      position: 'relative' as const,
+    },
+    image: {
+      width: '100%' as const,
+      height: '100%' as const,
+    },
+    imagePlaceholder: {
+      width: '100%' as const,
+      height: '100%' as const,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      backgroundColor: theme === 'dark' ? colors.darkHeader : colors.imageBackground,
+    },
+    shareButton: {
+      position: 'absolute' as const,
+      top: 8,
+      left: 8,
+      backgroundColor: theme === 'dark' ? colors.cartIconBgDarkColor : colors.cartIconBgLightColor,
+      borderRadius: 18,
+      width: 36,
+      height: 36,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      shadowColor: colors.darkHeader,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+    },
+    addToCartButton: {
+      position: 'absolute' as const,
+      top: 8,
+      right: 8,
+      backgroundColor: theme === 'dark' ? colors.cartIconBgDarkColor : colors.cartIconBgLightColor,
+      borderRadius: 18,
+      width: 36,
+      height: 36,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      shadowColor: colors.darkHeader,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      transform: [{ scale: cartIconScaleAnim }],
+    },
+    productInfo: {
+      padding: 10,
+    },
+    productTitle: {
+      fontSize: scaleFont(14),
+      fontFamily: fonts.semiBold,
+      marginBottom: 6,
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+    price: {
+      fontSize: scaleFont(15),
+      fontFamily: fonts.Bold,
+      color: theme === 'dark' ? colors.priceDark : colors.icon,
+    },
+    locationText: {
+      fontSize: scaleFont(10),
+      fontFamily: fonts.regular,
+      color: theme === 'dark' ? colors.lightText : colors.darkBorder,
+      marginTop: 2,
+    },
+    dateText: {
+      fontSize: scaleFont(10),
+      fontFamily: fonts.regular,
+      opacity: 0.7,
+      marginTop: 4,
+      color: theme === 'dark' ? colors.lightText : colors.darkBorder,
+    },
+  }), [theme, scaleAnim, cartIconScaleAnim]);
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onPress(item)}
+      activeOpacity={1}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <View ref={imageRef} style={styles.imageWrapper}>
+        {item.images[0]?.fullUrl ? (
+          <FastImage
+            source={{
+              uri: item.images[0].fullUrl,
+              priority: FastImage.priority.normal,
+            }}
+            style={styles.image}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Ionicons
+              name="image-outline"
+              size={32}
+              color={theme === 'dark' ? colors.lightText : colors.darkText}
+            />
+          </View>
+        )}
+        
+        <TouchableOpacity style={styles.shareButton} onPress={handleSharePress}>
+          <Ionicons name="share-outline" size={20} color={theme === 'dark' ? colors.primaryLight : colors.primaryDark} />
+        </TouchableOpacity>
+
+        {!isOwner && (
+          <TouchableOpacity
+            style={styles.addToCartButton}
+            onPressIn={handleAddToCartPressIn}
+            onPressOut={handleAddToCartPressOut}
+            activeOpacity={1}
+          >
+            <Ionicons name="cart-outline" size={20} color={theme === 'dark' ? colors.primaryLight : colors.primaryDark} />
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <View style={styles.productInfo}>
+        <Text style={styles.productTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+        <Text style={styles.locationText} numberOfLines={1}>
+          {item.location?.name ?? 'Unknown Location'}
+        </Text>
+        <Text style={styles.dateText}>{getTimeAgo(item.createdAt)}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+});
+
+// Category Components
+const CategoryItem = memo<{category: {name: string, icon: string}, onPress: (name: string) => void}>(({ category, onPress }) => {
+  const { theme } = useTheme();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = useCallback(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 0.92,
+      duration: 100,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim]);
+
+  const handlePressOut = useCallback(() => {
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 150,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim]);
+
+  const styles = useMemo(() => ({
+    categoryCard: {
+      width: 85,
+      height: 100,
+      borderRadius: 10,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      marginRight: 12,
+      padding: 8,
+      elevation: 2,
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+      shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+      transform: [{ scale: scaleAnim }],
+    },
+    categoryText: {
+      fontSize: scaleFont(12),
+      fontFamily: fonts.semiBold,
+      marginTop: 8,
+      textAlign: 'center' as const,
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+  }), [theme, scaleAnim]);
+
+  return (
+    <TouchableOpacity
+      style={styles.categoryCard}
+      onPress={() => onPress(category.name)}
+      activeOpacity={1}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Ionicons
+        name={category.icon}
+        size={24}
+        color={theme === 'dark' ? colors.primary : colors.primaryDark}
+      />
+      <Text style={styles.categoryText}>{category.name}</Text>
+    </TouchableOpacity>
+  );
+});
+
+const CategorySkeleton = memo(() => {
+  const { theme } = useTheme();
+  
+  const skeletonConfig = useMemo(() => ({
+    borderRadius: 4,
+    backgroundColor: theme === 'dark' ? colors.darkPlaceholder : colors.lightPlaceholder,
+    highlightColor: theme === 'dark' ? colors.darkHighlight : colors.lightHighlight,
+  }), [theme]);
+
+  const styles = useMemo(() => ({
+    categoryCard: {
+      width: 85,
+      height: 100,
+      borderRadius: 10,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      marginRight: 12,
+      padding: 8,
+      elevation: 2,
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+      shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+    },
+  }), [theme]);
+
+  return (
+    <View style={styles.categoryCard}>
+      <SkeletonPlaceholder {...skeletonConfig}>
+        <SkeletonPlaceholder.Item width={24} height={24} borderRadius={12} />
+        <SkeletonPlaceholder.Item width={60} height={scaleFont(12)} marginTop={8} />
+      </SkeletonPlaceholder>
+    </View>
+  );
+});
+
+export const CategoryList = memo<CategoryListProps>(({ loading, onCategoryPress }) => {
+  const containerStyle = useMemo(() => ({
+    paddingLeft: LAYOUT.HORIZONTAL_PADDING,
+    paddingRight: 8,
+    paddingBottom: 8,
+  }), []);
+
+  const renderSkeletons = useCallback(() => 
+    Array.from({ length: 5 }).map((_, index) => (
+      <CategorySkeleton key={`cat-skeleton-${index}`} />
+    )), []);
+
+  const renderCategories = useCallback(() =>
+    categories.map((category) => (
+      <CategoryItem
+        key={category.name}
+        category={category}
+        onPress={onCategoryPress}
+      />
+    )), [onCategoryPress]);
+
+  return (
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false} 
+      contentContainerStyle={containerStyle}
+    >
+      {loading ? renderSkeletons() : renderCategories()}
+    </ScrollView>
+  );
+});
+
+// Skeleton Components
+export const ProductSkeleton = memo(() => {
+  const { theme } = useTheme();
+
+  const skeletonConfig = useMemo(() => ({
+    borderRadius: 4,
+    backgroundColor: theme === 'dark' ? colors.darkPlaceholder : colors.lightPlaceholder,
+    highlightColor: theme === 'dark' ? colors.darkHighlight : colors.lightHighlight,
+  }), [theme]);
+
+  const styles = useMemo(() => ({
+    card: {
+      width: LAYOUT.CARD_WIDTH,
+      borderRadius: 12,
+      overflow: 'hidden' as const,
+      elevation: 2,
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 2 },
+      backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
+      shadowColor: theme === 'dark' ? colors.darkHeader : colors.border,
+    },
+    imageWrapper: {
+      width: '100%' as const,
+      height: LAYOUT.CARD_WIDTH * 0.9,
+    },
+    productInfo: {
+      padding: 10,
+    },
+  }), [theme]);
+
+  return (
+    <View style={styles.card}>
+      <SkeletonPlaceholder {...skeletonConfig}>
+        <SkeletonPlaceholder.Item style={styles.imageWrapper} />
+        <SkeletonPlaceholder.Item style={styles.productInfo}>
+          <SkeletonPlaceholder.Item width={LAYOUT.CARD_WIDTH * 0.8} height={scaleFont(14)} marginBottom={6} />
+          <SkeletonPlaceholder.Item width={LAYOUT.CARD_WIDTH * 0.5} height={scaleFont(15)} marginBottom={2} />
+          <SkeletonPlaceholder.Item width={LAYOUT.CARD_WIDTH * 0.7} height={scaleFont(10)} marginTop={2} />
+          <SkeletonPlaceholder.Item width={LAYOUT.CARD_WIDTH * 0.4} height={scaleFont(10)} marginTop={4} />
+        </SkeletonPlaceholder.Item>
+      </SkeletonPlaceholder>
+    </View>
+  );
+});
+
+// Error Display Component
+export const ErrorDisplay = memo<ErrorDisplayProps>(({ errorMessage, onRetry }) => {
+  const { theme } = useTheme();
+  const errorOpacity = useRef(new Animated.Value(0)).current;
+  const errorTranslateY = useRef(new Animated.Value(20)).current;
+
+  const animateErrorIn = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(errorOpacity, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(errorTranslateY, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [errorOpacity, errorTranslateY]);
+
+  React.useEffect(() => {
+    if (errorMessage) {
+      animateErrorIn();
+    } else {
+      errorOpacity.setValue(0);
+      errorTranslateY.setValue(20);
+    }
+  }, [errorMessage, animateErrorIn, errorOpacity, errorTranslateY]);
+
+  const styles = useMemo(() => ({
+    container: {
+      flex: 1,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      paddingHorizontal: 20,
+    },
+    errorText: {
+      fontSize: scaleFont(16),
+      fontFamily: fonts.medium,
+      textAlign: 'center' as const,
+      marginTop: 15,
+      lineHeight: 24,
+      color: theme === 'dark' ? colors.notFoundDark : colors.notFoundLight,
+    },
+    retryButton: {
+      marginTop: 20,
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      backgroundColor: theme === 'dark' ? colors.primary : colors.primaryDark,
+    },
+    retryButtonText: {
+      color: colors.lightHeader,
+      fontSize: scaleFont(16),
+      fontFamily: fonts.semiBold,
+    },
+  }), [theme]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          opacity: errorOpacity,
+          transform: [{ translateY: errorTranslateY }],
+        },
+      ]}
+    >
+      <MaterialCommunityIcons
+        name="emoticon-sad-outline"
+        size={60}
+        color={theme === 'dark' ? colors.notFoundDark : colors.notFoundLight}
+      />
+      <Text style={styles.errorText}>
+        {errorMessage}
+      </Text>
+      <TouchableOpacity
+        style={styles.retryButton}
+        onPress={onRetry}
+      >
+        <Text style={styles.retryButtonText}>Reload</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+});
+
+// Section Header Component
+export const SectionHeader = memo<{title: string, marginTop?: number}>(({ title, marginTop = 0 }) => {
+  const { theme } = useTheme();
+
+  const styles = useMemo(() => ({
+    sectionTitle: {
+      fontSize: scaleFont(18),
+      fontFamily: fonts.Bold,
+      marginBottom: 12,
+      paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
+      marginTop,
+      color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
+    },
+  }), [theme, marginTop]);
+
+  return <Text style={styles.sectionTitle}>{title}</Text>;
+});
+
+// Product Grid Component
+export const ProductGrid = memo<{
+  products: Product[];
+  loading: boolean;
+  refreshing: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  onRefresh: () => void;
+  onLoadMore: () => void;
+  onProductPress: (product: Product) => void;
+  onAddToCart: (product: Product, position: {x: number, y: number, width: number, height: number}) => void;
+  userId?: string;
+  selectedLocation: string;
+  onLocationSelect: (location: string) => void;
+  onCategoryPress: (categoryName: string) => void;
+}>(({ products, loading, refreshing, loadingMore, hasMore, onRefresh, onLoadMore, onProductPress, onAddToCart, userId, selectedLocation, onLocationSelect, onCategoryPress }) => {
+  const { theme } = useTheme();
+
+  const renderItem = useCallback(
+    ({ item }: { item: Product }) => (
+      <ProductItem
+        item={item}
+        onPress={onProductPress}
+        onAddToCart={onAddToCart}
+        isOwner={item.user._id === userId}
+      />
+    ),
+    [onProductPress, onAddToCart, userId]
+  );
+
+  const renderSkeletonItem = useCallback(
+    ({ index }: { index: number }) => <ProductSkeleton key={`skeleton-${index}`} />,
+    []
+  );
+
+  const renderListHeader = useCallback(() => (
+    <>
+      <LocationSelector
+        selectedLocation={selectedLocation}
+        onSelect={onLocationSelect}
+      />
+
+      <SectionHeader title="Browse Categories" marginTop={20} />
+      <CategoryList
+        loading={loading}
+        onCategoryPress={onCategoryPress}
+      />
+
+      <SectionHeader title="Latest Listings" marginTop={8} />
+    </>
+  ), [selectedLocation, onLocationSelect, loading, onCategoryPress]);
+
+  const renderFooter = useCallback(() => {
+    if (loadingMore) {
+      return (
+        <View style={{
+          paddingVertical: 20,
+          alignItems: 'center',
+        }}>
+          <ActivityIndicator size="small" color={theme === 'dark' ? colors.primary : colors.primaryDark} />
+          <Text style={{
+            fontSize: scaleFont(13),
+            fontFamily: fonts.regular,
+            color: theme === 'dark' ? colors.lightText : colors.textPrimary,
+            marginTop: 8,
+          }}>
+            Loading more listings...
+          </Text>
+        </View>
+      );
+    }
+
+    if (!hasMore && products.length > 0) {
+      return (
+        <Text style={{
+          fontSize: scaleFont(13),
+          fontFamily: fonts.regular,
+          color: theme === 'dark' ? colors.lightText : colors.textPrimary,
+          textAlign: 'center',
+          paddingVertical: 16,
+        }}>
+          No more listings
+        </Text>
+      );
+    }
+
+    return null;
+  }, [loadingMore, hasMore, products.length, theme]);
+
+  const keyExtractor = useCallback((item: Product, index: number) => item?._id || `product-${index}`, []);
+  const skeletonData = useMemo(() => Array.from({ length: 6 }), []);
+
+  const listStyles = useMemo(() => ({
+    listContainer: {
+      paddingBottom: 75,
+    },
+    row: {
+      justifyContent: 'space-between' as const,
+      paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
+      marginBottom: LAYOUT.CARD_GAP,
+    },
+  }), []);
+
+  if (loading && products.length === 0) {
+    return (
+      <FlatList
+        data={skeletonData}
+        keyExtractor={(_, index) => `skeleton-${index}`}
+        renderItem={renderSkeletonItem}
+        numColumns={2}
+        columnWrapperStyle={listStyles.row}
+        contentContainerStyle={listStyles.listContainer}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={6}
+        initialNumToRender={6}
+        windowSize={10}
+        ListHeaderComponent={renderListHeader}
+      />
+    );
+  }
+
+  return (
+    <FlatList
+      data={products}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      numColumns={2}
+      columnWrapperStyle={listStyles.row}
+      contentContainerStyle={listStyles.listContainer}
+      showsVerticalScrollIndicator={false}
+      ListHeaderComponent={renderListHeader}
+      ListFooterComponent={renderFooter}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      onEndReached={onLoadMore}
+      onEndReachedThreshold={0.3}
+      initialNumToRender={8}
+      maxToRenderPerBatch={8}
+      updateCellsBatchingPeriod={50}
+      windowSize={15}
+      removeClippedSubviews={true}
+    />
+  );
+});

@@ -41,22 +41,6 @@ export interface ProductImage {
   _id: string;
 }
 
-export type ProductData = {
-  title: string;
-  description: string;
-  price: number;
-  location: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  images: Asset[];
-};
-export type Asset = {
-  uri: string;         
-  type?: string;        
-  fileName?: string; 
-};
 
 export interface ProductDeepLink {
   id: string;
