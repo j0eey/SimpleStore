@@ -1,16 +1,17 @@
 import Config from 'react-native-config';
-import { ProductNotificationData } from "../types/Product";
+import oneSignalApi from '../api/oneSignalApi';
+import { ProductNotificationData, NotificationResult } from "../types/Product";
+
 
 class OneSignalService {
   private appId = Config.ONESIGNAL_APP_ID;
-  private restApiKey = Config.ONESIGNAL_REST_API_KEY;
 
   /**
    * Send push notification to all users when a new product is added
    */
-  async showProductAddedNotification(product: ProductNotificationData) {
+  async showProductAddedNotification(product: ProductNotificationData): Promise<NotificationResult> {
     try {
-      const notificationData = {
+      const notificationPayload = {
         app_id: this.appId,
         included_segments: ['All'], // Send to all subscribed users
         headings: { en: 'New Product Added! 🎉' },
@@ -32,18 +33,9 @@ class OneSignalService {
         } : undefined,
       };
 
-      const response = await fetch('https://api.onesignal.com/notifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Key ${this.restApiKey}`,
-        },
-        body: JSON.stringify(notificationData),
-      });
+      const result = await oneSignalApi.sendNotification(notificationPayload);
 
-      const result = await response.json();
-
-      if (response.ok && result.id && result.id !== '') {
+      if (result.id && result.id !== '') {
         return { 
           success: true, 
           notificationId: result.id,
@@ -55,7 +47,10 @@ class OneSignalService {
       }
       
     } catch (error) {
-      return { success: false, error: String(error) };
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : String(error)
+      };
     }
   }
 }

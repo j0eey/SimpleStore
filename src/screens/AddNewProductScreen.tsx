@@ -349,8 +349,6 @@ const AddNewProductScreen = () => {
     </ScrollView>
   );
 };
-
-
 const styles = StyleSheet.create({
   container: {
    padding: 16, 

@@ -81,5 +81,30 @@ export interface ProductNotificationData {
   }>;
 }
 
+export interface OneSignalNotificationPayload {
+  app_id: string;
+  included_segments: string[];
+  headings: { en: string };
+  contents: { en: string };
+  data: Record<string, any>;
+  buttons?: Array<{ id: string; text: string }>;
+  big_picture?: string;
+  ios_attachments?: Record<string, string>;
+}
+
+export interface OneSignalApiResponse {
+  id?: string;
+  errors?: any;
+  [key: string]: any;
+}
+
+export interface NotificationResult {
+  success: boolean;
+  notificationId?: string;
+  productId?: string;
+  productTitle?: string;
+  error?: any;
+}
+
 
 

@@ -265,7 +265,13 @@ const AppNavigator = () => {
               component={AddNewProductScreen}
               options={{ presentation: 'modal' }}
             />
-            <Stack.Screen name="MapsScreen" component={MapsScreen} />
+            <Stack.Screen name="MapsScreen" component={MapsScreen} 
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                gestureEnabled: true,
+                headerShown: false,
+              }}
+            />
             <Stack.Screen
               name="EditProfile"
               component={EditProfileScreen}
