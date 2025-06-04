@@ -1,0 +1,839 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for edge case product titles: edge-case-product-titles 1`] = `
+[
+  {
+    "productTitle": "",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: ",
+    },
+    "titleLength": 0,
+  },
+  {
+    "productTitle": " ",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product " ". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product:  ",
+    },
+    "titleLength": 1,
+  },
+  {
+    "productTitle": "   ",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "   ". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product:    ",
+    },
+    "titleLength": 3,
+  },
+  {
+    "productTitle": "
+",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "
+". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: 
+",
+    },
+    "titleLength": 1,
+  },
+  {
+    "productTitle": "	",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "	". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: 	",
+    },
+    "titleLength": 1,
+  },
+  {
+    "productTitle": "A",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "A". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: A",
+    },
+    "titleLength": 1,
+  },
+  {
+    "productTitle": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    },
+    "titleLength": 100,
+  },
+  {
+    "productTitle": "Product
+With
+Newlines",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product
+With
+Newlines". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product
+With
+Newlines",
+    },
+    "titleLength": 21,
+  },
+  {
+    "productTitle": "Product	With	Tabs",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product	With	Tabs". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product	With	Tabs",
+    },
+    "titleLength": 17,
+  },
+  {
+    "productTitle": "Product With    Multiple    Spaces",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product With    Multiple    Spaces". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product With    Multiple    Spaces",
+    },
+    "titleLength": 34,
+  },
+  {
+    "productTitle": "PRODUCT IN ALL CAPS",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "PRODUCT IN ALL CAPS". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: PRODUCT IN ALL CAPS",
+    },
+    "titleLength": 19,
+  },
+  {
+    "productTitle": "product in all lowercase",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "product in all lowercase". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: product in all lowercase",
+    },
+    "titleLength": 24,
+  },
+  {
+    "productTitle": "Product With Mixed CaSe",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product With Mixed CaSe". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product With Mixed CaSe",
+    },
+    "titleLength": 23,
+  },
+  {
+    "productTitle": "123456789",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "123456789". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: 123456789",
+    },
+    "titleLength": 9,
+  },
+  {
+    "productTitle": "!@#$%^&*()",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "!@#$%^&*()". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: !@#$%^&*()",
+    },
+    "titleLength": 10,
+  },
+  {
+    "productTitle": "Product-with-hyphens-everywhere",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product-with-hyphens-everywhere". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product-with-hyphens-everywhere",
+    },
+    "titleLength": 31,
+  },
+  {
+    "productTitle": "Product_with_underscores_everywhere",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product_with_underscores_everywhere". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product_with_underscores_everywhere",
+    },
+    "titleLength": 35,
+  },
+  {
+    "productTitle": "Product.with.dots.everywhere",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product.with.dots.everywhere". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product.with.dots.everywhere",
+    },
+    "titleLength": 28,
+  },
+]
+`;
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for international characters and emojis: international-characters-and-emojis 1`] = `
+[
+  {
+    "productTitle": "Café Espresso Machine",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Café Espresso Machine". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Café Espresso Machine",
+    },
+  },
+  {
+    "productTitle": "Señor García's Guitar",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Señor García's Guitar". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Señor García's Guitar",
+    },
+  },
+  {
+    "productTitle": "Château Wine Collection",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Château Wine Collection". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Château Wine Collection",
+    },
+  },
+  {
+    "productTitle": "Naïve Art Painting",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Naïve Art Painting". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Naïve Art Painting",
+    },
+  },
+  {
+    "productTitle": "Résumé Template Premium",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Résumé Template Premium". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Résumé Template Premium",
+    },
+  },
+  {
+    "productTitle": "München Beer Stein",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "München Beer Stein". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: München Beer Stein",
+    },
+  },
+  {
+    "productTitle": "Tokyo Ramen Bowl 🍜",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Tokyo Ramen Bowl 🍜". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Tokyo Ramen Bowl 🍜",
+    },
+  },
+  {
+    "productTitle": "Paris Café Croissant 🥐",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Paris Café Croissant 🥐". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Paris Café Croissant 🥐",
+    },
+  },
+  {
+    "productTitle": "New York Pizza Slice 🍕",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "New York Pizza Slice 🍕". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: New York Pizza Slice 🍕",
+    },
+  },
+  {
+    "productTitle": "London Tea Set ☕",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "London Tea Set ☕". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: London Tea Set ☕",
+    },
+  },
+  {
+    "productTitle": "Product with Ñoño character",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with Ñoño character". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with Ñoño character",
+    },
+  },
+  {
+    "productTitle": "Ürün Açıklaması (Turkish)",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Ürün Açıklaması (Turkish)". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Ürün Açıklaması (Turkish)",
+    },
+  },
+  {
+    "productTitle": "产品描述 (Chinese)",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "产品描述 (Chinese)". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: 产品描述 (Chinese)",
+    },
+  },
+  {
+    "productTitle": "Описание продукта (Russian)",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Описание продукта (Russian)". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Описание продукта (Russian)",
+    },
+  },
+  {
+    "productTitle": "製品説明 (Japanese)",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "製品説明 (Japanese)". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: 製品説明 (Japanese)",
+    },
+  },
+]
+`;
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for realistic e-commerce product titles: realistic-ecommerce-titles 1`] = `
+[
+  {
+    "bodyLength": 152,
+    "productTitle": "Apple iPhone 14 Pro Max 256GB Space Black - Unlocked",
+    "subjectLength": 81,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Apple iPhone 14 Pro Max 256GB Space Black - Unlocked". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Apple iPhone 14 Pro Max 256GB Space Black - Unlocked",
+    },
+  },
+  {
+    "bodyLength": 159,
+    "productTitle": "Samsung 65" 4K QLED Smart TV with Alexa Built-in (QN65Q70A)",
+    "subjectLength": 88,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Samsung 65" 4K QLED Smart TV with Alexa Built-in (QN65Q70A)". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Samsung 65" 4K QLED Smart TV with Alexa Built-in (QN65Q70A)",
+    },
+  },
+  {
+    "bodyLength": 162,
+    "productTitle": "Nike Men's Air Max 270 Running Shoes - Size 10.5 - Black/White",
+    "subjectLength": 91,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Nike Men's Air Max 270 Running Shoes - Size 10.5 - Black/White". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Nike Men's Air Max 270 Running Shoes - Size 10.5 - Black/White",
+    },
+  },
+  {
+    "bodyLength": 156,
+    "productTitle": "Instant Pot Duo 7-in-1 Electric Pressure Cooker, 6 Quart",
+    "subjectLength": 85,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Instant Pot Duo 7-in-1 Electric Pressure Cooker, 6 Quart". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Instant Pot Duo 7-in-1 Electric Pressure Cooker, 6 Quart",
+    },
+  },
+  {
+    "bodyLength": 149,
+    "productTitle": "Dyson V15 Detect Absolute Cordless Vacuum Cleaner",
+    "subjectLength": 78,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Dyson V15 Detect Absolute Cordless Vacuum Cleaner". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Dyson V15 Detect Absolute Cordless Vacuum Cleaner",
+    },
+  },
+  {
+    "bodyLength": 163,
+    "productTitle": "KitchenAid Professional 600 Series 6-Quart Stand Mixer - Silver",
+    "subjectLength": 92,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "KitchenAid Professional 600 Series 6-Quart Stand Mixer - Silver". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: KitchenAid Professional 600 Series 6-Quart Stand Mixer - Silver",
+    },
+  },
+  {
+    "bodyLength": 159,
+    "productTitle": "Sony WH-1000XM5 Wireless Noise Canceling Headphones - Black",
+    "subjectLength": 88,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Sony WH-1000XM5 Wireless Noise Canceling Headphones - Black". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Sony WH-1000XM5 Wireless Noise Canceling Headphones - Black",
+    },
+  },
+  {
+    "bodyLength": 157,
+    "productTitle": "The North Face Men's Thermoball Eco Jacket - Large - Navy",
+    "subjectLength": 86,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "The North Face Men's Thermoball Eco Jacket - Large - Navy". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: The North Face Men's Thermoball Eco Jacket - Large - Navy",
+    },
+  },
+  {
+    "bodyLength": 158,
+    "productTitle": "Canon EOS R5 Mirrorless Camera with 24-105mm f/4L Lens Kit",
+    "subjectLength": 87,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Canon EOS R5 Mirrorless Camera with 24-105mm f/4L Lens Kit". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Canon EOS R5 Mirrorless Camera with 24-105mm f/4L Lens Kit",
+    },
+  },
+  {
+    "bodyLength": 151,
+    "productTitle": "Herman Miller Aeron Chair - Size B - Graphite Frame",
+    "subjectLength": 80,
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Herman Miller Aeron Chair - Size B - Graphite Frame". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Herman Miller Aeron Chair - Size B - Graphite Frame",
+    },
+  },
+]
+`;
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for special characters in product titles: special-characters-in-titles 1`] = `
+[
+  {
+    "productTitle": "Product with "Quotes"",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with "Quotes"". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with "Quotes"",
+    },
+  },
+  {
+    "productTitle": "Product with 'Single Quotes'",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with 'Single Quotes'". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with 'Single Quotes'",
+    },
+  },
+  {
+    "productTitle": "Product with & Ampersand",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with & Ampersand". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with & Ampersand",
+    },
+  },
+  {
+    "productTitle": "Product with < > Brackets",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with < > Brackets". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with < > Brackets",
+    },
+  },
+  {
+    "productTitle": "Product with @ Symbol",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with @ Symbol". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with @ Symbol",
+    },
+  },
+  {
+    "productTitle": "Product with # Hash",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with # Hash". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with # Hash",
+    },
+  },
+  {
+    "productTitle": "Product with % Percent",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with % Percent". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with % Percent",
+    },
+  },
+  {
+    "productTitle": "Product with $ Dollar",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with $ Dollar". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with $ Dollar",
+    },
+  },
+  {
+    "productTitle": "Product with + Plus",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with + Plus". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with + Plus",
+    },
+  },
+  {
+    "productTitle": "Product with = Equals",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with = Equals". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with = Equals",
+    },
+  },
+  {
+    "productTitle": "Product with [] Square Brackets",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with [] Square Brackets". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with [] Square Brackets",
+    },
+  },
+  {
+    "productTitle": "Product with () Parentheses",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with () Parentheses". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with () Parentheses",
+    },
+  },
+  {
+    "productTitle": "Product with | Pipe",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with | Pipe". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with | Pipe",
+    },
+  },
+  {
+    "productTitle": "Product with \\ Backslash",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with \\ Backslash". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with \\ Backslash",
+    },
+  },
+  {
+    "productTitle": "Product with / Forward Slash",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Product with / Forward Slash". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Product with / Forward Slash",
+    },
+  },
+]
+`;
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for standard product titles: standard-product-titles 1`] = `
+[
+  {
+    "productTitle": "iPhone 14 Pro",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "iPhone 14 Pro". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: iPhone 14 Pro",
+    },
+  },
+  {
+    "productTitle": "Samsung Galaxy S23",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Samsung Galaxy S23". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Samsung Galaxy S23",
+    },
+  },
+  {
+    "productTitle": "MacBook Pro 16-inch",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "MacBook Pro 16-inch". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: MacBook Pro 16-inch",
+    },
+  },
+  {
+    "productTitle": "Nike Air Jordan 1",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Nike Air Jordan 1". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Nike Air Jordan 1",
+    },
+  },
+  {
+    "productTitle": "Sony WH-1000XM4 Headphones",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Sony WH-1000XM4 Headphones". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Sony WH-1000XM4 Headphones",
+    },
+  },
+  {
+    "productTitle": "Tesla Model 3",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Tesla Model 3". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Tesla Model 3",
+    },
+  },
+  {
+    "productTitle": "Apple Watch Series 8",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Apple Watch Series 8". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Apple Watch Series 8",
+    },
+  },
+  {
+    "productTitle": "Dell XPS 13 Laptop",
+    "template": {
+      "body": "Hello,
+
+I'm interested in your product "Dell XPS 13 Laptop". Could you please provide more information?
+
+Best regards,",
+      "subject": "Intrested with your product: Dell XPS 13 Laptop",
+    },
+  },
+]
+`;
+
+exports[`emailTemplates productInquiryTemplate Email Template Structure Snapshots should match snapshot for template structure analysis: template-structure-analysis 1`] = `
+{
+  "bodyStructure": {
+    "closing": "Best regards,",
+    "firstLine": "I'm interested in your product "Sample Product for Structure Analysis".",
+    "greeting": "Hello,",
+    "hasProductTitleInQuotes": true,
+    "newlineCount": 4,
+    "secondLine": "Could you please provide more information?",
+    "totalLength": 137,
+  },
+  "subjectStructure": {
+    "hasTypo": true,
+    "prefix": "Intrested with your product: ",
+    "productTitlePlaceholder": "Sample Product for Structure Analysis",
+    "totalLength": 66,
+  },
+  "template": {
+    "body": "Hello,
+
+I'm interested in your product "Sample Product for Structure Analysis". Could you please provide more information?
+
+Best regards,",
+    "subject": "Intrested with your product: Sample Product for Structure Analysis",
+  },
+  "templateKeys": [
+    "subject",
+    "body",
+  ],
+  "templateValues": [
+    "Intrested with your product: Sample Product for Structure Analysis",
+    "Hello,
+
+I'm interested in your product "Sample Product for Structure Analysis". Could you please provide more information?
+
+Best regards,",
+  ],
+}
+`;

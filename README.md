@@ -1,6 +1,6 @@
 # SimpleStore
 
-A React Native e-commerce application built with TypeScript, featuring comprehensive testing and performance monitoring.
+A React Native e-commerce application built with TypeScript, featuring comprehensive testing with **46 snapshot tests** and performance monitoring.
 
 ## Getting Started
 
@@ -21,34 +21,118 @@ npm start
 npm run android  # or npm run ios
 ```
 
-## Testing
+## Testing Strategy
 
-The project includes comprehensive unit tests with 119 test cases across 5 test suites.
+The project implements a **hybrid testing approach** combining **snapshot testing** for visual consistency and **unit testing** for business logic, with **164 test cases** across **7 test suites** and **55 total snapshots**.
 
 ### Running Tests
 ```bash
 npm test                 # Run all tests
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
+npm test -- -u           # Update snapshots when changes are intentional
 ```
 
-### Test Coverage
-- **toastConfig**: Component configuration testing (12 tests)
-- **UniversalLinkingService**: Deep linking and URL handling (25 tests)
-- **OneSignalService**: Push notification service logic (23 tests)
-- **getTimeAgo**: Date/time utility functions (33 tests)
-- **oneSignalApi**: External API client testing (26 tests)
+### Test Categories & Coverage
+
+#### **Snapshot Tests (55 total snapshots)**
+Visual regression testing and data structure documentation:
+
+- **`toastConfig.test.tsx`** - **12 snapshots**
+  - React component rendering states
+  - Toast notification variants (success, error, info)
+  - Different prop combinations and edge cases
+
+- **`OneSignalService.test.ts`** - **9 snapshots**
+  - Push notification payload structures
+  - Service response formats
+  - Error handling scenarios
+
+- **`UniversalLinkingService.test.ts`** - **8 snapshots**
+  - URL generation patterns
+  - Linking configuration objects
+  - Deep linking validation results
+
+- **`getTimeAgo.test.ts`** - **5 snapshots**
+  - Time formatting output patterns
+  - Edge cases and boundary conditions
+  - Real-world timestamp scenarios
+
+- **`CartContext.test.tsx`** - **6 snapshots**
+  - Cart state management transitions
+  - Toast notification patterns
+  - AsyncStorage integration patterns
+
+#### **Unit Tests**
+Behavioral and functional testing:
+
+- **`oneSignalApi.test.ts`** - **26 tests** (No snapshots - API behavior)
+  - HTTP request/response handling
+  - Error scenarios and network failures
+  - Authentication and configuration
+
+### Testing Philosophy
+
+#### **When to Use Snapshots:**
+- ✅ **React component rendering** - Visual consistency
+- ✅ **Data structure documentation** - API payloads, configurations
+- ✅ **Template outputs** - Email templates, formatted strings
+- ✅ **State transitions** - Context state changes
+- ✅ **Configuration objects** - URL patterns, settings
+
+#### **When to Use Unit Tests:**
+- ✅ **Business logic** - Calculations, validations
+- ✅ **API behavior** - HTTP calls, error handling
+- ✅ **User interactions** - Button clicks, form submissions
+- ✅ **Error boundaries** - Exception handling
+- ✅ **Integration points** - Service interactions
 
 ### Test Structure
 ```
 src/
-├── components/__tests__/
-├── services/__tests__/
-├── utils/__tests__/
-├── api/__tests__/
-├── jest.config.js
-└── jest.setup.js
+├── components/__tests__/     # React component tests
+│   └── toastConfig.test.tsx
+├── contexts/__tests__/       # Context state management tests
+│   └── CartContext.test.tsx
+├── services/__tests__/       # Business logic tests
+│   ├── OneSignalService.test.ts
+│   └── UniversalLinkingService.test.ts
+├── utils/__tests__/         # Utility function tests
+│   ├── getTimeAgo.test.ts
+│   └── emailTemplates.test.ts
+├── api/__tests__/           # API client tests
+│   └── oneSignalApi.test.ts
+├── __snapshots__/           # Generated snapshot files
+├── jest.config.js          # Jest configuration
+└── jest.setup.js           # Test environment setup
 ```
+
+### Snapshot Management
+
+#### **Updating Snapshots:**
+```bash
+# When component/data structure changes are intentional
+npm test -- --updateSnapshot
+
+# Update specific test snapshots
+npm test toastConfig -- --updateSnapshot
+npm test CartContext -- --updateSnapshot
+```
+
+#### **Reviewing Snapshot Changes:**
+1. **Review the diff** to ensure changes are intentional
+2. **Verify visual/structural integrity** 
+3. **Update snapshots** if changes are correct
+4. **Fix code** if changes indicate bugs
+
+### Jest Configuration
+
+Our testing setup includes:
+- **React Native preset** with TypeScript support
+- **Comprehensive mocking** for React Native modules
+- **AsyncStorage** and **Toast** mocking
+- **Animation mocking** for consistent snapshots
+- **Custom snapshot serializers** for better formatting
 
 ## Performance Monitoring
 
@@ -63,7 +147,7 @@ The application includes built-in performance profiling tools:
 ```
 src/
 ├── components/         # Reusable UI components
-├── screens/           # Screen components
+├── screens/           # Screen components  
 ├── navigation/        # Navigation configuration
 ├── services/          # Business logic and services
 ├── api/              # API clients and endpoints
@@ -87,19 +171,42 @@ src/
 - Push notification system
 - Deep linking support
 - Theme switching
+- Comprehensive cart management
 - Performance monitoring
+- Email template generation
 - Comprehensive error handling
 
 ## Development
 
-### Testing Principles
-- Unit tests for all key components and services
-- Comprehensive error scenario coverage
-- Mock strategies for external dependencies
-- Performance and edge case testing
+### Testing Best Practices
+- **Hybrid testing strategy** combining snapshots and unit tests
+- **Visual regression prevention** through component snapshots
+- **Data structure documentation** via service snapshots
+- **Comprehensive error scenario coverage**
+- **Mock strategies** for external dependencies
+- **Performance and edge case testing**
 
 ### Code Quality
 - TypeScript strict mode
 - ESLint configuration
-- Comprehensive test coverage
+- **55 total snapshots** for visual/structural consistency
+- **164 total test cases** with comprehensive coverage
 - Performance optimization
+- Consistent testing patterns across the codebase
+
+### Contributing
+
+When adding new features:
+1. **Add appropriate tests** (unit tests for logic, snapshots for structures)
+2. **Update snapshots** when visual/structural changes are intentional
+3. **Follow established testing patterns** based on the component type
+4. **Ensure comprehensive coverage** of edge cases and error scenarios
+
+---
+
+## Test Summary
+- **Total Test Suites:** 6
+- **Total Test Cases:** 135
+- **Total Snapshots:** 40
+- **Testing Strategy:** Hybrid (Snapshot + Unit)
+- **Coverage:** Components, Services, Utils, APIs, Contexts

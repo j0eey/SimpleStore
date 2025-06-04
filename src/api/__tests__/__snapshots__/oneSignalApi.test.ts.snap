@@ -1,0 +1,188 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for minimal notification payload: minimal-notification-payload 1`] = `
+{
+  "app_id": "test-app-id",
+  "contents": {
+    "en": "Simple content",
+  },
+  "data": {
+    "type": "minimal_notification",
+  },
+  "headings": {
+    "en": "Simple Notification",
+  },
+  "included_segments": [
+    "All",
+  ],
+}
+`;
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for notification with custom data: custom-data-notification-payload 1`] = `
+{
+  "app_id": "test-app-id",
+  "big_picture": "https://example.com/image.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "This is a test notification",
+  },
+  "data": {
+    "actionType": "custom_action",
+    "customField1": "value1",
+    "customField2": "value2",
+    "userId": "12345",
+  },
+  "headings": {
+    "en": "Test Notification",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/image.jpg",
+  },
+}
+`;
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for notification with special characters: special-characters-payload 1`] = `
+{
+  "app_id": "test-app-id",
+  "big_picture": "https://example.com/image.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "Content with émojis 😀 and spëcial chârs",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Test Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "Test 🎉 Special chars: & < > " ' \\",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/image.jpg",
+  },
+}
+`;
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for notification without optional fields: no-optional-fields-payload 1`] = `
+{
+  "app_id": "test-app-id",
+  "contents": {
+    "en": "This is a test notification",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Test Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "Test Notification",
+  },
+  "included_segments": [
+    "All",
+  ],
+}
+`;
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for request headers and config: request-configuration 1`] = `
+{
+  "headers": {
+    "Authorization": "Key test-rest-api-key-12345",
+    "Content-Type": "application/json",
+  },
+  "method": "POST",
+  "url": "https://api.onesignal.com/notifications",
+}
+`;
+
+exports[`OneSignalApi Request Payload Snapshots should match snapshot for standard notification payload: standard-notification-payload 1`] = `
+{
+  "app_id": "test-app-id",
+  "big_picture": "https://example.com/image.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "This is a test notification",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Test Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "Test Notification",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/image.jpg",
+  },
+}
+`;
+
+exports[`OneSignalApi Response Structure Snapshots should match snapshot for response with additional fields: extended-response 1`] = `
+{
+  "errors": null,
+  "external_id": "external-123",
+  "id": "notification-id-123",
+  "recipients": 150,
+  "warnings": [],
+}
+`;
+
+exports[`OneSignalApi Response Structure Snapshots should match snapshot for response with errors: error-response 1`] = `
+{
+  "errors": [
+    "Invalid API key",
+    "Missing required field",
+  ],
+  "id": "",
+  "recipients": 0,
+}
+`;
+
+exports[`OneSignalApi Response Structure Snapshots should match snapshot for successful response: success-response 1`] = `
+{
+  "external_id": null,
+  "id": "notification-id-123",
+  "recipients": 150,
+}
+`;

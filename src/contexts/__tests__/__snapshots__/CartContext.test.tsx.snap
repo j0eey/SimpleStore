@@ -1,0 +1,469 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CartContext Cart State Snapshots should match snapshot for cart operations sequence: cart-operations-sequence 1`] = `
+[
+  {
+    "action": "add",
+    "cart": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 1,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+  },
+  {
+    "action": "add_existing",
+    "cart": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 2,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+  },
+  {
+    "action": "update_quantity",
+    "cart": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 5,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+  },
+  {
+    "action": "add_second_product",
+    "cart": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 5,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+      {
+        "__v": 0,
+        "_id": "test-product-2",
+        "createdAt": "2024-01-02T00:00:00Z",
+        "description": "Another test product",
+        "images": [
+          {
+            "_id": "img-2",
+            "fullUrl": "https://example.com/test-image-2.jpg",
+            "url": "test-image-2.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 41.8781,
+          "longitude": -87.6298,
+          "name": "Test Location 2",
+        },
+        "price": 49.99,
+        "quantity": 2,
+        "title": "Test Product 2",
+        "updatedAt": "2024-01-02T00:00:00Z",
+        "user": {
+          "_id": "user-2",
+          "email": "test2@example.com",
+        },
+      },
+    ],
+  },
+  {
+    "action": "remove_first_product",
+    "cart": [
+      {
+        "__v": 0,
+        "_id": "test-product-2",
+        "createdAt": "2024-01-02T00:00:00Z",
+        "description": "Another test product",
+        "images": [
+          {
+            "_id": "img-2",
+            "fullUrl": "https://example.com/test-image-2.jpg",
+            "url": "test-image-2.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 41.8781,
+          "longitude": -87.6298,
+          "name": "Test Location 2",
+        },
+        "price": 49.99,
+        "quantity": 2,
+        "title": "Test Product 2",
+        "updatedAt": "2024-01-02T00:00:00Z",
+        "user": {
+          "_id": "user-2",
+          "email": "test2@example.com",
+        },
+      },
+    ],
+  },
+]
+`;
+
+exports[`CartContext Cart State Snapshots should match snapshot for cart with multiple items: cart-with-multiple-items 1`] = `
+{
+  "cart": [
+    {
+      "__v": 0,
+      "_id": "test-product-1",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "description": "A test product",
+      "images": [
+        {
+          "_id": "img-1",
+          "fullUrl": "https://example.com/test-image.jpg",
+          "url": "test-image.jpg",
+        },
+      ],
+      "location": {
+        "latitude": 40.7128,
+        "longitude": -74.006,
+        "name": "Test Location",
+      },
+      "price": 29.99,
+      "quantity": 2,
+      "title": "Test Product",
+      "updatedAt": "2024-01-01T00:00:00Z",
+      "user": {
+        "_id": "user-1",
+        "email": "test@example.com",
+      },
+    },
+    {
+      "__v": 0,
+      "_id": "test-product-2",
+      "createdAt": "2024-01-02T00:00:00Z",
+      "description": "Another test product",
+      "images": [
+        {
+          "_id": "img-2",
+          "fullUrl": "https://example.com/test-image-2.jpg",
+          "url": "test-image-2.jpg",
+        },
+      ],
+      "location": {
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "name": "Test Location 2",
+      },
+      "price": 49.99,
+      "quantity": 1,
+      "title": "Test Product 2",
+      "updatedAt": "2024-01-02T00:00:00Z",
+      "user": {
+        "_id": "user-2",
+        "email": "test2@example.com",
+      },
+    },
+  ],
+  "cartLength": 2,
+  "productIds": [
+    "test-product-1",
+    "test-product-2",
+  ],
+  "totalItems": 3,
+}
+`;
+
+exports[`CartContext Cart State Snapshots should match snapshot for cart with single item: cart-with-single-item 1`] = `
+{
+  "cart": [
+    {
+      "__v": 0,
+      "_id": "test-product-1",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "description": "A test product",
+      "images": [
+        {
+          "_id": "img-1",
+          "fullUrl": "https://example.com/test-image.jpg",
+          "url": "test-image.jpg",
+        },
+      ],
+      "location": {
+        "latitude": 40.7128,
+        "longitude": -74.006,
+        "name": "Test Location",
+      },
+      "price": 29.99,
+      "quantity": 1,
+      "title": "Test Product",
+      "updatedAt": "2024-01-01T00:00:00Z",
+      "user": {
+        "_id": "user-1",
+        "email": "test@example.com",
+      },
+    },
+  ],
+  "cartLength": 1,
+  "firstItem": {
+    "__v": 0,
+    "_id": "test-product-1",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "description": "A test product",
+    "images": [
+      {
+        "_id": "img-1",
+        "fullUrl": "https://example.com/test-image.jpg",
+        "url": "test-image.jpg",
+      },
+    ],
+    "location": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+      "name": "Test Location",
+    },
+    "price": 29.99,
+    "quantity": 1,
+    "title": "Test Product",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "user": {
+      "_id": "user-1",
+      "email": "test@example.com",
+    },
+  },
+}
+`;
+
+exports[`CartContext Cart State Snapshots should match snapshot for initial empty cart state: initial-empty-cart-state 1`] = `
+{
+  "availableMethods": [
+    "addToCart",
+    "removeFromCart",
+    "updateCartItemQuantity",
+    "clearCart",
+  ],
+  "cart": [],
+  "cartLength": 0,
+}
+`;
+
+exports[`CartContext Cart State Snapshots should match snapshot for quantity update scenarios: quantity-update-scenarios 1`] = `
+[
+  {
+    "cartState": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 5,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+    "newQuantity": 5,
+    "scenario": "increase quantity",
+  },
+  {
+    "cartState": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 2,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+    "newQuantity": 2,
+    "scenario": "decrease quantity",
+  },
+  {
+    "cartState": [
+      {
+        "__v": 0,
+        "_id": "test-product-1",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "description": "A test product",
+        "images": [
+          {
+            "_id": "img-1",
+            "fullUrl": "https://example.com/test-image.jpg",
+            "url": "test-image.jpg",
+          },
+        ],
+        "location": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+          "name": "Test Location",
+        },
+        "price": 29.99,
+        "quantity": 1,
+        "title": "Test Product",
+        "updatedAt": "2024-01-01T00:00:00Z",
+        "user": {
+          "_id": "user-1",
+          "email": "test@example.com",
+        },
+      },
+    ],
+    "newQuantity": 1,
+    "scenario": "set to minimum",
+  },
+  {
+    "cartState": [],
+    "newQuantity": 0,
+    "scenario": "set to zero (should remove)",
+  },
+]
+`;
+
+exports[`CartContext Toast Notification Snapshots should match snapshot for all toast notification calls: toast-notification-calls 1`] = `
+[
+  [
+    {
+      "text1": ""Test Product" added to cart!",
+      "text2": "Quantity: 1",
+      "type": "success",
+    },
+  ],
+  [
+    {
+      "text1": "Quantity for "Test Product" updated!",
+      "text2": "New quantity: 2",
+      "type": "info",
+    },
+  ],
+  [
+    {
+      "text1": ""Test Product 2" added to cart!",
+      "text2": "Quantity: 2",
+      "type": "success",
+    },
+  ],
+  [
+    {
+      "text1": "Cart cleared!",
+      "type": "info",
+    },
+  ],
+  [
+    {
+      "text1": "Item removed from cart.",
+      "type": "success",
+    },
+  ],
+]
+`;
