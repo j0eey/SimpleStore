@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         Keychain.resetGenericPassword({ service: ACCESS_TOKEN_SERVICE }),
         Keychain.resetGenericPassword({ service: REFRESH_TOKEN_SERVICE })
       ]);
-      setCurrentToken(''); // Clear the current token state
+      setCurrentToken('');
     } catch (error) {
       console.error('Error clearing tokens:', error);
     }
@@ -93,19 +93,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       ]);
 
       if (oldAccessToken) {
-        console.log('Migrating access token to Keychain...');
         await storeAccessToken(oldAccessToken);
         await AsyncStorage.removeItem('@accessToken');
       }
 
       if (oldRefreshToken) {
-        console.log('Migrating refresh token to Keychain...');
         await storeRefreshToken(oldRefreshToken);
         await AsyncStorage.removeItem('@refreshToken');
-      }
-
-      if (oldAccessToken || oldRefreshToken) {
-        console.log('Token migration completed successfully');
       }
     } catch (error) {
       console.error('Error during token migration:', error);
