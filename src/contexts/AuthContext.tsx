@@ -1,9 +1,12 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import { AuthContextType, Tokens } from '../types/AuthContextType';
 import { refreshTokenApi } from '../api/auth.api';
 import { fetchUserProfile } from '../api/user.api';
 import { AuthProviderProps } from '../types/user';
+
+// Keychain service name for your app
+const KEYCHAIN_SERVICE = 'com.simplestore';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -16,29 +19,65 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [userId, setUserId] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Helper function to store items in Keychain
+  const setKeychainItem = async (key: string, value: string) => {
+    try {
+      await Keychain.setGenericPassword(key, value, {
+        service: KEYCHAIN_SERVICE,
+        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      });
+    } catch (error) {
+      console.error('Error storing in Keychain:', error);
+      throw error;
+    }
+  };
+
+  // Helper function to get items from Keychain
+  const getKeychainItem = async (key: string): Promise<string | null> => {
+    try {
+      const credentials = await Keychain.getGenericPassword({ service: KEYCHAIN_SERVICE });
+      if (credentials && credentials.username === key) {
+        return credentials.password;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error reading from Keychain:', error);
+      return null;
+    }
+  };
+
+  // Helper function to remove items from Keychain
+  const removeKeychainItem = async (key: string) => {
+    try {
+      // Keychain doesn't support removing individual items directly, 
+      // so we'll reset all credentials on logout
+    } catch (error) {
+      console.error('Error removing from Keychain:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const loadAuthState = async () => {
       try {
-        const startTime = Date.now();
-        
         const [
           savedAuth,
           savedEmail,
-          savedAccessToken,
-          savedRefreshToken,
           savedVerified,
           savedUserId,
         ] = await Promise.all([
-          AsyncStorage.getItem('@auth'),
-          AsyncStorage.getItem('@userEmail'),
-          AsyncStorage.getItem('@accessToken'),
-          AsyncStorage.getItem('@refreshToken'),
-          AsyncStorage.getItem('@isVerified'),
-          AsyncStorage.getItem('@userId'),
+          getKeychainItem('@auth'),
+          getKeychainItem('@userEmail'),
+          getKeychainItem('@isVerified'),
+          getKeychainItem('@userId'),
         ]);
 
+        // Load tokens separately since they're sensitive
+        const savedAccessToken = await getKeychainItem('@accessToken');
+        const savedRefreshToken = await getKeychainItem('@refreshToken');
+
         if (savedAuth !== null) {
-          setIsAuthenticated(JSON.parse(savedAuth));
+          setIsAuthenticated(savedAuth === 'true');
         }
         if (savedEmail) {
           setEmailState(savedEmail);
@@ -63,12 +102,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             
             if (userProfile.data?.user?.id) {
               setUserId(userProfile.data.user.id);
-              await AsyncStorage.setItem('@userId', userProfile.data.user.id);
+              await setKeychainItem('@userId', userProfile.data.user.id);
             }
           } catch (error) {
+            console.error('Error fetching user profile:', error);
           }
         }
       } catch (error) {
+        console.error('Error loading auth state:', error);
       } finally {
         setIsInitialized(true);
       }
@@ -79,24 +120,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setAuthState = async (authenticated: boolean) => {
     setIsAuthenticated(authenticated);
-    await AsyncStorage.setItem('@auth', JSON.stringify(authenticated));
+    await setKeychainItem('@auth', authenticated.toString());
   };
 
   const setEmail = async (newEmail: string) => {
     setEmailState(newEmail);
-    await AsyncStorage.setItem('@userEmail', newEmail);
+    await setKeychainItem('@userEmail', newEmail);
   };
 
   const setTokens = async (tokens: Tokens) => {
     setAccessToken(tokens.accessToken);
     setRefreshToken(tokens.refreshToken);
-    await AsyncStorage.setItem('@accessToken', tokens.accessToken);
-    await AsyncStorage.setItem('@refreshToken', tokens.refreshToken);
+    await Promise.all([
+      setKeychainItem('@accessToken', tokens.accessToken),
+      setKeychainItem('@refreshToken', tokens.refreshToken),
+    ]);
   };
 
   const setUserIdAsync = async (id: string) => {
     setUserId(id);
-    await AsyncStorage.setItem('@userId', id);
+    await setKeychainItem('@userId', id);
   };
 
   const login = async (tokens: Tokens) => {
@@ -110,36 +153,38 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await setUserIdAsync(userProfile.data.user.id);
       }
     } catch (error) {
+      console.error('Error fetching user profile during login:', error);
     }
   };
 
   const signup = async (newEmail: string) => {
     await setEmail(newEmail);
-    await AsyncStorage.setItem('@isVerified', 'false');
+    await setKeychainItem('@isVerified', 'false');
     setIsVerified(false);
   };
 
   const verify = async () => {
-    await AsyncStorage.setItem('@isVerified', 'true');
+    await setKeychainItem('@isVerified', 'true');
     setIsVerified(true);
     await setAuthState(true);
   };
 
   const logout = async () => {
-    await Promise.all([
-      AsyncStorage.removeItem('@auth'),
-      AsyncStorage.removeItem('@userEmail'),
-      AsyncStorage.removeItem('@accessToken'),
-      AsyncStorage.removeItem('@refreshToken'),
-      AsyncStorage.removeItem('@isVerified'),
-      AsyncStorage.removeItem('@userId'),
-    ]);
-    setIsAuthenticated(false);
-    setEmailState('');
-    setAccessToken('');
-    setRefreshToken('');
-    setIsVerified(false);
-    setUserId('');
+    try {
+      // Reset all Keychain credentials for our service
+      await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
+      
+      // Reset state
+      setIsAuthenticated(false);
+      setEmailState('');
+      setAccessToken('');
+      setRefreshToken('');
+      setIsVerified(false);
+      setUserId('');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      throw error;
+    }
   };
 
   const refreshAccessToken = async (): Promise<string> => {
