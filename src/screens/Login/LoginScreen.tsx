@@ -14,7 +14,6 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   // Custom hook for all login logic
   const {
-    // Form state
     control,
     errors,
     loading,

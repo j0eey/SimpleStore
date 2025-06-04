@@ -11,9 +11,6 @@ import toastConfig from './src/components/toastConfig';
 import { FlyingCartProvider } from './src/contexts/FlyingCartContext';
 import { OneSignal } from 'react-native-onesignal';
 
-/**
- * ThemedApp component handles theme-based styling and UI setup
- */
 const ThemedApp = () => {
   const { theme } = useTheme();
 
@@ -40,31 +37,26 @@ const ThemedApp = () => {
   );
 };
 
-/**
- * Main App component with OneSignal initialization and context providers
- */
 const App = () => {
-  // Initialize OneSignal when app starts
   useEffect(() => {
-    // Initialize with your OneSignal App ID
     OneSignal.initialize('1a69ea62-a8dc-4df7-8000-1ba3c2f7fa55');
-    
-    // Request notification permissions
     OneSignal.Notifications.requestPermission(true);
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <CartProvider>
-            <FlyingCartProvider>
-              <ThemedApp />
-            </FlyingCartProvider>
-          </CartProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <React.StrictMode>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <FlyingCartProvider>
+                <ThemedApp />
+              </FlyingCartProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </React.StrictMode>
   );
 };
 

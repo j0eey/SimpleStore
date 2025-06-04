@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Product } from '../../types/Product';
 import { fetchProductsApi } from '../../api/products.api';
@@ -13,7 +13,9 @@ export const useProducts = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const fetchedPages = useRef<Set<number>>(new Set());
+  const isInitialized = useRef(false);
 
+  // FIXED: Stable fetchProducts function with proper dependencies
   const fetchProducts = useCallback(
     async (pageNum: number = 1, append: boolean = false) => {
       if (pageNum === 1 && !append) {
@@ -55,7 +57,7 @@ export const useProducts = () => {
         setLoadingMore(false);
       }
     },
-    []
+    [] // Empty dependencies - this function is stable
   );
 
   const handleRefresh = useCallback(async () => {
@@ -80,7 +82,7 @@ export const useProducts = () => {
       setRefreshing(false);
       setLoading(false);
     }
-  }, []);
+  }, []); // Stable function
 
   const loadMoreProducts = useCallback(() => {
     if (!loadingMore && hasMore && !loading) {
@@ -89,15 +91,28 @@ export const useProducts = () => {
     }
   }, [loadingMore, hasMore, page, loading, fetchProducts]);
 
-  useFocusEffect(
-    useCallback(() => {
+  // FIXED: Stable initial load that only runs once per focus
+  const initializeProducts = useCallback(() => {
+    if (!isInitialized.current) {
+      isInitialized.current = true;
       setPage(1);
       setAllProducts([]);
       setHasMore(true);
       setErrorMessage('');
       fetchedPages.current.clear();
       fetchProducts(1, false);
-    }, [fetchProducts])
+    }
+  }, [fetchProducts]);
+  useFocusEffect(
+    useCallback(() => {
+      isInitialized.current = false;
+      initializeProducts();
+      
+      // Cleanup function when screen loses focus
+      return () => {
+        isInitialized.current = false;
+      };
+    }, [initializeProducts])
   );
 
   return {

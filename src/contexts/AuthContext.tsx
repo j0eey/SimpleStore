@@ -1,92 +1,147 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Keychain from 'react-native-keychain';
 import { AuthContextType, Tokens } from '../types/AuthContextType';
 import { refreshTokenApi } from '../api/auth.api';
 import { fetchUserProfile } from '../api/user.api';
 import { AuthProviderProps } from '../types/user';
 
-// Keychain service name for your app
-const KEYCHAIN_SERVICE = 'com.simplestore';
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const ACCESS_TOKEN_SERVICE = 'ecommerce_access_token';
+const REFRESH_TOKEN_SERVICE = 'ecommerce_refresh_token';
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [email, setEmailState] = useState('');
-  const [accessToken, setAccessToken] = useState('');
-  const [refreshToken, setRefreshToken] = useState('');
+  const [currentToken, setCurrentToken] = useState('');
   const [userId, setUserId] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Helper function to store items in Keychain
-  const setKeychainItem = async (key: string, value: string) => {
+  // Secure token storage functions
+  const storeAccessToken = async (token: string) => {
     try {
-      await Keychain.setGenericPassword(key, value, {
-        service: KEYCHAIN_SERVICE,
-        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      await Keychain.setGenericPassword('access_token', token, {
+        service: ACCESS_TOKEN_SERVICE,
       });
+      setCurrentToken(token);
     } catch (error) {
-      console.error('Error storing in Keychain:', error);
+      console.error('Error storing access token:', error);
       throw error;
     }
   };
 
-  // Helper function to get items from Keychain
-  const getKeychainItem = async (key: string): Promise<string | null> => {
+  const getAccessToken = async (): Promise<string | null> => {
     try {
-      const credentials = await Keychain.getGenericPassword({ service: KEYCHAIN_SERVICE });
-      if (credentials && credentials.username === key) {
+      const credentials = await Keychain.getGenericPassword({
+        service: ACCESS_TOKEN_SERVICE,
+      });
+      if (credentials && typeof credentials === 'object' && credentials.password) {
         return credentials.password;
       }
       return null;
     } catch (error) {
-      console.error('Error reading from Keychain:', error);
+      console.error('Error retrieving access token:', error);
       return null;
     }
   };
 
-  // Helper function to remove items from Keychain
-  const removeKeychainItem = async (key: string) => {
+  const storeRefreshToken = async (token: string) => {
     try {
-      // Keychain doesn't support removing individual items directly, 
-      // so we'll reset all credentials on logout
+      await Keychain.setGenericPassword('refresh_token', token, {
+        service: REFRESH_TOKEN_SERVICE,
+      });
     } catch (error) {
-      console.error('Error removing from Keychain:', error);
+      console.error('Error storing refresh token:', error);
       throw error;
+    }
+  };
+
+  const getRefreshToken = async (): Promise<string | null> => {
+    try {
+      const credentials = await Keychain.getGenericPassword({
+        service: REFRESH_TOKEN_SERVICE,
+      });
+      if (credentials && typeof credentials === 'object' && credentials.password) {
+        return credentials.password;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error retrieving refresh token:', error);
+      return null;
+    }
+  };
+
+  const clearTokens = async () => {
+    try {
+      await Promise.all([
+        Keychain.resetGenericPassword({ service: ACCESS_TOKEN_SERVICE }),
+        Keychain.resetGenericPassword({ service: REFRESH_TOKEN_SERVICE })
+      ]);
+      setCurrentToken(''); // Clear the current token state
+    } catch (error) {
+      console.error('Error clearing tokens:', error);
+    }
+  };
+
+  // Migration function to move tokens from AsyncStorage to Keychain
+  const migrateTokensFromAsyncStorage = async () => {
+    try {
+      const [oldAccessToken, oldRefreshToken] = await Promise.all([
+        AsyncStorage.getItem('@accessToken'),
+        AsyncStorage.getItem('@refreshToken')
+      ]);
+
+      if (oldAccessToken) {
+        console.log('Migrating access token to Keychain...');
+        await storeAccessToken(oldAccessToken);
+        await AsyncStorage.removeItem('@accessToken');
+      }
+
+      if (oldRefreshToken) {
+        console.log('Migrating refresh token to Keychain...');
+        await storeRefreshToken(oldRefreshToken);
+        await AsyncStorage.removeItem('@refreshToken');
+      }
+
+      if (oldAccessToken || oldRefreshToken) {
+        console.log('Token migration completed successfully');
+      }
+    } catch (error) {
+      console.error('Error during token migration:', error);
     }
   };
 
   useEffect(() => {
     const loadAuthState = async () => {
       try {
+        // First, migrate tokens from AsyncStorage if they exist
+        await migrateTokensFromAsyncStorage();
+
+        // Load non-sensitive data from AsyncStorage
         const [
           savedAuth,
           savedEmail,
           savedVerified,
           savedUserId,
         ] = await Promise.all([
-          getKeychainItem('@auth'),
-          getKeychainItem('@userEmail'),
-          getKeychainItem('@isVerified'),
-          getKeychainItem('@userId'),
+          AsyncStorage.getItem('@auth'),
+          AsyncStorage.getItem('@userEmail'),
+          AsyncStorage.getItem('@isVerified'),
+          AsyncStorage.getItem('@userId'),
         ]);
 
-        // Load tokens separately since they're sensitive
-        const savedAccessToken = await getKeychainItem('@accessToken');
-        const savedRefreshToken = await getKeychainItem('@refreshToken');
+        // Load access token from Keychain for current state
+        const savedAccessToken = await getAccessToken();
 
         if (savedAuth !== null) {
-          setIsAuthenticated(savedAuth === 'true');
+          setIsAuthenticated(JSON.parse(savedAuth));
         }
         if (savedEmail) {
           setEmailState(savedEmail);
         }
         if (savedAccessToken) {
-          setAccessToken(savedAccessToken);
-        }
-        if (savedRefreshToken) {
-          setRefreshToken(savedRefreshToken);
+          setCurrentToken(savedAccessToken);
         }
         if (savedVerified) {
           setIsVerified(savedVerified === 'true');
@@ -102,7 +157,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             
             if (userProfile.data?.user?.id) {
               setUserId(userProfile.data.user.id);
-              await setKeychainItem('@userId', userProfile.data.user.id);
+              await AsyncStorage.setItem('@userId', userProfile.data.user.id);
             }
           } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -120,26 +175,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setAuthState = async (authenticated: boolean) => {
     setIsAuthenticated(authenticated);
-    await setKeychainItem('@auth', authenticated.toString());
+    await AsyncStorage.setItem('@auth', JSON.stringify(authenticated));
   };
 
   const setEmail = async (newEmail: string) => {
     setEmailState(newEmail);
-    await setKeychainItem('@userEmail', newEmail);
+    await AsyncStorage.setItem('@userEmail', newEmail);
   };
 
   const setTokens = async (tokens: Tokens) => {
-    setAccessToken(tokens.accessToken);
-    setRefreshToken(tokens.refreshToken);
-    await Promise.all([
-      setKeychainItem('@accessToken', tokens.accessToken),
-      setKeychainItem('@refreshToken', tokens.refreshToken),
-    ]);
+    try {
+      await Promise.all([
+        storeAccessToken(tokens.accessToken),
+        storeRefreshToken(tokens.refreshToken)
+      ]);
+    } catch (error) {
+      console.error('Error setting tokens:', error);
+      throw error;
+    }
   };
 
   const setUserIdAsync = async (id: string) => {
     setUserId(id);
-    await setKeychainItem('@userId', id);
+    await AsyncStorage.setItem('@userId', id);
   };
 
   const login = async (tokens: Tokens) => {
@@ -159,47 +217,58 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signup = async (newEmail: string) => {
     await setEmail(newEmail);
-    await setKeychainItem('@isVerified', 'false');
+    await AsyncStorage.setItem('@isVerified', 'false');
     setIsVerified(false);
   };
 
   const verify = async () => {
-    await setKeychainItem('@isVerified', 'true');
+    await AsyncStorage.setItem('@isVerified', 'true');
     setIsVerified(true);
     await setAuthState(true);
   };
 
   const logout = async () => {
     try {
-      // Reset all Keychain credentials for our service
-      await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
+      // Clear non-sensitive data from AsyncStorage
+      await Promise.all([
+        AsyncStorage.removeItem('@auth'),
+        AsyncStorage.removeItem('@userEmail'),
+        AsyncStorage.removeItem('@isVerified'),
+        AsyncStorage.removeItem('@userId'),
+      ]);
+      
+      // Clear sensitive tokens from Keychain
+      await clearTokens();
       
       // Reset state
       setIsAuthenticated(false);
       setEmailState('');
-      setAccessToken('');
-      setRefreshToken('');
       setIsVerified(false);
       setUserId('');
     } catch (error) {
       console.error('Error during logout:', error);
-      throw error;
     }
   };
 
   const refreshAccessToken = async (): Promise<string> => {
     try {
-      const result = await refreshTokenApi(refreshToken);
+      const currentRefreshToken = await getRefreshToken();
+      if (!currentRefreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const result = await refreshTokenApi(currentRefreshToken);
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = result.data;
+      
       await setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken });
       return newAccessToken;
     } catch (err) {
+      console.error('Error refreshing token:', err);
       await logout();
       throw new Error('Session expired');
     }
   };
 
-  // Don't render children until auth state is initialized
   if (!isInitialized) {
     return null;
   }
@@ -210,7 +279,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         isAuthenticated,
         isVerified,
         email,
-        token: accessToken,
+        token: currentToken,
         userId,
         login,
         signup,
