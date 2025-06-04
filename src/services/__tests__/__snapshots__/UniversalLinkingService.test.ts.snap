@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UniversalLinkingService Configuration Snapshots should match snapshot for edge case URL generations: edge-case-url-generations 1`] = `
+[
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/",
+    "input": "",
+    "shareUrl": "https://test-api.simplestore.com/api/products/",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/test-123_ABC!@#",
+    "input": "test-123_ABC!@#",
+    "shareUrl": "https://test-api.simplestore.com/api/products/test-123_ABC!@#",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "shareUrl": "https://test-api.simplestore.com/api/products/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/0000",
+    "input": "0000",
+    "shareUrl": "https://test-api.simplestore.com/api/products/0000",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/product<script>",
+    "input": "product<script>",
+    "shareUrl": "https://test-api.simplestore.com/api/products/product<script>",
+  },
+]
+`;
+
+exports[`UniversalLinkingService Configuration Snapshots should match snapshot for linking configuration: linking-configuration 1`] = `
+{
+  "config": {
+    "initialRouteName": "Home",
+    "screens": {
+      "Home": "home",
+      "ProductDetails": {
+        "parse": {
+          "id": [Function],
+        },
+        "path": "api/products/:id",
+      },
+    },
+  },
+  "prefixes": [
+    "https://test-api.simplestore.com",
+  ],
+}
+`;
+
+exports[`UniversalLinkingService Configuration Snapshots should match snapshot for share content structures: share-content-structures 1`] = `
+[
+  {
+    "message": "Amazing Product
+I discovered an amazing product on SimpleStore, come check it out!: https://test-api.simplestore.com/api/products/ABC123",
+    "title": "Amazing Product",
+    "url": "https://test-api.simplestore.com/api/products/ABC123",
+  },
+  {
+    "message": "Special Product With Special Chars: & < > " '
+I discovered an amazing product on SimpleStore, come check it out!: https://test-api.simplestore.com/api/products/product-456",
+    "title": "Special Product With Special Chars: & < > " '",
+    "url": "https://test-api.simplestore.com/api/products/product-456",
+  },
+  {
+    "message": "
+I discovered an amazing product on SimpleStore, come check it out!: https://test-api.simplestore.com/api/products/12345",
+    "title": "",
+    "url": "https://test-api.simplestore.com/api/products/12345",
+  },
+  {
+    "message": "Very Long Product Title That Might Be Used In Real World Scenarios With Multiple Words And Description
+I discovered an amazing product on SimpleStore, come check it out!: https://test-api.simplestore.com/api/products/TEST-789",
+    "title": "Very Long Product Title That Might Be Used In Real World Scenarios With Multiple Words And Description",
+    "url": "https://test-api.simplestore.com/api/products/TEST-789",
+  },
+  {
+    "message": "Simple
+I discovered an amazing product on SimpleStore, come check it out!: https://test-api.simplestore.com/api/products/SIMPLE",
+    "title": "Simple",
+    "url": "https://test-api.simplestore.com/api/products/SIMPLE",
+  },
+]
+`;
+
+exports[`UniversalLinkingService Configuration Snapshots should match snapshot for various product URLs: product-urls-collection 1`] = `
+[
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/ABC123",
+    "productId": "ABC123",
+    "shareUrl": "https://test-api.simplestore.com/api/products/ABC123",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/product-456",
+    "productId": "product-456",
+    "shareUrl": "https://test-api.simplestore.com/api/products/product-456",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/12345",
+    "productId": "12345",
+    "shareUrl": "https://test-api.simplestore.com/api/products/12345",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/product-123_ABC",
+    "productId": "product-123_ABC",
+    "shareUrl": "https://test-api.simplestore.com/api/products/product-123_ABC",
+  },
+  {
+    "apiUrl": "https://test-api.simplestore.com/api/products/PROD-789-XYZ",
+    "productId": "PROD-789-XYZ",
+    "shareUrl": "https://test-api.simplestore.com/api/products/PROD-789-XYZ",
+  },
+]
+`;
+
+exports[`UniversalLinkingService URL Parsing Results Snapshots should match snapshot for invalid URL parsing results: invalid-url-parsing-results 1`] = `
+[
+  {
+    "productId": null,
+    "url": "https://other-domain.com/api/products/123",
+  },
+  {
+    "productId": null,
+    "url": "https://test-api.simplestore.com/products/123",
+  },
+  {
+    "productId": null,
+    "url": "https://test-api.simplestore.com/api/users/123",
+  },
+  {
+    "productId": null,
+    "url": "https://test-api.simplestore.com/api/products/",
+  },
+  {
+    "productId": null,
+    "url": "not-a-url",
+  },
+  {
+    "productId": null,
+    "url": "",
+  },
+  {
+    "productId": null,
+    "url": "https://test-api.simplestore.com/api/products/123/extra",
+  },
+]
+`;
+
+exports[`UniversalLinkingService URL Parsing Results Snapshots should match snapshot for valid URL parsing results: valid-url-parsing-results 1`] = `
+[
+  {
+    "productId": "ABC123",
+    "url": "https://test-api.simplestore.com/api/products/ABC123",
+  },
+  {
+    "productId": "product-456",
+    "url": "https://test-api.simplestore.com/api/products/product-456",
+  },
+  {
+    "productId": "ITEM_789",
+    "url": "https://test-api.simplestore.com/api/products/ITEM_789",
+  },
+  {
+    "productId": "product-123_ABC",
+    "url": "https://test-api.simplestore.com/api/products/product-123_ABC",
+  },
+]
+`;
+
+exports[`UniversalLinkingService Validation Results Snapshots should match snapshot for null/undefined validation: null-undefined-validation 1`] = `
+[
+  {
+    "input": null,
+    "isValid": false,
+  },
+  {
+    "input": undefined,
+    "isValid": false,
+  },
+]
+`;
+
+exports[`UniversalLinkingService Validation Results Snapshots should match snapshot for product ID validation results: product-id-validation-results 1`] = `
+[
+  {
+    "isValid": true,
+    "productId": "ABC123",
+  },
+  {
+    "isValid": true,
+    "productId": "product-123",
+  },
+  {
+    "isValid": true,
+    "productId": "item_456",
+  },
+  {
+    "isValid": true,
+    "productId": "12345",
+  },
+  {
+    "isValid": true,
+    "productId": "PROD-789-XYZ",
+  },
+  {
+    "isValid": true,
+    "productId": "a1b2c3",
+  },
+  {
+    "isValid": false,
+    "productId": "",
+  },
+  {
+    "isValid": false,
+    "productId": "   ",
+  },
+  {
+    "isValid": false,
+    "productId": "ab",
+  },
+  {
+    "isValid": false,
+    "productId": "0000",
+  },
+  {
+    "isValid": false,
+    "productId": "null",
+  },
+  {
+    "isValid": false,
+    "productId": "NULL",
+  },
+  {
+    "isValid": false,
+    "productId": "undefined",
+  },
+  {
+    "isValid": false,
+    "productId": "UNDEFINED",
+  },
+  {
+    "isValid": false,
+    "productId": "test",
+  },
+  {
+    "isValid": false,
+    "productId": "TEST",
+  },
+  {
+    "isValid": false,
+    "productId": "product<script>",
+  },
+  {
+    "isValid": false,
+    "productId": "item>alert",
+  },
+  {
+    "isValid": false,
+    "productId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  },
+]
+`;

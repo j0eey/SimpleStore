@@ -1,0 +1,461 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for different price formats: different-price-formats 1`] = `
+[
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $0 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "0",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $10 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "10",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $99.5 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "99.5",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $1234.56 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "1234.56",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+]
+`;
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for edge case scenarios: edge-case-scenarios 1`] = `
+[
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": " - $99.99 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "99.99",
+      "productId": "product-123",
+      "productTitle": "",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $99.99 in ",
+    },
+    "data": {
+      "location": "",
+      "price": "99.99",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "This is a very long product title that exceeds normal length limits and should still be handled correctly by the notification system - $99.99 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "99.99",
+      "productId": "product-123",
+      "productTitle": "This is a very long product title that exceeds normal length limits and should still be handled correctly by the notification system",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+  {
+    "app_id": "test-app-id-12345",
+    "big_picture": "https://example.com/image1.jpg",
+    "buttons": [
+      {
+        "id": "view_product",
+        "text": "View Product",
+      },
+      {
+        "id": "dismiss",
+        "text": "Dismiss",
+      },
+    ],
+    "contents": {
+      "en": "Amazing Product - $0 in New York, NY",
+    },
+    "data": {
+      "location": "New York, NY",
+      "price": "0",
+      "productId": "product-123",
+      "productTitle": "Amazing Product",
+      "type": "product_added",
+    },
+    "headings": {
+      "en": "New Product Added! 🎉",
+    },
+    "included_segments": [
+      "All",
+    ],
+    "ios_attachments": {
+      "product_image": "https://example.com/image1.jpg",
+    },
+  },
+]
+`;
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for product with special characters: product-with-special-characters 1`] = `
+{
+  "app_id": "test-app-id-12345",
+  "big_picture": "https://example.com/image1.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "Test & "Special" Product 🎉 - $99.99 in São Paulo, Brazil",
+  },
+  "data": {
+    "location": "São Paulo, Brazil",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Test & "Special" Product 🎉",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "New Product Added! 🎉",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/image1.jpg",
+  },
+}
+`;
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for product without images: product-without-images 1`] = `
+{
+  "app_id": "test-app-id-12345",
+  "big_picture": undefined,
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "Amazing Product - $99.99 in New York, NY",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Amazing Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "New Product Added! 🎉",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": undefined,
+}
+`;
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for single image product: single-image-product 1`] = `
+{
+  "app_id": "test-app-id-12345",
+  "big_picture": "https://example.com/single.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "Amazing Product - $99.99 in New York, NY",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Amazing Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "New Product Added! 🎉",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/single.jpg",
+  },
+}
+`;
+
+exports[`OneSignalService showProductAddedNotification Notification Payload Snapshots should match snapshot for standard product notification payload: standard-product-notification 1`] = `
+{
+  "app_id": "test-app-id-12345",
+  "big_picture": "https://example.com/image1.jpg",
+  "buttons": [
+    {
+      "id": "view_product",
+      "text": "View Product",
+    },
+    {
+      "id": "dismiss",
+      "text": "Dismiss",
+    },
+  ],
+  "contents": {
+    "en": "Amazing Product - $99.99 in New York, NY",
+  },
+  "data": {
+    "location": "New York, NY",
+    "price": "99.99",
+    "productId": "product-123",
+    "productTitle": "Amazing Product",
+    "type": "product_added",
+  },
+  "headings": {
+    "en": "New Product Added! 🎉",
+  },
+  "included_segments": [
+    "All",
+  ],
+  "ios_attachments": {
+    "product_image": "https://example.com/image1.jpg",
+  },
+}
+`;
+
+exports[`OneSignalService showProductAddedNotification Service Response Snapshots should match snapshot for error handling scenarios: error-handling-responses 1`] = `
+[
+  {
+    "error": "Network request failed",
+    "success": false,
+  },
+  {
+    "error": "Something went wrong",
+    "success": false,
+  },
+  {
+    "error": "[object Object]",
+    "success": false,
+  },
+]
+`;
+
+exports[`OneSignalService showProductAddedNotification Service Response Snapshots should match snapshot for failed responses: failed-service-responses 1`] = `
+[
+  {
+    "error": {
+      "error": "Invalid app ID",
+      "id": "",
+    },
+    "success": false,
+  },
+  {
+    "error": {
+      "error": "Authentication failed",
+    },
+    "success": false,
+  },
+]
+`;
+
+exports[`OneSignalService showProductAddedNotification Service Response Snapshots should match snapshot for successful response: successful-service-response 1`] = `
+{
+  "notificationId": "notification-id-123",
+  "productId": "product-123",
+  "productTitle": "Amazing Product",
+  "success": true,
+}
+`;

@@ -31,7 +31,155 @@ describe('UniversalLinkingService', () => {
     UniversalLinkingService.clearPermanentlyHandledUrls();
   });
 
-  describe('URL Validation', () => {
+  // SNAPSHOT TESTS - for generated data structures and configurations
+  describe('Configuration Snapshots', () => {
+    it('should match snapshot for linking configuration', () => {
+      const config = UniversalLinkingService.getLinkingConfig();
+      expect(config).toMatchSnapshot('linking-configuration');
+    });
+
+    it('should match snapshot for various product URLs', () => {
+      const productIds = [
+        'ABC123',
+        'product-456',
+        '12345',
+        'product-123_ABC',
+        'PROD-789-XYZ',
+      ];
+
+      const urls = productIds.map(id => ({
+        productId: id,
+        shareUrl: UniversalLinkingService.generateProductShareUrl(id),
+        apiUrl: UniversalLinkingService.getProductApiUrl(id),
+      }));
+
+      expect(urls).toMatchSnapshot('product-urls-collection');
+    });
+
+    it('should match snapshot for share content structures', () => {
+      const testProducts = [
+        { id: 'ABC123', title: 'Amazing Product' },
+        { id: 'product-456', title: 'Special Product With Special Chars: & < > " \'' },
+        { id: '12345', title: '' },
+        { id: 'TEST-789', title: 'Very Long Product Title That Might Be Used In Real World Scenarios With Multiple Words And Description' },
+        { id: 'SIMPLE', title: 'Simple' },
+      ];
+
+      const shareContents = testProducts.map(product => 
+        UniversalLinkingService.generateShareContent(product)
+      );
+
+      expect(shareContents).toMatchSnapshot('share-content-structures');
+    });
+
+    it('should match snapshot for edge case URL generations', () => {
+      const edgeCaseIds = [
+        '', // empty
+        'test-123_ABC!@#', // special characters
+        'a'.repeat(50), // long ID
+        '0000', // all zeros
+        'product<script>', // potentially dangerous chars
+      ];
+
+      const edgeCaseResults = edgeCaseIds.map(id => ({
+        input: id,
+        shareUrl: UniversalLinkingService.generateProductShareUrl(id),
+        apiUrl: UniversalLinkingService.getProductApiUrl(id),
+      }));
+
+      expect(edgeCaseResults).toMatchSnapshot('edge-case-url-generations');
+    });
+  });
+
+  describe('URL Parsing Results Snapshots', () => {
+    it('should match snapshot for valid URL parsing results', () => {
+      const validUrls = [
+        'https://test-api.simplestore.com/api/products/ABC123',
+        'https://test-api.simplestore.com/api/products/product-456',
+        'https://test-api.simplestore.com/api/products/ITEM_789',
+        'https://test-api.simplestore.com/api/products/product-123_ABC',
+      ];
+
+      const parseResults = validUrls.map(url => ({
+        url,
+        productId: (UniversalLinkingService as any).parseProductUrl(url),
+      }));
+
+      expect(parseResults).toMatchSnapshot('valid-url-parsing-results');
+    });
+
+    it('should match snapshot for invalid URL parsing results', () => {
+      const invalidUrls = [
+        'https://other-domain.com/api/products/123',
+        'https://test-api.simplestore.com/products/123',
+        'https://test-api.simplestore.com/api/users/123',
+        'https://test-api.simplestore.com/api/products/',
+        'not-a-url',
+        '',
+        'https://test-api.simplestore.com/api/products/123/extra',
+      ];
+
+      const parseResults = invalidUrls.map(url => ({
+        url,
+        productId: (UniversalLinkingService as any).parseProductUrl(url),
+      }));
+
+      expect(parseResults).toMatchSnapshot('invalid-url-parsing-results');
+    });
+  });
+
+  describe('Validation Results Snapshots', () => {
+    it('should match snapshot for product ID validation results', () => {
+      const testIds = [
+        // Valid IDs
+        'ABC123',
+        'product-123',
+        'item_456',
+        '12345',
+        'PROD-789-XYZ',
+        'a1b2c3',
+        // Invalid IDs
+        '',
+        '   ',
+        'ab',
+        '0000',
+        'null',
+        'NULL',
+        'undefined',
+        'UNDEFINED',
+        'test',
+        'TEST',
+        'product<script>',
+        'item>alert',
+        'a'.repeat(51),
+      ];
+
+      const validationResults = testIds.map(id => ({
+        productId: id,
+        isValid: (UniversalLinkingService as any).isValidProductIdFormat(id),
+      }));
+
+      expect(validationResults).toMatchSnapshot('product-id-validation-results');
+    });
+
+    it('should match snapshot for null/undefined validation', () => {
+      const nullUndefinedResults = [
+        {
+          input: null,
+          isValid: (UniversalLinkingService as any).isValidProductIdFormat(null),
+        },
+        {
+          input: undefined,
+          isValid: (UniversalLinkingService as any).isValidProductIdFormat(undefined),
+        },
+      ];
+
+      expect(nullUndefinedResults).toMatchSnapshot('null-undefined-validation');
+    });
+  });
+
+  // UNIT TESTS - for behavior and functionality
+  describe('URL Validation Behavior', () => {
     describe('isValidProductIdFormat', () => {
       it('should accept valid product IDs', () => {
         const validIds = [
@@ -44,7 +192,6 @@ describe('UniversalLinkingService', () => {
         ];
 
         validIds.forEach(id => {
-          // Access private method for testing
           const isValid = (UniversalLinkingService as any).isValidProductIdFormat(id);
           expect(isValid).toBe(true);
         });
@@ -52,19 +199,19 @@ describe('UniversalLinkingService', () => {
 
       it('should reject invalid product IDs', () => {
         const invalidIds = [
-          '', // empty
-          '   ', // whitespace only
-          'ab', // too short
-          '0000', // all zeros
-          'null', // null string
+          '',
+          '   ',
+          'ab',
+          '0000',
+          'null',
           'NULL',
           'undefined',
           'UNDEFINED',
           'test',
           'TEST',
-          'product<script>', // contains <>
-          'item>alert', // contains <>
-          'a'.repeat(51), // too long
+          'product<script>',
+          'item>alert',
+          'a'.repeat(51),
         ];
 
         invalidIds.forEach(id => {
@@ -107,14 +254,14 @@ describe('UniversalLinkingService', () => {
 
       it('should return null for invalid URLs', () => {
         const invalidUrls = [
-          'https://other-domain.com/api/products/123', // wrong domain
-          'https://test-api.simplestore.com/products/123', // missing /api
-          'https://test-api.simplestore.com/api/users/123', // wrong resource
-          'https://test-api.simplestore.com/api/products/', // missing ID
-          'https://test-api.simplestore.com/api/products', // no trailing slash, no ID
+          'https://other-domain.com/api/products/123',
+          'https://test-api.simplestore.com/products/123',
+          'https://test-api.simplestore.com/api/users/123',
+          'https://test-api.simplestore.com/api/products/',
+          'https://test-api.simplestore.com/api/products',
           'not-a-url',
           '',
-          'https://test-api.simplestore.com/api/products/123/extra', // too many parts
+          'https://test-api.simplestore.com/api/products/123/extra',
         ];
 
         invalidUrls.forEach(url => {
@@ -139,7 +286,7 @@ describe('UniversalLinkingService', () => {
     });
   });
 
-  describe('URL Generation', () => {
+  describe('URL Generation Behavior', () => {
     describe('generateProductShareUrl', () => {
       it('should generate correct product URLs', () => {
         const testCases = [
@@ -201,17 +348,9 @@ describe('UniversalLinkingService', () => {
         expect(result.url).toBe('https://test-api.simplestore.com/api/products/ABC123');
       });
     });
-
-    describe('getProductApiUrl', () => {
-      it('should generate correct API URLs', () => {
-        const productId = 'TEST123';
-        const result = UniversalLinkingService.getProductApiUrl(productId);
-        expect(result).toBe('https://test-api.simplestore.com/api/products/TEST123');
-      });
-    });
   });
 
-  describe('State Management', () => {
+  describe('State Management Behavior', () => {
     describe('reset', () => {
       it('should clear all internal state', () => {
         // Set some state
@@ -292,7 +431,7 @@ describe('UniversalLinkingService', () => {
         (UniversalLinkingService as any).pendingUrl = 'test-url';
         (UniversalLinkingService as any).pendingUrlTimestamp = now;
 
-        jest.spyOn(Date, 'now').mockReturnValue(now + 1000); // 1 second later
+        jest.spyOn(Date, 'now').mockReturnValue(now + 1000);
 
         const isValid = (UniversalLinkingService as any).isPendingUrlValid();
         expect(isValid).toBe(true);
@@ -312,20 +451,7 @@ describe('UniversalLinkingService', () => {
     });
   });
 
-  describe('Configuration', () => {
-    describe('getLinkingConfig', () => {
-      it('should return correct linking configuration', () => {
-        const config = UniversalLinkingService.getLinkingConfig();
-
-        expect(config.prefixes).toEqual(['https://test-api.simplestore.com']);
-        expect(config.config.initialRouteName).toBe('Home');
-        expect(config.config.screens.Home).toBe('home');
-        expect(config.config.screens.ProductDetails.path).toBe('api/products/:id');
-      });
-    });
-  });
-
-  describe('Edge Cases', () => {
+  describe('Edge Cases and Error Handling', () => {
     it('should handle empty strings gracefully', () => {
       expect(() => {
         UniversalLinkingService.generateProductShareUrl('');
@@ -346,7 +472,16 @@ describe('UniversalLinkingService', () => {
     });
   });
 
-  describe('Constants', () => {
+  describe('Configuration and Constants', () => {
+    it('should return correct linking configuration', () => {
+      const config = UniversalLinkingService.getLinkingConfig();
+
+      expect(config.prefixes).toEqual(['https://test-api.simplestore.com']);
+      expect(config.config.initialRouteName).toBe('Home');
+      expect(config.config.screens.Home).toBe('home');
+      expect(config.config.screens.ProductDetails.path).toBe('api/products/:id');
+    });
+
     it('should expose API_BASE_URL', () => {
       const { API_BASE_URL } = require('../UniversalLinkingService');
       expect(API_BASE_URL).toBe('https://test-api.simplestore.com');
@@ -354,7 +489,7 @@ describe('UniversalLinkingService', () => {
 
     it('should have correct timeout constant', () => {
       const timeout = (UniversalLinkingService as any).PENDING_URL_TIMEOUT;
-      expect(timeout).toBe(5 * 60 * 1000); // 5 minutes
+      expect(timeout).toBe(5 * 60 * 1000);
     });
   });
 });

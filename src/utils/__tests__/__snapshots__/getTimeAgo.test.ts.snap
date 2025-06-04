@@ -1,0 +1,396 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getTimeAgo Time Unit Output Snapshots should match snapshot for all time unit variations: all-time-unit-variations 1`] = `
+[
+  {
+    "description": "current time",
+    "input": "2024-01-15T12:00:00Z",
+    "output": "just now",
+  },
+  {
+    "description": "30 seconds ago",
+    "input": "2024-01-15T11:59:30Z",
+    "output": "just now",
+  },
+  {
+    "description": "59 seconds ago",
+    "input": "2024-01-15T11:59:01Z",
+    "output": "just now",
+  },
+  {
+    "description": "1 minute ago",
+    "input": "2024-01-15T11:59:00Z",
+    "output": "1 minute ago",
+  },
+  {
+    "description": "2 minutes ago",
+    "input": "2024-01-15T11:58:00Z",
+    "output": "2 minutes ago",
+  },
+  {
+    "description": "30 minutes ago",
+    "input": "2024-01-15T11:30:00Z",
+    "output": "30 minutes ago",
+  },
+  {
+    "description": "59 minutes ago",
+    "input": "2024-01-15T11:01:00Z",
+    "output": "59 minutes ago",
+  },
+  {
+    "description": "1 hour ago",
+    "input": "2024-01-15T11:00:00Z",
+    "output": "1 hour ago",
+  },
+  {
+    "description": "2 hours ago",
+    "input": "2024-01-15T10:00:00Z",
+    "output": "2 hours ago",
+  },
+  {
+    "description": "12 hours ago",
+    "input": "2024-01-15T00:00:00Z",
+    "output": "12 hours ago",
+  },
+  {
+    "description": "23 hours ago",
+    "input": "2024-01-14T13:00:00Z",
+    "output": "23 hours ago",
+  },
+  {
+    "description": "1 day ago",
+    "input": "2024-01-14T12:00:00Z",
+    "output": "1 day ago",
+  },
+  {
+    "description": "2 days ago",
+    "input": "2024-01-13T12:00:00Z",
+    "output": "2 days ago",
+  },
+  {
+    "description": "7 days ago",
+    "input": "2024-01-08T12:00:00Z",
+    "output": "7 days ago",
+  },
+  {
+    "description": "15 days ago",
+    "input": "2023-12-31T12:00:00Z",
+    "output": "15 days ago",
+  },
+  {
+    "description": "1 month ago",
+    "input": "2023-12-15T12:00:00Z",
+    "output": "1 month ago",
+  },
+  {
+    "description": "2 months ago",
+    "input": "2023-11-15T12:00:00Z",
+    "output": "2 months ago",
+  },
+  {
+    "description": "6 months ago",
+    "input": "2023-07-15T12:00:00Z",
+    "output": "6 months ago",
+  },
+  {
+    "description": "11 months ago",
+    "input": "2023-02-15T12:00:00Z",
+    "output": "11 months ago",
+  },
+  {
+    "description": "1 year ago",
+    "input": "2023-01-15T12:00:00Z",
+    "output": "1 year ago",
+  },
+  {
+    "description": "2 years ago",
+    "input": "2022-01-15T12:00:00Z",
+    "output": "2 years ago",
+  },
+  {
+    "description": "5 years ago",
+    "input": "2019-01-15T12:00:00Z",
+    "output": "5 years ago",
+  },
+]
+`;
+
+exports[`getTimeAgo Time Unit Output Snapshots should match snapshot for edge cases and boundaries: edge-cases-and-boundaries 1`] = `
+[
+  {
+    "description": "future date",
+    "input": "2024-01-16T12:00:00Z",
+    "output": "just now",
+  },
+  {
+    "description": "1 year in future",
+    "input": "2025-01-15T12:00:00Z",
+    "output": "just now",
+  },
+  {
+    "description": "very old date",
+    "input": "1990-01-15T12:00:00Z",
+    "output": "34 years ago",
+  },
+  {
+    "description": "millennium start",
+    "input": "2000-01-01T00:00:00Z",
+    "output": "24 years ago",
+  },
+  {
+    "description": "leap year date",
+    "input": "2020-02-29T12:00:00Z",
+    "output": "3 years ago",
+  },
+  {
+    "description": "non-leap year equivalent",
+    "input": "2021-02-28T12:00:00Z",
+    "output": "2 years ago",
+  },
+  {
+    "description": "just under 1 minute",
+    "input": "2024-01-15T11:59:01Z",
+    "output": "just now",
+  },
+  {
+    "description": "just under 1 hour",
+    "input": "2024-01-15T11:00:01Z",
+    "output": "59 minutes ago",
+  },
+  {
+    "description": "just under 1 day",
+    "input": "2024-01-14T12:01:00Z",
+    "output": "23 hours ago",
+  },
+  {
+    "description": "almost 1 year (364 days)",
+    "input": "2023-01-16T12:00:00Z",
+    "output": "12 months ago",
+  },
+  {
+    "description": "UTC format",
+    "input": "2024-01-15T11:00:00Z",
+    "output": "1 hour ago",
+  },
+  {
+    "description": "UTC+1 format",
+    "input": "2024-01-15T12:00:00+01:00",
+    "output": "1 hour ago",
+  },
+  {
+    "description": "UTC-5 format",
+    "input": "2024-01-15T06:00:00-05:00",
+    "output": "1 hour ago",
+  },
+  {
+    "description": "with milliseconds",
+    "input": "2024-01-14T12:00:00.000Z",
+    "output": "1 day ago",
+  },
+]
+`;
+
+exports[`getTimeAgo Time Unit Output Snapshots should match snapshot for invalid date handling: invalid-date-handling 1`] = `
+[
+  {
+    "input": "invalid-date",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+  {
+    "input": "",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+  {
+    "input": "2024-13-01",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+  {
+    "input": "2024-01-32",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+  {
+    "input": "not-a-date-at-all",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+  {
+    "input": "2024/01/15",
+    "isValidOutput": true,
+    "output": "14 hours ago",
+  },
+  {
+    "input": "15-01-2024",
+    "isValidOutput": true,
+    "output": "just now",
+  },
+]
+`;
+
+exports[`getTimeAgo Time Unit Output Snapshots should match snapshot for real-world social media scenarios: social-media-scenarios 1`] = `
+[
+  {
+    "input": "2024-01-15T11:59:45Z",
+    "output": "just now",
+    "scenario": "just posted",
+  },
+  {
+    "input": "2024-01-15T11:45:00Z",
+    "output": "15 minutes ago",
+    "scenario": "recent comment",
+  },
+  {
+    "input": "2024-01-15T08:00:00Z",
+    "output": "4 hours ago",
+    "scenario": "this morning",
+  },
+  {
+    "input": "2024-01-14T20:00:00Z",
+    "output": "16 hours ago",
+    "scenario": "last evening",
+  },
+  {
+    "input": "2024-01-14T12:00:00Z",
+    "output": "1 day ago",
+    "scenario": "yesterday",
+  },
+  {
+    "input": "2024-01-13T12:00:00Z",
+    "output": "2 days ago",
+    "scenario": "day before yesterday",
+  },
+  {
+    "input": "2024-01-08T12:00:00Z",
+    "output": "7 days ago",
+    "scenario": "last week",
+  },
+  {
+    "input": "2024-01-01T12:00:00Z",
+    "output": "14 days ago",
+    "scenario": "start of month",
+  },
+  {
+    "input": "2023-12-15T12:00:00Z",
+    "output": "1 month ago",
+    "scenario": "last month",
+  },
+  {
+    "input": "2023-11-15T12:00:00Z",
+    "output": "2 months ago",
+    "scenario": "two months ago",
+  },
+  {
+    "input": "2023-06-15T12:00:00Z",
+    "output": "7 months ago",
+    "scenario": "mid year",
+  },
+  {
+    "input": "2023-01-15T12:00:00Z",
+    "output": "1 year ago",
+    "scenario": "last year",
+  },
+  {
+    "input": "2022-01-15T12:00:00Z",
+    "output": "2 years ago",
+    "scenario": "two years ago",
+  },
+]
+`;
+
+exports[`getTimeAgo Time Unit Output Snapshots should match snapshot for singular vs plural patterns: singular-plural-patterns 1`] = `
+[
+  {
+    "expectedCount": 1,
+    "expectedUnit": "minute",
+    "input": "2024-01-15T11:59:00Z",
+    "output": "1 minute ago",
+  },
+  {
+    "expectedCount": 2,
+    "expectedUnit": "minutes",
+    "input": "2024-01-15T11:58:00Z",
+    "output": "2 minutes ago",
+  },
+  {
+    "expectedCount": 15,
+    "expectedUnit": "minutes",
+    "input": "2024-01-15T11:45:00Z",
+    "output": "15 minutes ago",
+  },
+  {
+    "expectedCount": 1,
+    "expectedUnit": "hour",
+    "input": "2024-01-15T11:00:00Z",
+    "output": "1 hour ago",
+  },
+  {
+    "expectedCount": 2,
+    "expectedUnit": "hours",
+    "input": "2024-01-15T10:00:00Z",
+    "output": "2 hours ago",
+  },
+  {
+    "expectedCount": 6,
+    "expectedUnit": "hours",
+    "input": "2024-01-15T06:00:00Z",
+    "output": "6 hours ago",
+  },
+  {
+    "expectedCount": 1,
+    "expectedUnit": "day",
+    "input": "2024-01-14T12:00:00Z",
+    "output": "1 day ago",
+  },
+  {
+    "expectedCount": 2,
+    "expectedUnit": "days",
+    "input": "2024-01-13T12:00:00Z",
+    "output": "2 days ago",
+  },
+  {
+    "expectedCount": 5,
+    "expectedUnit": "days",
+    "input": "2024-01-10T12:00:00Z",
+    "output": "5 days ago",
+  },
+  {
+    "expectedCount": 1,
+    "expectedUnit": "month",
+    "input": "2023-12-15T12:00:00Z",
+    "output": "1 month ago",
+  },
+  {
+    "expectedCount": 2,
+    "expectedUnit": "months",
+    "input": "2023-11-15T12:00:00Z",
+    "output": "2 months ago",
+  },
+  {
+    "expectedCount": 3,
+    "expectedUnit": "months",
+    "input": "2023-10-15T12:00:00Z",
+    "output": "3 months ago",
+  },
+  {
+    "expectedCount": 1,
+    "expectedUnit": "year",
+    "input": "2023-01-15T12:00:00Z",
+    "output": "1 year ago",
+  },
+  {
+    "expectedCount": 2,
+    "expectedUnit": "years",
+    "input": "2022-01-15T12:00:00Z",
+    "output": "2 years ago",
+  },
+  {
+    "expectedCount": 4,
+    "expectedUnit": "years",
+    "input": "2020-01-15T12:00:00Z",
+    "output": "4 years ago",
+  },
+]
+`;

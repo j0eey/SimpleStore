@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toastConfig - Snapshots edge cases snapshots should match snapshot for all toast types with same props: error-toast 1`] = `
+<View
+  testID="mock-error-toast"
+>
+  <Text>
+    Comparison Test
+  </Text>
+  <Text>
+    All toast types
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots edge cases snapshots should match snapshot for all toast types with same props: info-toast 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Comparison Test
+  </Text>
+  <Text>
+    All toast types
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots edge cases snapshots should match snapshot for all toast types with same props: success-toast 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Comparison Test
+  </Text>
+  <Text>
+    All toast types
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots edge cases snapshots should match snapshot with empty props 1`] = `
+<View
+  testID="mock-base-toast"
+/>
+`;
+
+exports[`toastConfig - Snapshots edge cases snapshots should match snapshot with undefined text props 1`] = `
+<View
+  testID="mock-base-toast"
+/>
+`;
+
+exports[`toastConfig - Snapshots error toast snapshots should match snapshot with basic props 1`] = `
+<View
+  testID="mock-error-toast"
+>
+  <Text>
+    Test Title
+  </Text>
+  <Text>
+    Test Subtitle
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots error toast snapshots should match snapshot without text2 1`] = `
+<View
+  testID="mock-error-toast"
+>
+  <Text>
+    Error Message
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots info toast snapshots should match snapshot with basic props 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Test Title
+  </Text>
+  <Text>
+    Test Subtitle
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots info toast snapshots should match snapshot with long text 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    This is a very long title that should wrap to multiple lines and still be displayed correctly
+  </Text>
+  <Text>
+    This is also a long subtitle for testing purposes
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots success toast snapshots should match snapshot with basic props 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Test Title
+  </Text>
+  <Text>
+    Test Subtitle
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots success toast snapshots should match snapshot with custom props 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Custom Success Message
+  </Text>
+  <Text>
+    Custom Success Subtitle
+  </Text>
+</View>
+`;
+
+exports[`toastConfig - Snapshots success toast snapshots should match snapshot with only text1 1`] = `
+<View
+  testID="mock-base-toast"
+>
+  <Text>
+    Success Message Only
+  </Text>
+</View>
+`;
