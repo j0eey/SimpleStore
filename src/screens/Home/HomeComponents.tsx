@@ -1,18 +1,13 @@
-import React, { memo, useRef, useCallback, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, Animated, Easing, Share, StyleSheet  } from 'react-native';
+import React, { memo, useCallback, useMemo } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FastImage from 'react-native-fast-image';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Product } from '../../types/Product';
 import { categories } from '../../types/categories';
 import { fonts, colors } from '../../theme/Theme';
-import { getTimeAgo } from '../../utils/getTimeAgo';
-import { ProductItemProps, CategoryListProps, LocationSelectorProps, ErrorDisplayProps, HomeHeaderProps } from './types';
+import { CategoryListProps, LocationSelectorProps, ErrorDisplayProps, HomeHeaderProps } from './types';
 import { LAYOUT, scaleFont, getTimeOfDay } from './constants';
-import DeepLinkingService from '../../services/UniversalLinkingService';
-
 
 // Home Header Component
 export const HomeHeader = memo<HomeHeaderProps>(({ onProfilePress }) => {
@@ -112,160 +107,6 @@ export const LocationSelector = memo<LocationSelectorProps>(({ selectedLocation,
         <Ionicons name="chevron-down-outline" size={16} color={theme === 'dark' ? colors.lightText : colors.darkText} />
       </TouchableOpacity>
     </View>
-  );
-});
-
-// Product Item Component
-export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart, isOwner }) => {
-  const { theme } = useTheme();
-  const imageRef = useRef<View>(null);
-
-  const handlePress = useCallback(() => {
-    onPress(item);
-  }, [onPress, item]);
-
-  const handleAddToCart = useCallback(() => {
-    imageRef.current?.measureInWindow((x, y, width, height) => {
-      onAddToCart(item, {x, y, width, height});
-    });
-  }, [onAddToCart, item]);
-
-  const handleSharePress = useCallback(async () => {
-    try {
-      const shareContent = DeepLinkingService.generateShareContent({
-        id: item._id,
-        title: item.title,
-        price: `${item.price}`,
-        image: item.images[0]?.fullUrl || '',
-      });
-      await Share.share({
-        title: shareContent.title,
-        message: shareContent.message,
-        url: shareContent.url,
-      });
-    } catch (error) {
-      // Handle error silently
-    }
-  }, [item._id, item.title, item.price, item.images]);
-
-  const cardStyle = useMemo(() => ({
-    width: LAYOUT.CARD_WIDTH,
-    borderRadius: 12,
-    overflow: 'hidden' as const,
-    backgroundColor: theme === 'dark' ? colors.darkCard : colors.lightCard,
-  }), [theme]);
-
-  const buttonStyle = useMemo(() => ({
-    position: 'absolute' as const,
-    top: 8,
-    backgroundColor: theme === 'dark' ? colors.cartIconBgDarkColor : colors.cartIconBgLightColor,
-    borderRadius: 18,
-    width: 36,
-    height: 36,
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-  }), [theme]);
-
-  const imageUri = item.images[0]?.fullUrl;
-  const locationName = item.location?.name ?? 'Unknown Location';
-  const timeAgo = useMemo(() => getTimeAgo(item.createdAt), [item.createdAt]);
-  const formattedPrice = useMemo(() => `$${item.price.toFixed(2)}`, [item.price]);
-
-  return (
-    <TouchableOpacity
-      style={cardStyle}
-      onPress={handlePress}
-      activeOpacity={0.9}
-    >
-      <View ref={imageRef} style={{
-        width: '100%',
-        height: LAYOUT.CARD_WIDTH * 0.9,
-        position: 'relative',
-      }}>
-        {imageUri ? (
-          <FastImage
-            source={{
-              uri: imageUri,
-              priority: FastImage.priority.normal,
-            }}
-            style={{ width: '100%', height: '100%' }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-        ) : (
-          <View style={{
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: theme === 'dark' ? colors.darkHeader : colors.imageBackground,
-          }}>
-            <Ionicons
-              name="image-outline"
-              size={32}
-              color={theme === 'dark' ? colors.lightText : colors.darkText}
-            />
-          </View>
-        )}
-        
-        <TouchableOpacity 
-          style={[buttonStyle, { left: 8 }]} 
-          onPress={handleSharePress}
-          activeOpacity={0.9}
-        >
-          <Ionicons name="share-outline" size={20} color={theme === 'dark' ? colors.primaryLight : colors.primaryDark} />
-        </TouchableOpacity>
-
-        {!isOwner && (
-          <TouchableOpacity
-            style={[buttonStyle, { right: 8 }]}
-            onPress={handleAddToCart}
-            activeOpacity={0.9}
-          >
-            <Ionicons name="cart-outline" size={20} color={theme === 'dark' ? colors.primaryLight : colors.primaryDark} />
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <View style={{ padding: 10 }}>
-        <Text style={{
-          fontSize: scaleFont(14),
-          fontFamily: fonts.semiBold,
-          marginBottom: 6,
-          color: theme === 'dark' ? colors.lightHeader : colors.darkHeader,
-        }} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={{
-          fontSize: scaleFont(15),
-          fontFamily: fonts.Bold,
-          color: theme === 'dark' ? colors.priceDark : colors.icon,
-        }}>
-          {formattedPrice}
-        </Text>
-        <Text style={{
-          fontSize: scaleFont(10),
-          fontFamily: fonts.regular,
-          color: theme === 'dark' ? colors.lightText : colors.darkBorder,
-          marginTop: 2,
-        }} numberOfLines={1}>
-          {locationName}
-        </Text>
-        <Text style={{
-          fontSize: scaleFont(10),
-          fontFamily: fonts.regular,
-          opacity: 0.7,
-          marginTop: 4,
-          color: theme === 'dark' ? colors.lightText : colors.darkBorder,
-        }}>
-          {timeAgo}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.item._id === nextProps.item._id &&
-    prevProps.isOwner === nextProps.isOwner
   );
 });
 
@@ -387,7 +228,7 @@ export const CategoryList = memo<CategoryListProps>(({ loading, onCategoryPress 
   );
 });
 
-// Skeleton Components
+// Product Skeleton Component
 export const ProductSkeleton = memo(() => {
   const { theme } = useTheme();
 
@@ -466,7 +307,6 @@ export const ErrorDisplay = memo<ErrorDisplayProps>(({ errorMessage, onRetry }) 
     },
   }), [theme]);
 
-  // Dedicated reload function
   const handleReload = useCallback(() => {
     onRetry();
   }, [onRetry]);
@@ -507,193 +347,4 @@ export const SectionHeader = memo<{title: string, marginTop?: number}>(({ title,
   }), [theme, marginTop]);
 
   return <Text style={styles.sectionTitle}>{title}</Text>;
-});
-
-// Product Grid Component
-export const ProductGrid = memo<{
-  products: Product[];
-  loading: boolean;
-  refreshing: boolean;
-  loadingMore: boolean;
-  hasMore: boolean;
-  onRefresh: () => void;
-  onLoadMore: () => void;
-  onProductPress: (product: Product) => void;
-  onAddToCart: (product: Product, position: {x: number, y: number, width: number, height: number}) => void;
-  userId?: string;
-  selectedLocation: string;
-  onLocationSelect: (location: string) => void;
-  onCategoryPress: (categoryName: string) => void;
-}>(({ products, loading, refreshing, loadingMore, hasMore, onRefresh, onLoadMore, onProductPress, onAddToCart, userId, selectedLocation, onLocationSelect, onCategoryPress }) => {
-  const { theme } = useTheme();
-
-  const hasScrolledRef = useRef(false);
-  const isReadyForPaginationRef = useRef(false);
-
-  // Dedicated reload function
-  const handleReload = useCallback(() => {
-    hasScrolledRef.current = false;
-    isReadyForPaginationRef.current = false;
-    onRefresh();
-  }, [onRefresh]);
-
-  const handleScroll = useCallback(() => {
-    if (!hasScrolledRef.current) {
-      hasScrolledRef.current = true;
-      setTimeout(() => {
-        isReadyForPaginationRef.current = true;
-      }, 500);
-    }
-  }, []);
-
-  const handleLoadMore = useCallback(() => {
-    if (
-      hasScrolledRef.current && 
-      isReadyForPaginationRef.current && 
-      hasMore && 
-      !loadingMore && 
-      !loading && 
-      products.length > 0
-    ) {
-      onLoadMore();
-    }
-  }, [hasMore, loadingMore, loading, products.length, onLoadMore]);
-
-  const renderItem = useCallback(
-    ({ item }: { item: Product }) => (
-      <ProductItem
-        item={item}
-        onPress={onProductPress}
-        onAddToCart={onAddToCart}
-        isOwner={item.user._id === userId}
-      />
-    ),
-    [onProductPress, onAddToCart, userId]
-  );
-
-  const renderSkeletonItem = useCallback(
-    ({ index }: { index: number }) => <ProductSkeleton key={`skeleton-${index}`} />,
-    []
-  );
-
-  const renderListHeader = useCallback(() => (
-    <>
-      <LocationSelector
-        selectedLocation={selectedLocation}
-        onSelect={onLocationSelect}
-      />
-
-      <SectionHeader title="Browse Categories" marginTop={20} />
-      <CategoryList
-        loading={loading}
-        onCategoryPress={onCategoryPress}
-      />
-
-      <SectionHeader title="Latest Listings" marginTop={8} />
-    </>
-  ), [selectedLocation, onLocationSelect, loading, onCategoryPress]);
-
-  const renderFooter = useCallback(() => {
-    if (loadingMore && products.length > 0) {
-      return (
-        <View style={{
-          paddingVertical: 20,
-          alignItems: 'center',
-        }}>
-          <ActivityIndicator size="small" color={theme === 'dark' ? colors.primary : colors.primaryDark} />
-          <Text style={{
-            fontSize: scaleFont(13),
-            fontFamily: fonts.regular,
-            color: theme === 'dark' ? colors.lightText : colors.textPrimary,
-            marginTop: 8,
-          }}>
-            Loading more listings...
-          </Text>
-        </View>
-      );
-    }
-
-    if (!hasMore && products.length > 0 && !loadingMore && !loading) {
-      return (
-        <Text style={{
-          fontSize: scaleFont(13),
-          fontFamily: fonts.regular,
-          color: theme === 'dark' ? colors.lightText : colors.textPrimary,
-          textAlign: 'center',
-          paddingVertical: 16,
-        }}>
-          No more listings
-        </Text>
-      );
-    }
-
-    return null;
-  }, [loadingMore, hasMore, products.length, theme, loading]);
-
-  const keyExtractor = useCallback((item: Product, index: number) => item?._id || `product-${index}`, []);
-  const skeletonData = useMemo(() => Array.from({ length: 6 }), []);
-
-  const listStyles = useMemo(() => ({
-    listContainer: {
-      paddingBottom: 75,
-    },
-    row: {
-      justifyContent: 'space-between' as const,
-      paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
-      marginBottom: LAYOUT.CARD_GAP,
-    },
-  }), []);
-
-  if (loading && products.length === 0) {
-    return (
-      <FlatList
-        data={skeletonData}
-        keyExtractor={(_, index) => `skeleton-${index}`}
-        renderItem={renderSkeletonItem}
-        numColumns={2}
-        columnWrapperStyle={listStyles.row}
-        contentContainerStyle={listStyles.listContainer}
-        showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={4}
-        initialNumToRender={4}
-        windowSize={8}
-        ListHeaderComponent={renderListHeader}
-        scrollEnabled={false}
-      />
-    );
-  }
-
-  return (
-    <FlatList
-      data={products}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      numColumns={2}
-      columnWrapperStyle={listStyles.row}
-      contentContainerStyle={listStyles.listContainer}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={renderListHeader}
-      ListFooterComponent={renderFooter}
-      refreshing={refreshing}
-      onRefresh={handleReload}
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.2}
-      onScroll={handleScroll}
-      scrollEventThrottle={100}
-      initialNumToRender={4}
-      maxToRenderPerBatch={2}
-      updateCellsBatchingPeriod={150}
-      windowSize={4}
-      removeClippedSubviews={true}
-      legacyImplementation={false}
-      disableIntervalMomentum={true}
-      disableScrollViewPanResponder={false}
-      getItemLayout={(data, index) => ({
-        length: LAYOUT.CARD_WIDTH + LAYOUT.CARD_GAP,
-        offset: (LAYOUT.CARD_WIDTH + LAYOUT.CARD_GAP) * Math.floor(index / 2),
-        index,
-      })}
-    />
-  );
 });

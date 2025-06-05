@@ -11,13 +11,12 @@ import { useFlyingCart } from '../../contexts/FlyingCartContext';
 import { colors } from '../../theme/Theme';
 import Toast from 'react-native-toast-message';
 import { useProducts } from './useProducts';
-import { HomeHeader, LocationSelector, SectionHeader, CategoryList, ProductGrid, ErrorDisplay } from './HomeComponents';
+import { HomeHeader, ErrorDisplay } from './HomeComponents';
+import { OptimizedProductGrid } from './OptimizedProductGrid'; // NEW COMPONENT
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen = () => {
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  
   // Hooks
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { theme } = useTheme();
@@ -37,7 +36,7 @@ const HomeScreen = () => {
     loadMoreProducts,
   } = useProducts();
 
-  // Styles
+  // Styles - SIMPLIFIED
   const containerStyle = useMemo(
     () => ({
       flex: 1,
@@ -46,10 +45,10 @@ const HomeScreen = () => {
     [theme]
   );
 
-  // Navigation handlers
+  // SIMPLIFIED Navigation handlers - Remove unnecessary dependencies
   const handleProfilePress = useCallback(() => {
     navigation.navigate('Profile');
-  }, [navigation]);
+  }, []);
 
   const handleProductPress = useCallback(
     (product: Product) => {
@@ -63,43 +62,26 @@ const HomeScreen = () => {
         postedDate: product.createdAt,
       });
     },
-    [navigation]
+    []
   );
 
   const handleCategoryPress = useCallback(
     (categoryName: string) => {
       navigation.navigate('Category', { category: categoryName });
     },
-    [navigation]
+    []
   );
 
-  // Cart handler
+  // SIMPLIFIED Cart handler
   const handleAddToCart = useCallback(
     (product: Product, position: {x: number, y: number, width: number, height: number}) => {
-      if (product) {
-        addToCart(product, 1);
-        if (product.images[0]?.fullUrl) {
-          triggerFlyingAnimation(position, product.images[0].fullUrl);
-        }
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Cannot add to cart. Product data not available.',
-        });
+      addToCart(product, 1);
+      if (product.images[0]?.fullUrl) {
+        triggerFlyingAnimation(position, product.images[0].fullUrl);
       }
     },
-    [addToCart, triggerFlyingAnimation]
+    []
   );
-
-  // Location handler
-  const handleLocationSelect = useCallback((location: string) => {
-    setSelectedLocation(location);
-  }, []);
-
-  // Error retry handler
-  const handleRetry = useCallback(() => {
-    handleRefresh();
-  }, [handleRefresh]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -109,10 +91,10 @@ const HomeScreen = () => {
         {errorMessage ? (
           <ErrorDisplay
             errorMessage={errorMessage}
-            onRetry={handleRetry}
+            onRetry={handleRefresh}
           />
         ) : (
-          <ProductGrid
+          <OptimizedProductGrid
             products={allProducts}
             loading={loading}
             refreshing={refreshing}
@@ -123,8 +105,6 @@ const HomeScreen = () => {
             onProductPress={handleProductPress}
             onAddToCart={handleAddToCart}
             userId={userId}
-            selectedLocation={selectedLocation}
-            onLocationSelect={handleLocationSelect}
             onCategoryPress={handleCategoryPress}
           />
         )}
