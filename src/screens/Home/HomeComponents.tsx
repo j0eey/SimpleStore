@@ -1,5 +1,5 @@
 import React, { memo, useRef, useCallback, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, Animated, Easing, Share } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator, Animated, Easing, Share, StyleSheet  } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FastImage from 'react-native-fast-image';
@@ -17,8 +17,8 @@ import DeepLinkingService from '../../services/UniversalLinkingService';
 // Home Header Component
 export const HomeHeader = memo<HomeHeaderProps>(({ onProfilePress }) => {
   const { theme } = useTheme();
-  
-  const headerStyles = useMemo(() => ({
+
+  const headerStyles = useMemo(() => StyleSheet.create({
     header: {
       paddingHorizontal: LAYOUT.HORIZONTAL_PADDING,
       paddingTop: 10,
@@ -681,14 +681,19 @@ export const ProductGrid = memo<{
       onEndReachedThreshold={0.2}
       onScroll={handleScroll}
       scrollEventThrottle={100}
-      initialNumToRender={6}
-      maxToRenderPerBatch={4}
+      initialNumToRender={4}
+      maxToRenderPerBatch={2}
       updateCellsBatchingPeriod={150}
-      windowSize={6}
+      windowSize={4}
       removeClippedSubviews={true}
       legacyImplementation={false}
       disableIntervalMomentum={true}
       disableScrollViewPanResponder={false}
+      getItemLayout={(data, index) => ({
+        length: LAYOUT.CARD_WIDTH + LAYOUT.CARD_GAP,
+        offset: (LAYOUT.CARD_WIDTH + LAYOUT.CARD_GAP) * Math.floor(index / 2),
+        index,
+      })}
     />
   );
 });
