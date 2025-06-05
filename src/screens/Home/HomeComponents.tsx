@@ -9,35 +9,10 @@ import { Product } from '../../types/Product';
 import { categories } from '../../types/categories';
 import { fonts, colors } from '../../theme/Theme';
 import { getTimeAgo } from '../../utils/getTimeAgo';
+import { ProductItemProps, CategoryListProps, LocationSelectorProps, ErrorDisplayProps, HomeHeaderProps } from './types';
 import { LAYOUT, scaleFont, getTimeOfDay } from './constants';
 import DeepLinkingService from '../../services/UniversalLinkingService';
 
-// Types
-interface ProductItemProps {
-  item: Product;
-  onPress: (product: Product) => void;
-  onAddToCart: (product: Product, position: {x: number, y: number, width: number, height: number}) => void;
-  isOwner: boolean;
-}
-
-interface CategoryListProps {
-  loading: boolean;
-  onCategoryPress: (categoryName: string) => void;
-}
-
-interface LocationSelectorProps {
-  selectedLocation: string;
-  onSelect: (location: string) => void;
-}
-
-interface ErrorDisplayProps {
-  errorMessage: string;
-  onRetry: () => void;
-}
-
-interface HomeHeaderProps {
-  onProfilePress: () => void;
-}
 
 // Home Header Component
 export const HomeHeader = memo<HomeHeaderProps>(({ onProfilePress }) => {
@@ -140,12 +115,11 @@ export const LocationSelector = memo<LocationSelectorProps>(({ selectedLocation,
   );
 });
 
-// FIXED: Product Item Component - Optimized for 28.4ms TouchableOpacity issue
+// Product Item Component
 export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart, isOwner }) => {
   const { theme } = useTheme();
   const imageRef = useRef<View>(null);
 
-  // PERFORMANCE FIX: Simplified handlers to reduce TouchableOpacity render time
   const handlePress = useCallback(() => {
     onPress(item);
   }, [onPress, item]);
@@ -156,7 +130,6 @@ export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart,
     });
   }, [onAddToCart, item]);
 
-  // PERFORMANCE FIX: Simplified share handler
   const handleSharePress = useCallback(async () => {
     try {
       const shareContent = DeepLinkingService.generateShareContent({
@@ -175,7 +148,6 @@ export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart,
     }
   }, [item._id, item.title, item.price, item.images]);
 
-  // PERFORMANCE FIX: Static styles - moved outside component or memoized properly
   const cardStyle = useMemo(() => ({
     width: LAYOUT.CARD_WIDTH,
     borderRadius: 12,
@@ -194,11 +166,10 @@ export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart,
     alignItems: 'center' as const,
   }), [theme]);
 
-  // PERFORMANCE FIX: Pre-compute values outside render
   const imageUri = item.images[0]?.fullUrl;
   const locationName = item.location?.name ?? 'Unknown Location';
   const timeAgo = useMemo(() => getTimeAgo(item.createdAt), [item.createdAt]);
-  const formattedPrice = useMemo(() => `${item.price.toFixed(2)}`, [item.price]);
+  const formattedPrice = useMemo(() => `$${item.price.toFixed(2)}`, [item.price]);
 
   return (
     <TouchableOpacity
@@ -292,14 +263,13 @@ export const ProductItem = memo<ProductItemProps>(({ item, onPress, onAddToCart,
     </TouchableOpacity>
   );
 }, (prevProps, nextProps) => {
-  // PERFORMANCE FIX: Better comparison function
   return (
     prevProps.item._id === nextProps.item._id &&
     prevProps.isOwner === nextProps.isOwner
   );
 });
 
-// OPTIMIZED: Category Components with simplified animations
+// Category Components
 const CategoryItem = memo<{category: {name: string, icon: string}, onPress: (name: string) => void}>(({ category, onPress }) => {
   const { theme } = useTheme();
 
@@ -463,7 +433,7 @@ export const ProductSkeleton = memo(() => {
   );
 });
 
-// Error Display Component - Simplified animations
+// Error Display Component
 export const ErrorDisplay = memo<ErrorDisplayProps>(({ errorMessage, onRetry }) => {
   const { theme } = useTheme();
 
@@ -496,6 +466,11 @@ export const ErrorDisplay = memo<ErrorDisplayProps>(({ errorMessage, onRetry }) 
     },
   }), [theme]);
 
+  // Dedicated reload function
+  const handleReload = useCallback(() => {
+    onRetry();
+  }, [onRetry]);
+
   return (
     <View style={styles.container}>
       <MaterialCommunityIcons
@@ -508,7 +483,7 @@ export const ErrorDisplay = memo<ErrorDisplayProps>(({ errorMessage, onRetry }) 
       </Text>
       <TouchableOpacity
         style={styles.retryButton}
-        onPress={onRetry}
+        onPress={handleReload}
       >
         <Text style={styles.retryButtonText}>Reload</Text>
       </TouchableOpacity>
@@ -534,7 +509,7 @@ export const SectionHeader = memo<{title: string, marginTop?: number}>(({ title,
   return <Text style={styles.sectionTitle}>{title}</Text>;
 });
 
-// OPTIMIZED: Product Grid Component with better FlatList configuration
+// Product Grid Component
 export const ProductGrid = memo<{
   products: Product[];
   loading: boolean;
@@ -551,6 +526,38 @@ export const ProductGrid = memo<{
   onCategoryPress: (categoryName: string) => void;
 }>(({ products, loading, refreshing, loadingMore, hasMore, onRefresh, onLoadMore, onProductPress, onAddToCart, userId, selectedLocation, onLocationSelect, onCategoryPress }) => {
   const { theme } = useTheme();
+
+  const hasScrolledRef = useRef(false);
+  const isReadyForPaginationRef = useRef(false);
+
+  // Dedicated reload function
+  const handleReload = useCallback(() => {
+    hasScrolledRef.current = false;
+    isReadyForPaginationRef.current = false;
+    onRefresh();
+  }, [onRefresh]);
+
+  const handleScroll = useCallback(() => {
+    if (!hasScrolledRef.current) {
+      hasScrolledRef.current = true;
+      setTimeout(() => {
+        isReadyForPaginationRef.current = true;
+      }, 500);
+    }
+  }, []);
+
+  const handleLoadMore = useCallback(() => {
+    if (
+      hasScrolledRef.current && 
+      isReadyForPaginationRef.current && 
+      hasMore && 
+      !loadingMore && 
+      !loading && 
+      products.length > 0
+    ) {
+      onLoadMore();
+    }
+  }, [hasMore, loadingMore, loading, products.length, onLoadMore]);
 
   const renderItem = useCallback(
     ({ item }: { item: Product }) => (
@@ -587,7 +594,7 @@ export const ProductGrid = memo<{
   ), [selectedLocation, onLocationSelect, loading, onCategoryPress]);
 
   const renderFooter = useCallback(() => {
-    if (loadingMore) {
+    if (loadingMore && products.length > 0) {
       return (
         <View style={{
           paddingVertical: 20,
@@ -606,7 +613,7 @@ export const ProductGrid = memo<{
       );
     }
 
-    if (!hasMore && products.length > 0) {
+    if (!hasMore && products.length > 0 && !loadingMore && !loading) {
       return (
         <Text style={{
           fontSize: scaleFont(13),
@@ -621,20 +628,10 @@ export const ProductGrid = memo<{
     }
 
     return null;
-  }, [loadingMore, hasMore, products.length, theme]);
+  }, [loadingMore, hasMore, products.length, theme, loading]);
 
   const keyExtractor = useCallback((item: Product, index: number) => item?._id || `product-${index}`, []);
   const skeletonData = useMemo(() => Array.from({ length: 6 }), []);
-
-  // OPTIMIZED: Better layout calculation
-  const getItemLayout = useCallback((data: any, index: number) => {
-    const itemHeight = LAYOUT.CARD_WIDTH * 0.9 + 80; // image height + padding + text
-    return {
-      length: itemHeight,
-      offset: itemHeight * Math.floor(index / 2),
-      index,
-    };
-  }, []);
 
   const listStyles = useMemo(() => ({
     listContainer: {
@@ -662,6 +659,7 @@ export const ProductGrid = memo<{
         initialNumToRender={4}
         windowSize={8}
         ListHeaderComponent={renderListHeader}
+        scrollEnabled={false}
       />
     );
   }
@@ -678,16 +676,19 @@ export const ProductGrid = memo<{
       ListHeaderComponent={renderListHeader}
       ListFooterComponent={renderFooter}
       refreshing={refreshing}
-      onRefresh={onRefresh}
-      onEndReached={onLoadMore}
-      onEndReachedThreshold={0.5}
-      initialNumToRender={4}
+      onRefresh={handleReload}
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.2}
+      onScroll={handleScroll}
+      scrollEventThrottle={100}
+      initialNumToRender={6}
       maxToRenderPerBatch={4}
-      updateCellsBatchingPeriod={100}
-      windowSize={8}
+      updateCellsBatchingPeriod={150}
+      windowSize={6}
       removeClippedSubviews={true}
-      getItemLayout={getItemLayout}
       legacyImplementation={false}
+      disableIntervalMomentum={true}
+      disableScrollViewPanResponder={false}
     />
   );
 });

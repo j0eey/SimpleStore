@@ -44,7 +44,6 @@ const App = () => {
   }, []);
 
   return (
-    <React.StrictMode>
       <SafeAreaProvider>
         <ThemeProvider>
           <AuthProvider>
@@ -56,7 +55,6 @@ const App = () => {
           </AuthProvider>
         </ThemeProvider>
       </SafeAreaProvider>
-    </React.StrictMode>
   );
 };
 

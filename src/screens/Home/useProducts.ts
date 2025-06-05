@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Product } from '../../types/Product';
 import { fetchProductsApi } from '../../api/products.api';
@@ -8,114 +8,120 @@ export const useProducts = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); 
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const fetchedPages = useRef<Set<number>>(new Set());
+  
+  // Add refs to prevent infinite loops
   const isInitialized = useRef(false);
+  const lastFetchAttempt = useRef<number>(0);
+  const RETRY_DELAY = 5000;
 
-  // FIXED: Stable fetchProducts function with proper dependencies
   const fetchProducts = useCallback(
     async (pageNum: number = 1, append: boolean = false) => {
-      if (pageNum === 1 && !append) {
+      const isInitialOrRefreshLoad = pageNum === 1 && !append;
+      if (isInitialOrRefreshLoad && !refreshing) {
+        setLoading(true);
+      } else if (append) {
+        setLoadingMore(true);
+      }
+
+      if (fetchedPages.current.has(pageNum) && !refreshing && allProducts.length > 0) {
+        if (isInitialOrRefreshLoad) setLoading(false);
+        if (append) setLoadingMore(false);
+        return;
+      }
+
+      // Clear states relevant to a fresh start BEFORE fetching, only if it's an initial load.
+      if (isInitialOrRefreshLoad) {
+        setErrorMessage('');
         fetchedPages.current.clear();
-        setAllProducts([]);
+        if (!append) {
+          setAllProducts([]);
+        }
         setHasMore(true);
       }
 
-      if (fetchedPages.current.has(pageNum)) {
-        setLoading(false);
-        setLoadingMore(false);
-        return;
-      }
-      fetchedPages.current.add(pageNum);
-
       try {
-        if (pageNum === 1 && !append) {
-          setLoading(true);
-        } else {
-          setLoadingMore(true);
-        }
-
         const data = await fetchProductsApi(pageNum);
 
         if (data.length === 0) {
           setHasMore(false);
         } else {
-          setAllProducts((prev) => (append ? [...prev, ...data] : data));
+          setAllProducts((prev) => {
+            const newProducts = append
+              ? [...prev, ...data.filter(item => !prev.some(p => p._id === item._id))]
+              : data;
+            return newProducts;
+          });
           setErrorMessage('');
           setPage(pageNum);
+          fetchedPages.current.add(pageNum);
+          setHasMore(true);
         }
+        
+        // Mark as initialized after first successful fetch
+        isInitialized.current = true;
+        
       } catch (error) {
         const message = getErrorMessage(error);
         setErrorMessage(message);
         setHasMore(false);
         fetchedPages.current.delete(pageNum);
+        
+        if (allProducts.length === 0) {
+          setAllProducts([]);
+        }
       } finally {
-        setLoading(false);
-        setLoadingMore(false);
+        if (isInitialOrRefreshLoad) setLoading(false);
+        if (append) setLoadingMore(false);
       }
     },
-    [] // Empty dependencies - this function is stable
+    [refreshing] 
   );
 
   const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setLoading(true);
-    setHasMore(true);
-    setErrorMessage('');
-    fetchedPages.current.clear();
-    setAllProducts([]);
-
+    setRefreshing(true); 
+    isInitialized.current = false;
+    lastFetchAttempt.current = 0;
+    
     try {
-      const data = await fetchProductsApi(1);
-      setAllProducts(data);
-      setPage(1);
-      setHasMore(data.length > 0);
-      setErrorMessage('');
-      fetchedPages.current.add(1);
+      await fetchProducts(1, false);
     } catch (error) {
-      const message = getErrorMessage(error);
-      setErrorMessage(message);
     } finally {
       setRefreshing(false);
-      setLoading(false);
     }
-  }, []); // Stable function
+  }, [fetchProducts]); 
 
+  // Function to handle loading more products (pagination)
   const loadMoreProducts = useCallback(() => {
-    if (!loadingMore && hasMore && !loading) {
+    if (!loading && !loadingMore && hasMore && allProducts.length > 0) {
       const nextPage = page + 1;
-      fetchProducts(nextPage, true);
+      fetchProducts(nextPage, true); // Fetch and append the next page
     }
-  }, [loadingMore, hasMore, page, loading, fetchProducts]);
+  }, [loading, loadingMore, hasMore, page, allProducts.length, fetchProducts]);
 
-  // FIXED: Stable initial load that only runs once per focus
-  const initializeProducts = useCallback(() => {
-    if (!isInitialized.current) {
-      isInitialized.current = true;
-      setPage(1);
-      setAllProducts([]);
-      setHasMore(true);
-      setErrorMessage('');
-      fetchedPages.current.clear();
-      fetchProducts(1, false);
-    }
-  }, [fetchProducts]);
+  // Effect to trigger initial data fetch - prevent infinite loops
   useFocusEffect(
     useCallback(() => {
-      isInitialized.current = false;
-      initializeProducts();
+      const now = Date.now();
       
-      // Cleanup function when screen loses focus
-      return () => {
-        isInitialized.current = false;
-      };
-    }, [initializeProducts])
+      if (!isInitialized.current && 
+          allProducts.length === 0 && 
+          (now - lastFetchAttempt.current) > RETRY_DELAY) {
+        
+        lastFetchAttempt.current = now;
+        fetchProducts(1, false);
+      }
+      
+      return undefined;
+    }, [])
   );
 
-  return {
+  // Memoize the return object for performance, preventing unnecessary re-renders of consuming components
+  const memoizedReturn = useMemo(() => ({
     allProducts,
     loading,
     errorMessage,
@@ -124,5 +130,7 @@ export const useProducts = () => {
     hasMore,
     handleRefresh,
     loadMoreProducts,
-  };
+  }), [allProducts, loading, errorMessage, refreshing, loadingMore, hasMore, handleRefresh, loadMoreProducts]);
+
+  return memoizedReturn;
 };

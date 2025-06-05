@@ -1,10 +1,12 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Keychain from 'react-native-keychain';
+import Toast from 'react-native-toast-message';
 import { AuthContextType, Tokens } from '../types/AuthContextType';
 import { refreshTokenApi } from '../api/auth.api';
 import { fetchUserProfile } from '../api/user.api';
 import { AuthProviderProps } from '../types/user';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ACCESS_TOKEN_SERVICE = 'ecommerce_access_token';
@@ -26,7 +28,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
       setCurrentToken(token);
     } catch (error) {
-      console.error('Error storing access token:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to store access token: ${errorMessage}`,
+      });
       throw error;
     }
   };
@@ -41,7 +48,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       return null;
     } catch (error) {
-      console.error('Error retrieving access token:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to retrieve access token: ${errorMessage}`,
+      });
       return null;
     }
   };
@@ -52,7 +64,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         service: REFRESH_TOKEN_SERVICE,
       });
     } catch (error) {
-      console.error('Error storing refresh token:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to store refresh token: ${errorMessage}`,
+      });
       throw error;
     }
   };
@@ -67,7 +84,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       return null;
     } catch (error) {
-      console.error('Error retrieving refresh token:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to retrieve refresh token: ${errorMessage}`,
+      });
       return null;
     }
   };
@@ -80,7 +102,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       ]);
       setCurrentToken('');
     } catch (error) {
-      console.error('Error clearing tokens:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to clear tokens: ${errorMessage}`,
+      });
     }
   };
 
@@ -102,7 +129,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await AsyncStorage.removeItem('@refreshToken');
       }
     } catch (error) {
-      console.error('Error during token migration:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Migration Error',
+        text2: `Failed to migrate tokens: ${errorMessage}`,
+      });
     }
   };
 
@@ -154,11 +186,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               await AsyncStorage.setItem('@userId', userProfile.data.user.id);
             }
           } catch (error) {
-            console.error('Error fetching user profile:', error);
+            const errorMessage = getErrorMessage(error);
+            Toast.show({
+              type: 'error',
+              text1: 'Network Error',
+              text2: `Failed to load user profile: ${errorMessage}`,
+            });
           }
         }
       } catch (error) {
-        console.error('Error loading auth state:', error);
+        const errorMessage = getErrorMessage(error);
+        Toast.show({
+          type: 'error',
+          text1: 'Initialization Error',
+          text2: `Failed to load authentication state: ${errorMessage}`,
+        });
       } finally {
         setIsInitialized(true);
       }
@@ -168,13 +210,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const setAuthState = async (authenticated: boolean) => {
-    setIsAuthenticated(authenticated);
-    await AsyncStorage.setItem('@auth', JSON.stringify(authenticated));
+    try {
+      setIsAuthenticated(authenticated);
+      await AsyncStorage.setItem('@auth', JSON.stringify(authenticated));
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to save authentication state: ${errorMessage}`,
+      });
+    }
   };
 
   const setEmail = async (newEmail: string) => {
-    setEmailState(newEmail);
-    await AsyncStorage.setItem('@userEmail', newEmail);
+    try {
+      setEmailState(newEmail);
+      await AsyncStorage.setItem('@userEmail', newEmail);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to save email: ${errorMessage}`,
+      });
+    }
   };
 
   const setTokens = async (tokens: Tokens) => {
@@ -184,41 +244,91 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         storeRefreshToken(tokens.refreshToken)
       ]);
     } catch (error) {
-      console.error('Error setting tokens:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Authentication Error',
+        text2: `Failed to save authentication tokens: ${errorMessage}`,
+      });
       throw error;
     }
   };
 
   const setUserIdAsync = async (id: string) => {
-    setUserId(id);
-    await AsyncStorage.setItem('@userId', id);
+    try {
+      setUserId(id);
+      await AsyncStorage.setItem('@userId', id);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Storage Error',
+        text2: `Failed to save user ID: ${errorMessage}`,
+      });
+    }
   };
 
   const login = async (tokens: Tokens) => {
-    await setTokens(tokens);
-    await setAuthState(true);
-    
-    // Fetch user profile to get user ID
     try {
-      const userProfile = await fetchUserProfile();
-      if (userProfile.data?.user?.id) {
-        await setUserIdAsync(userProfile.data.user.id);
+      await setTokens(tokens);
+      await setAuthState(true);
+      
+      // Fetch user profile to get user ID
+      try {
+        const userProfile = await fetchUserProfile();
+        if (userProfile.data?.user?.id) {
+          await setUserIdAsync(userProfile.data.user.id);
+        }
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        Toast.show({
+          type: 'error',
+          text1: 'Profile Error',
+          text2: `Failed to load user profile: ${errorMessage}`,
+        });
+        // Don't throw here - login was successful, just profile fetch failed
       }
     } catch (error) {
-      console.error('Error fetching user profile during login:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Login Error',
+        text2: `Login failed: ${errorMessage}`,
+      });
+      throw error;
     }
   };
 
   const signup = async (newEmail: string) => {
-    await setEmail(newEmail);
-    await AsyncStorage.setItem('@isVerified', 'false');
-    setIsVerified(false);
+    try {
+      await setEmail(newEmail);
+      await AsyncStorage.setItem('@isVerified', 'false');
+      setIsVerified(false);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Error',
+        text2: `Signup failed: ${errorMessage}`,
+      });
+      throw error;
+    }
   };
 
   const verify = async () => {
-    await AsyncStorage.setItem('@isVerified', 'true');
-    setIsVerified(true);
-    await setAuthState(true);
+    try {
+      await AsyncStorage.setItem('@isVerified', 'true');
+      setIsVerified(true);
+      await setAuthState(true);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Verification Error',
+        text2: `Verification failed: ${errorMessage}`,
+      });
+      throw error;
+    }
   };
 
   const logout = async () => {
@@ -240,7 +350,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsVerified(false);
       setUserId('');
     } catch (error) {
-      console.error('Error during logout:', error);
+      const errorMessage = getErrorMessage(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Logout Error',
+        text2: `Logout failed: ${errorMessage}`,
+      });
     }
   };
 
@@ -257,7 +372,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken });
       return newAccessToken;
     } catch (err) {
-      console.error('Error refreshing token:', err);
+      const errorMessage = getErrorMessage(err);
+      
+      // Show different messages based on error type
+      if (errorMessage.includes('No refresh token')) {
+        Toast.show({
+          type: 'error',
+          text1: 'Session Expired',
+          text2: 'Please log in again',
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Session Error',
+          text2: `Failed to refresh session: ${errorMessage}`,
+        });
+      }
+      
       await logout();
       throw new Error('Session expired');
     }

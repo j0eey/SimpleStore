@@ -94,7 +94,6 @@ const HomeScreen = () => {
   // Location handler
   const handleLocationSelect = useCallback((location: string) => {
     setSelectedLocation(location);
-    // TODO: Implement location filtering logic
   }, []);
 
   // Error retry handler
@@ -134,4 +133,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default React.memo(HomeScreen);

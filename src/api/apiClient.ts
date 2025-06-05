@@ -112,8 +112,6 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        console.log('Token expired, attempting to refresh...');
-        
         const refreshToken = await getRefreshToken();
         if (!refreshToken) {
           throw new Error('Missing refresh token');
@@ -125,8 +123,6 @@ api.interceptors.response.use(
         await storeTokens(accessToken, newRefreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        
-        console.log('Token refreshed successfully');
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
