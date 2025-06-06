@@ -8,6 +8,7 @@ import { updateProductApi, fetchProductByIdApi } from '../../api/products.api';
 import { getUpdatedProductSuccessMessage } from '../../utils/getSuccessMessage';
 import { getErrorMessage } from '../../utils/getErrorMessage';
 import { EDIT_PRODUCT_CONSTANTS, EDIT_PRODUCT_MESSAGES } from './constants';
+import { locationCallbackManager } from '../Maps/LocationCallbackManager';
 
 interface FormData {
   name: string;
@@ -34,6 +35,9 @@ export const useEditProduct = (productId: string, navigation: any) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Generate unique callback ID
+  const callbackId = `edit_product_location_${productId}_${Date.now()}_${Math.random()}`;
+
   // Derived values
   const remainingExistingImages = existingImages.filter(img => !imagesToDelete.includes(img));
   const totalCurrentImages = remainingExistingImages.length + images.length;
@@ -46,6 +50,20 @@ export const useEditProduct = (productId: string, navigation: any) => {
     formData.location.name &&
     totalCurrentImages > 0
   );
+
+  // Register location callback
+  useEffect(() => {
+    const handleLocationSelected = (selectedLocation: LocationType) => {
+      setFormData(prev => ({ ...prev, location: selectedLocation }));
+    };
+
+    locationCallbackManager.register(callbackId, handleLocationSelected);
+
+    // Cleanup when component unmounts
+    return () => {
+      locationCallbackManager.unregister(callbackId);
+    };
+  }, [callbackId]);
 
   // Fetch product data
   useEffect(() => {
@@ -72,7 +90,7 @@ export const useEditProduct = (productId: string, navigation: any) => {
     fetchProduct();
   }, [productId, navigation]);
 
-  // Handle location selection from map
+  // Handle location selection from map (keep this for backward compatibility if needed)
   useFocusEffect(
     useCallback(() => {
       const currentRoute = navigation.getState().routes[navigation.getState().index];
@@ -210,14 +228,13 @@ export const useEditProduct = (productId: string, navigation: any) => {
     navigation.goBack();
   }, [navigation]);
 
+  // ✅ FIXED: Now uses callback system instead of passing function
   const handleLocationSelect = useCallback(() => {
     navigation.navigate('MapsScreen', {
       initialLocation: formData.location,
-      onLocationSelected: (selectedLocation: LocationType) => {
-        setFormData(prev => ({ ...prev, location: selectedLocation }));
-      },
+      callbackId: callbackId, // Pass string ID instead of function
     });
-  }, [navigation, formData.location]);
+  }, [navigation, formData.location, callbackId]);
 
   // Helper functions
   const showErrorToast = useCallback((error: unknown) => {

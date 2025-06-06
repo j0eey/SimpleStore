@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Platform, PermissionsAndroid } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
@@ -10,6 +10,7 @@ import { getProductSuccessMessage } from '../../utils/getSuccessMessage';
 import { getFailureMessage, getProductFailureCreationMessage } from '../../utils/getFailureMessage';
 import OneSignalService from '../../services/OneSignalService';
 import { ADD_PRODUCT_CONSTANTS, VALIDATION_MESSAGES } from './constants';
+import { locationCallbackManager } from '../Maps/LocationCallbackManager';
 
 export const useAddProduct = (navigation: any) => {
   // Form state
@@ -24,7 +25,24 @@ export const useAddProduct = (navigation: any) => {
   const [images, setImages] = useState<Asset[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle location selection from map
+  // Generate unique callback ID
+  const callbackId = `add_product_location_${Date.now()}_${Math.random()}`;
+
+  // Register location callback
+  useEffect(() => {
+    const handleLocationSelected = (selectedLocation: LocationType) => {
+      setLocation(selectedLocation);
+    };
+
+    locationCallbackManager.register(callbackId, handleLocationSelected);
+
+    // Cleanup when component unmounts
+    return () => {
+      locationCallbackManager.unregister(callbackId);
+    };
+  }, [callbackId]);
+
+  // Handle location selection from map (keep this for backward compatibility if needed)
   useFocusEffect(
     useCallback(() => {
       const currentRoute = navigation.getState().routes[navigation.getState().index];
@@ -173,13 +191,12 @@ export const useAddProduct = (navigation: any) => {
     navigation.goBack();
   }, [navigation]);
 
+  // ✅ FIXED: Now uses callback system instead of passing function
   const handleLocationSelect = useCallback(() => {
     navigation.navigate('MapsScreen', {
-      onLocationSelected: (selectedLocation: LocationType) => {
-        setLocation(selectedLocation);
-      },
+      callbackId: callbackId, // Pass string ID instead of function
     });
-  }, [navigation]);
+  }, [navigation, callbackId]);
 
   return {
     // Form state

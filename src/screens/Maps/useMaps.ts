@@ -4,10 +4,11 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Region, MapPressEvent } from 'react-native-maps';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Geocoder from 'react-native-geocoding';
-import { RootStackParamList, Prediction } from '../../types/types';
+import { RootStackParamList, Prediction, LocationType } from '../../types/types';
 import { LocationData } from './types';
 import { GOOGLE_PLACES_API_BASE_URL, GOOGLE_MAPS_API_KEY } from '../../api/apiClient';
 import { MAPS_CONSTANTS, MAPS_MESSAGES, GOOGLE_PLACES_ENDPOINTS, GOOGLE_PLACES_PARAMS } from './constants';
+import { locationCallbackManager } from './LocationCallbackManager';
 
 // Types
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'MapsScreen'>;
@@ -18,10 +19,10 @@ Geocoder.init(GOOGLE_MAPS_API_KEY);
 export const useMaps = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp<RootStackParamList, 'MapsScreen'>>();
-  const { onLocationSelected } = route.params;
+  const { callbackId } = route.params;
 
   // State
-  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(null);
   const [region, setRegion] = useState<Region>(MAPS_CONSTANTS.DEFAULT_REGION);
   const [searchText, setSearchText] = useState('');
   const [predictions, setPredictions] = useState<Prediction[]>([]);
@@ -176,11 +177,11 @@ export const useMaps = () => {
   }, []);
 
   const handleApply = useCallback(() => {
-    if (selectedLocation && onLocationSelected) {
-      onLocationSelected(selectedLocation);
+    if (selectedLocation && callbackId) {
+      locationCallbackManager.call(callbackId, selectedLocation);
       navigation.goBack();
     }
-  }, [selectedLocation, onLocationSelected, navigation]);
+  }, [selectedLocation, callbackId, navigation]);
 
   const handleGoBack = useCallback(() => {
     navigation.goBack();

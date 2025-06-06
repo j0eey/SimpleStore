@@ -24,7 +24,7 @@ export type RootStackParamList = {
   ViewAll: undefined;
   MapsScreen: {
     initialLocation?: LocationType;
-    onLocationSelected: (location: LocationType) => void;
+    callbackId: string; // ✅ Changed from function to string ID
   };
   AddNewProduct: {
     selectedLocation?: {
@@ -36,7 +36,6 @@ export type RootStackParamList = {
   EditProfile: undefined;
   EditProduct: { productId: string };
   Cart: undefined;
-  
 };
 
 export type LocationType = {
@@ -97,7 +96,3 @@ export const CONSTANTS = {
 export type RouteParams = {
   productId: string;
 };
-
-
-
-

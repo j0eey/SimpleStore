@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,8 +7,6 @@ import { colors } from '../../theme/Theme';
 import { Prediction } from '../../types/types';
 import { HeaderProps, SearchBarProps, PredictionsListProps, MapContainerProps, ApplyButtonProps, MainContainerProps } from './types';
 import { MAPS_CONSTANTS, MAPS_MESSAGES, DARK_MAP_STYLE } from './constants';
-
-
 
 // Header Component
 export const Header = memo<HeaderProps>(({ onGoBack }) => {
@@ -75,14 +73,19 @@ export const SearchBar = memo<SearchBarProps>(({
         style={inputStyle}
         placeholder={MAPS_MESSAGES.SEARCH_PLACEHOLDER}
         placeholderTextColor={placeholderColor}
-        value={searchText}
+        value={searchText || ''}
         onChangeText={onSearchChange}
+        onFocus={onSearchFocus}
         autoCorrect={false}
         autoCapitalize="none"
-        onFocus={onSearchFocus}
+        returnKeyType="search"
+        blurOnSubmit={false}
+        keyboardType="default"
+        textContentType="none"
+        importantForAutofill="no"
       />
       {searchText ? (
-        <TouchableOpacity onPress={onSearchClear}>
+        <TouchableOpacity onPress={onSearchClear} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
           <Icon
             name="close"
             size={20}
@@ -95,7 +98,28 @@ export const SearchBar = memo<SearchBarProps>(({
   );
 });
 
-// Predictions List Component
+// Simple Prediction Item Component - NO HOOKS
+const PredictionItem = ({ item, isDark, onPress }: { 
+  item: Prediction; 
+  isDark: boolean; 
+  onPress: () => void; 
+}) => {
+  const itemStyle = [
+    styles.predictionItem,
+    { borderBottomColor: isDark ? colors.darkSearch : '#ccc' }
+  ];
+  const textColor = isDark ? colors.lightHeader : colors.darkHeader;
+
+  return (
+    <TouchableOpacity style={itemStyle} onPress={onPress}>
+      <Text style={{ color: textColor }}>
+        {item.description}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
+// Predictions List Component - Fixed
 export const PredictionsList = memo<PredictionsListProps>(({
   predictions,
   showPredictions,
@@ -109,25 +133,15 @@ export const PredictionsList = memo<PredictionsListProps>(({
     { backgroundColor: isDark ? colors.darkSearchbar : colors.background }
   ], [isDark]);
 
-  const renderPrediction = ({ item }: { item: Prediction }) => {
-    const itemStyle = useMemo(() => [
-      styles.predictionItem,
-      { borderBottomColor: isDark ? colors.darkSearch : '#ccc' }
-    ], [isDark]);
-
-    const textColor = isDark ? colors.lightHeader : colors.darkHeader;
-
+  const renderPrediction = useCallback(({ item }: { item: Prediction }) => {
     return (
-      <TouchableOpacity
-        style={itemStyle}
+      <PredictionItem
+        item={item}
+        isDark={isDark}
         onPress={() => onPredictionSelect(item.place_id, item.description)}
-      >
-        <Text style={{ color: textColor }}>
-          {item.description}
-        </Text>
-      </TouchableOpacity>
+      />
     );
-  };
+  }, [isDark, onPredictionSelect]);
 
   if (!showPredictions || predictions.length === 0) {
     return null;
