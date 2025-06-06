@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Region, MapPressEvent } from 'react-native-maps';
@@ -11,7 +11,6 @@ import { MAPS_CONSTANTS, MAPS_MESSAGES, GOOGLE_PLACES_ENDPOINTS, GOOGLE_PLACES_P
 
 // Types
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'MapsScreen'>;
-
 
 // Initialize Geocoder
 Geocoder.init(GOOGLE_MAPS_API_KEY);
@@ -28,9 +27,12 @@ export const useMaps = () => {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
 
+  // Debounce timer
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Google Places API functions
   const fetchPredictions = useCallback(async (input: string) => {
-    if (!input) {
+    if (!input || input.length < 2) {
       setPredictions([]);
       setShowPredictions(false);
       return;
@@ -99,11 +101,29 @@ export const useMaps = () => {
     }
   }, [cleanAddress]);
 
-  // Event handlers
+  // Event handlers - THE FIX IS HERE
   const handleSearchChange = useCallback((text: string) => {
     setSearchText(text);
-    fetchPredictions(text);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Set new timeout - wait 500ms after user stops typing
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchPredictions(text);
+    }, 500);
   }, [fetchPredictions]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handlePredictionSelect = useCallback(async (placeId: string, description: string) => {
     Keyboard.dismiss();
@@ -144,6 +164,11 @@ export const useMaps = () => {
     setSearchText('');
     setPredictions([]);
     setShowPredictions(false);
+    
+    // Clear timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
   }, []);
 
   const handleSearchFocus = useCallback(() => {

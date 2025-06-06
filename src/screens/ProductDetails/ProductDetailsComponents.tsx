@@ -536,8 +536,6 @@ export const ErrorDisplay = memo<ErrorDisplayProps>(({
 
 // Action Button Component
 export const ActionButton = memo<ActionButtonProps>(({ 
-  product, 
-  quantity, 
   onAddToCart, 
   isOwner 
 }) => {
