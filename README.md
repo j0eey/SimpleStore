@@ -210,3 +210,35 @@ When adding new features:
 - **Total Snapshots:** 40
 - **Testing Strategy:** Hybrid (Snapshot + Unit)
 - **Coverage:** Components, Services, Utils, APIs, Contexts
+
+## Environment Configuration
+
+This project uses environment variables to manage configuration for different stages (development, staging, production) via [react-native-config](https://github.com/luggit/react-native-config).
+
+### Available Environment Files
+- `.env` (default)
+- `.env.development`
+- `.env.staging`
+- `.env.production`
+
+Each file contains variables such as:
+API_BASE_URL
+GOOGLE_PLACES_API_BASE_URL
+GOOGLE_MAPS_API_KEY
+ONESIGNAL_APP_ID
+ONESIGNAL_REST_API_KEY
+DEBUG_MODE=true|false
+LOG_LEVEL=debug|info|error
+ENVIRONMENT=development|staging|production
+
+
+### Selecting an Environment
+By default, the app uses `.env` (set in `android/gradle.properties` as `ENVFILE=.env`).
+
+To use a different environment:
+1. Open `android/gradle.properties`.
+2. Change the line to one of the following:
+   - `ENVFILE=.env.development`
+   - `ENVFILE=.env.staging`
+   - `ENVFILE=.env.production`
+
