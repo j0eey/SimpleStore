@@ -113,7 +113,8 @@ api.interceptors.response.use(
       try {
         const refreshToken = await getRefreshToken();
         if (!refreshToken) {
-          throw new Error('Missing refresh token');
+          // User is logged out, just reject the original error
+          return Promise.reject(error);
         }
 
         const newTokens = await refreshTokenApi(refreshToken);
@@ -125,7 +126,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
-        
         await clearAllTokens();
         return Promise.reject(refreshError);
       }
