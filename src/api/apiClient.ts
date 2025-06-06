@@ -63,7 +63,6 @@ const clearAllTokens = async (): Promise<void> => {
       // Clear secure tokens from Keychain
       Keychain.resetGenericPassword({ service: ACCESS_TOKEN_SERVICE }),
       Keychain.resetGenericPassword({ service: REFRESH_TOKEN_SERVICE }),
-      // Clear non-sensitive data from AsyncStorage
       AsyncStorage.multiRemove([
         '@auth',
         '@userEmail',

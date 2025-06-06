@@ -4,6 +4,7 @@ apply plugin: "com.facebook.react"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
 
 
 
@@ -101,6 +102,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -108,6 +112,9 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            firebaseCrashlytics {
+                mappingFileUploadEnabled true
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { StatusBar, StatusBarStyle } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import BootSplash from "react-native-bootsplash";
+import Config from 'react-native-config';
 import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
@@ -39,22 +40,28 @@ const ThemedApp = () => {
 
 const App = () => {
   useEffect(() => {
-    OneSignal.initialize('1a69ea62-a8dc-4df7-8000-1ba3c2f7fa55');
-    OneSignal.Notifications.requestPermission(true);
+    const oneSignalAppId = Config.ONESIGNAL_APP_ID;
+    
+    if (oneSignalAppId) {
+      OneSignal.initialize(oneSignalAppId);
+      OneSignal.Notifications.requestPermission(true);
+    } else {
+      console.error('OneSignal App ID not found in environment variables');
+    }
   }, []);
 
   return (
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
-              <FlyingCartProvider>
-                <ThemedApp />
-              </FlyingCartProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </SafeAreaProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <FlyingCartProvider>
+              <ThemedApp />
+            </FlyingCartProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 };
 
